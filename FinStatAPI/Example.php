@@ -187,19 +187,37 @@ if(!empty($response2->Offices)) {
             "</th><th>Typ".
             "</th></tr>";
     foreach($response2->Offices as $office) {
-        echo "<tr><td>" .´
-              $office->Street . " " . $office->StreetNumber . ", ". 
-              $office->City . " " . $office->ZipCode . ", ".
-              $office->District . ", " . $office->Region . ", " . $office->Country,
-        "</td><td>" . 
-        (!empty($office->Subjects)) ? implode(",<br />", $office->Subjects) : "" .
-        "</td><td>" . 
-         $office->Type .  
-        "</td></tr>";
+        echo    "<tr><td>" .´
+                $office->Street . " " . $office->StreetNumber . ", ". 
+                $office->City . " " . $office->ZipCode . ", ".
+                $office->District . ", " . $office->Region . ", " . $office->Country,
+                "</td><td>" . 
+                (!empty($office->Subjects)) ? implode(",<br />", $office->Subjects) : "" .
+                "</td><td>" . 
+                $office->Type .  
+                "</td></tr>";
     }
     echo "</table><br />";
 }
-
+if (!empty($response2->Subjects)) {
+    echo '<b>Predmety podnikania: </b><br />';  
+    echo "<br /><table>";
+    echo
+            "<tr><th>Názov" .
+            "</th><th>Od" .
+            "</th><th>Pozastavené od".
+            "</th></tr>";
+    foreach($response2->Subjects as $subject) {
+        echo    "<tr><td>" .´
+                $subject->Title .
+                "</td><td>" . 
+                (($subject->ValidFrom) ? $subject->ValidFrom->format('d.m.Y') : '').
+                "</td><td>" . 
+                (($subject->SuspendedFrom) ? $subject->SuspendedFrom->format('d.m.Y') : '').
+                "</td></tr>";
+    }
+    echo "</table><br />";  
+}
 echo '<br />';
 echo "</pre>";
 echo '<hr />';
@@ -366,7 +384,25 @@ if(!empty($response3->Offices)) {
     }
     echo "</table><br />";
 }
-
+if (!empty($response3->Subjects)) {
+    echo '<b>Predmety podnikania: </b><br />';  
+    echo "<br /><table>";
+    echo
+            "<tr><th>Názov" .
+            "</th><th>Od" .
+            "</th><th>Pozastavené od".
+            "</th></tr>";
+    foreach($response3->Subjects as $subject) {
+        echo    "<tr><td>" .´
+                $subject->Title .
+                "</td><td>" . 
+                (($subject->ValidFrom) ? $subject->ValidFrom->format('d.m.Y') : '').
+                "</td><td>" . 
+                (($subject->SuspendedFrom) ? $subject->SuspendedFrom->format('d.m.Y') : '').
+                "</td></tr>";
+    }
+    echo "</table><br />";  
+}
 echo '<br />';
 echo "</pre>";
 echo '<hr />';

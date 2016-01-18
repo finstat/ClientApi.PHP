@@ -42,6 +42,15 @@ class OfficeResult
         ;
 }
 
+class SubjectResult
+{
+    public
+        $Title,
+        $ValidFrom,
+        $SuspendedFrom
+    ;
+}
+
 class ExtendedResult
 {
     public
@@ -95,5 +104,6 @@ class ExtendedResult
         $WarningLiquidation
         $SelfEmployed,
         $Offices,
+        $Subjects
         ;
     }

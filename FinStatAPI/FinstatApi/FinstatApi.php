@@ -315,6 +315,17 @@ class FinstatApi
                 $response->Offices[] = $o;
             }
         }
+        
+         if (!empty($detail->Subjects)) {
+              $response->Subjects = array();
+               foreach ($detail->Subjects->Subject as $subject) {
+                   $o = new SubjectResult();
+                   $o->Title = (string)$subject->Title;
+                   $o->ValidFrom = $this->parseDate($subject->ValidFrom);
+                   $o->SuspendedFrom = $this->parseDate($subject->SuspendedFrom);
+                   $response->Subjects[] = $o;  
+               }
+         }
 
         return $response;
     }
