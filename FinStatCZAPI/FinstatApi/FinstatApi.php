@@ -1,7 +1,7 @@
 <?php
 
 require_once('Requests.php');
-require_once('DetailResult.php');
+require_once('BaseResultCZ.php');
 require_once('AutoCompleteResult.php');
 
 class FinstatApi
@@ -163,27 +163,23 @@ class FinstatApi
 
         $response = new DetailResult();
         $response->Ico                  = "{$detail->Ico}";
-        $response->RegisterNumberText   = "{$detail->RegisterNumberText}";
-        $response->Dic                  = "{$detail->Dic}";
-        $response->IcDPH                = "{$detail->IcDPH}";
+        $response->CZNACE               = "{$detail->CZNACE}";
         $response->Name                 = "{$detail->Name}";
         $response->Street               = "{$detail->Street}";
         $response->StreetNumber         = "{$detail->StreetNumber}";
         $response->ZipCode              = "{$detail->ZipCode}";
         $response->City                 = "{$detail->City}";
+        $response->Region               = "{$detail->Region}";
+        $response->District             = "{$detail->District}";
         $response->Created              = $this->parseDate($detail->Created);
         $response->Cancelled            = $this->parseDate($detail->Cancelled);
-        $response->SuspendedAsPerson    = "{$detail->SuspendedAsPerson}"  == 'true' ;
         $response->Activity             = "{$detail->Activity}";
         $response->Url                  = "{$detail->Url}";
         $response->Warning              = "{$detail->Warning}"  == 'true' ;
         $response->WarningUrl           = "{$detail->WarningUrl}";
-        $response->PaymentOrderWarning  = "{$detail->PaymentOrderWarning}"  == 'true';
-        $response->PaymentOrderUrl      = "{$detail->PaymentOrderUrl}";
-        $response->OrChange             = "{$detail->OrChange}"  == 'true';
-        $response->OrChangeUrl          = "{$detail->OrChangeURL}";
-        $response->Revenue              = "{$detail->Revenue}";
-        $response->Profit               = "{$detail->Profit}";
+        $response->LegalForm            = "{$detail->LegalForm}";
+        $response->OwnershipType        = "{$detail->OwnershipType}";
+        $response->EmployeeCount        = "{$detail->EmployeeCount}";
 
         return $response;
     }

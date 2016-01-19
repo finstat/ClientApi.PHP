@@ -1,30 +1,27 @@
 <?php
 
-class DetailResult
+class BaseResultCZ
 {
     public
         $Ico,
-        $RegisterNumberText,
-        $Dic,
         $IcDPH,
         $Name,
         $Street,
         $StreetNumber,
         $ZipCode,
         $City,
+        $Region,
+        $District,
+        $LegalForm,
+        $OwnershipType,
+        $EmployeeCount,
         $Activity,
         $Created,
         $Cancelled,
-        $SuspendedAsPerson,
         $Url,
         $Warning,
         $WarningUrl,
-        $OrChange,
-        $OrChangeUrl,
-        $PaymentOrderWarning,
-        $PaymentOrderUrl, 
-        $Revenue,
-        $Profit
+        $CZNACE       
     ;
 }
 ?>

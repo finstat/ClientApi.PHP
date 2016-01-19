@@ -38,46 +38,25 @@ catch (Exception $e)
 header('Content-Type: text/html; charset=utf-8');
 echo "<pre>";
 echo '<b>IČO: </b>'.                    $response->Ico.'<br />';
-echo '<b>Reg. Číslo: </b>'.             $response->RegisterNumberText.'<br />';
-echo '<b>DIČ: </b>'.                    $response->Dic.'<br />';
-echo '<b>IčDPH: </b>'.                  $response->IcDPH.'<br />';
 echo '<b>Názov: </b>'.                  $response->Name.'<br />';
 echo '<b>Ulica: </b>'.                  $response->Street.'<br />';
 echo '<b>Číslo ulice: </b>'.            $response->StreetNumber.'<br />';
 echo '<b>PSČ: </b>'.                    $response->ZipCode.'<br />';
 echo '<b>Mesto: </b>'.                  $response->City.'<br />';
+echo '<b>Okres: </b>'.                  $response->District.'<br />';
+echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
 echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
+echo '<b>CZNACE: </b>'.                 $response->CZNACE.'<br />';
+echo '<b>Právna forma: </b>'.           $response->LegalForm.'<br />';
+echo '<b>Druh vlastníctva: </b>'.       $response->OwnershipType.'<br />';
+echo '<b>Počet zamestnancov: </b>'.     $response->EmployeeCount.'<br />';
 echo '<b>Založená: </b>'.               (($response->Created) ? $response->Created->format('d.m.Y') : '').'<br />';
 echo '<b>Zrušená: </b>'.                (($response->Cancelled) ? $response->Cancelled->format('d.m.Y') : '') .'<br />';
-echo '<b>Pozastavená(živnosť): </b>'.   (($response->SuspendedAsPerson)? "Ano": "Nie").'<br />';
+
 echo '<b>Url: </b>'.            $response->Url.'<br />';
-echo '<b>Príznak, či sa daná firma nachádza v zoznamoch dlžníkov, konkurzov alebo likvidácií: </b>';
+echo '<b>Príznak, či sa daná firma nachádza insolvenčnom registry: </b>';
 if($response->Warning) echo 'Áno (<a href="'.$response->WarningUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
 
-echo '<b>Príznak, či má platobné príkazy: </b> ';
-if($response->PaymentOrderWarning) echo 'Áno (<a href="'.$response->PaymentOrderUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
-
-echo '<b>Príznak, či nastala pre danú firmu zmena v ORSR počas posledných 3 mesiacov: </b> ';
-if($response->OrChange) echo 'Áno (<a href="'.$response->OrChangeUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
-
-echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
-switch($response->Revenue)
-{
-    case 'Unknown': echo 'Neznámy'; break;
-    case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
-    case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
-}
-echo '<br />';
-
-echo '<b>Príznak nárastu/poklesu zisku firmy medzi posledným a predposledným rokom v databáze: </b>';
-switch($response->Profit)
-{
-    case 'Unknown': echo 'Neznámy'; break;
-    case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
-    case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
-    case 'Loss': echo 'Firma bola posledný rok v strate (<a href="'.$response->Url.'">viac info</a>)'; break;
-}
-echo '<br />';
 echo "</pre>";
 echo '<hr />';
 ?>
