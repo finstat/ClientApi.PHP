@@ -1,6 +1,6 @@
 <?php
 
-class CompanyResult 
+class CompanyResult
 {
     public
         $Ico,

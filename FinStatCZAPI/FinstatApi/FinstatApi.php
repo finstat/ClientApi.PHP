@@ -161,7 +161,7 @@ class FinstatApi
             return $detail;
         }
 
-        $response = new DetailResult();
+        $response = new BaseResultCZ();
         $response->Ico                  = "{$detail->Ico}";
         $response->CZNACE               = "{$detail->CZNACE}";
         $response->Name                 = "{$detail->Name}";

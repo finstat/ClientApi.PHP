@@ -101,7 +101,7 @@ class ExtendedResult
         $Debts = array(),
         $PaymentOrders = array(),
         $WarningKaR,
-        $WarningLiquidation
+        $WarningLiquidation,
         $SelfEmployed,
         $Offices,
         $Subjects

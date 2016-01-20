@@ -21,7 +21,7 @@ class BaseResultCZ
         $Url,
         $Warning,
         $WarningUrl,
-        $CZNACE       
+        $CZNACE
     ;
 }
 ?>

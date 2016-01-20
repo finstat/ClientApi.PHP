@@ -17,7 +17,7 @@ $timeout = 10;                            // Dĺžka čakania na odozvu zo serve
 $api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
 
 // priklad dopytu na detail firmy, ktora ma ICO 35757442
-$ico = ($_GET['ico']) ? $_GET['ico'] : '35757442';
+$ico = (isset($_GET['ico']) && !empty($_GET['ico'])) ? $_GET['ico'] : '35757442';
 ?>
 <h1>Detail test:</h1>
 <?php
@@ -134,7 +134,7 @@ echo '<b>Credit scoring - text: </b>'.                      $response2->CreditSc
 echo '<b>Zisk za aktuálny rok: </b>'.                       $response2->ProfitActual.'<br />';
 echo '<b>Zisk za predošlý rok: </b>'.                       $response2->ProfitPrev.'<br />';
 echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response2->RevenueActual.'<br />';
-echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response2->RevnuePrev.'<br />';
+echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response2->RevenuePrev.'<br />';
 echo '<b>Pomer cudzích zdrojov za aktuálny rok : </b>'.     $response2->ForeignResources.'<br />';
 echo '<b>Hrubá marža za aktuálny rok: </b>'.                $response2->GrossMargin.'<br />';
 echo '<b>ROA výnosov za aktuálny rok: </b>'.                $response2->ROA.'<br />';
@@ -187,20 +187,20 @@ if(!empty($response2->Offices)) {
             "</th><th>Typ".
             "</th></tr>";
     foreach($response2->Offices as $office) {
-        echo    "<tr><td>" .´
-                $office->Street . " " . $office->StreetNumber . ", ". 
+        echo    "<tr><td>" .
+                $office->Street . " " . $office->StreetNumber . ", ".
                 $office->City . " " . $office->ZipCode . ", ".
                 $office->District . ", " . $office->Region . ", " . $office->Country,
-                "</td><td>" . 
+                "</td><td>" .
                 (!empty($office->Subjects)) ? implode(",<br />", $office->Subjects) : "" .
-                "</td><td>" . 
-                $office->Type .  
+                "</td><td>" .
+                $office->Type .
                 "</td></tr>";
     }
     echo "</table><br />";
 }
 if (!empty($response2->Subjects)) {
-    echo '<b>Predmety podnikania: </b><br />';  
+    echo '<b>Predmety podnikania: </b><br />';
     echo "<br /><table>";
     echo
             "<tr><th>Názov" .
@@ -208,15 +208,15 @@ if (!empty($response2->Subjects)) {
             "</th><th>Pozastavené od".
             "</th></tr>";
     foreach($response2->Subjects as $subject) {
-        echo    "<tr><td>" .´
+        echo    "<tr><td>" .
                 $subject->Title .
-                "</td><td>" . 
+                "</td><td>" .
                 (($subject->ValidFrom) ? $subject->ValidFrom->format('d.m.Y') : '').
-                "</td><td>" . 
+                "</td><td>" .
                 (($subject->SuspendedFrom) ? $subject->SuspendedFrom->format('d.m.Y') : '').
                 "</td></tr>";
     }
-    echo "</table><br />";  
+    echo "</table><br />";
 }
 echo '<br />';
 echo "</pre>";
@@ -277,7 +277,7 @@ echo '<b>Credit scoring - text: </b>'.                      $response3->CreditSc
 echo '<b>Zisk za aktuálny rok: </b>'.                       $response3->ProfitActual.'<br />';
 echo '<b>Zisk za predošlý rok: </b>'.                       $response3->ProfitPrev.'<br />';
 echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response3->RevenueActual.'<br />';
-echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response3->RevnuePrev.'<br />';
+echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response3->RevenuePrev.'<br />';
 echo '<b>Pomer cudzích zdrojov za aktuálny rok : </b>'.     $response3->ForeignResources.'<br />';
 echo '<b>Hrubá marža za aktuálny rok: </b>'.                $response3->GrossMargin.'<br />';
 echo '<b>ROA výnosov za aktuálny rok: </b>'.                $response3->ROA.'<br />';
@@ -372,20 +372,20 @@ if(!empty($response3->Offices)) {
             "</th><th>Typ".
             "</th></tr>";
     foreach($response3->Offices as $office) {
-        echo "<tr><td>" .´
-              $office->Street . " " . $office->StreetNumber . ", ". 
+        echo "<tr><td>" .
+              $office->Street . " " . $office->StreetNumber . ", ".
               $office->City . " " . $office->ZipCode . ", ".
               $office->District . ", " . $office->Region . ", " . $office->Country,
-        "</td><td>" . 
+        "</td><td>" .
         (!empty($office->Subjects)) ? implode(",<br />", $office->Subjects) : "" .
-        "</td><td>" . 
-         $office->Type .  
+        "</td><td>" .
+         $office->Type .
         "</td></tr>";
     }
     echo "</table><br />";
 }
 if (!empty($response3->Subjects)) {
-    echo '<b>Predmety podnikania: </b><br />';  
+    echo '<b>Predmety podnikania: </b><br />';
     echo "<br /><table>";
     echo
             "<tr><th>Názov" .
@@ -393,15 +393,15 @@ if (!empty($response3->Subjects)) {
             "</th><th>Pozastavené od".
             "</th></tr>";
     foreach($response3->Subjects as $subject) {
-        echo    "<tr><td>" .´
+        echo    "<tr><td>" .
                 $subject->Title .
-                "</td><td>" . 
+                "</td><td>" .
                 (($subject->ValidFrom) ? $subject->ValidFrom->format('d.m.Y') : '').
-                "</td><td>" . 
+                "</td><td>" .
                 (($subject->SuspendedFrom) ? $subject->SuspendedFrom->format('d.m.Y') : '').
                 "</td></tr>";
     }
-    echo "</table><br />";  
+    echo "</table><br />";
 }
 echo '<br />';
 echo "</pre>";

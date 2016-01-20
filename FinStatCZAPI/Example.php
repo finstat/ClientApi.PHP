@@ -2,7 +2,7 @@
 require_once('FinstatApi/FinstatApi.php');
 
 // zakladne prihlasovacie udaje a nastavenia klienta
-$apiUrl = 'http:/cz.finstat.sk/api/';    // URL adresa Finstat API
+$apiUrl = 'http://cz.finstat.sk/api/';    // URL adresa Finstat API
 $apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
                                         // prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
 $privateKey = 'PLEASE_FILL_IN_YOUR_PRIVATE_KEY';// PLEASE_FILL_IN_YOUR_PRIVATE_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
@@ -16,14 +16,14 @@ $timeout = 10;                            // Dĺžka čakania na odozvu zo serve
 // inicializacia klienta
 $api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
 
-// priklad dopytu na detail firmy, ktora ma ICO 35757442
-$ico = ($_GET['ico']) ? $_GET['ico'] : '35757442';
+// priklad dopytu na detail firmy, ktora ma ICO 48207349
+$ico = (isset($_GET['ico']) && !empty($_GET['ico'])) ? $_GET['ico'] : '48207349';
 ?>
 <h1>Detail test:</h1>
 <?php
 try
 {
-    // funkcia $api->RequestDetail(string) vracia naplneny objekt typu DetailResult s udajmi o dopytovanej firme
+    // funkcia $api->RequestDetail(string) vracia naplneny objekt typu BaseResultCZ s udajmi o dopytovanej firme
     if (!empty($ico)) {
         $response = $api->Request($ico);
     }
