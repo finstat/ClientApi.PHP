@@ -218,6 +218,14 @@ if (!empty($response2->Subjects)) {
     }
     echo "</table><br />";
 }
+if ($response2->SelfEmployed && !empty($response2->StructuredName)) {
+    echo '<b>Štrukturovane meno: </b><br />';
+    echo (!empty($response2->StructuredName->Prefix))   ? "Prefix: " . implode(" ", $response2->StructuredName->Prefix) . "<br />": "";
+    echo (!empty($response2->StructuredName->Name))     ? "Name: " . implode(" ", $response2->StructuredName->Name) . "<br />": "";
+    echo (!empty($response2->StructuredName->Suffix))   ? "Suffix: " . implode(" ", $response2->StructuredName->Suffix) . "<br />": "";
+    echo (!empty($response2->StructuredName->After))    ? "After: " . implode(" ", $response2->StructuredName->After) . "<br />": "";
+    echo "<br />";
+}
 echo '<br />';
 echo "</pre>";
 echo '<hr />';
@@ -402,6 +410,14 @@ if (!empty($response3->Subjects)) {
                 "</td></tr>";
     }
     echo "</table><br />";
+}
+if ($response3->SelfEmployed && !empty($response3->StructuredName)) {
+    echo '<b>Štrukturovane meno: </b><br />';
+    echo (!empty($response3->StructuredName->Prefix))   ? "Prefix: " . implode(" ", $response3->StructuredName->Prefix) . "<br />": "";
+    echo (!empty($response3->StructuredName->Name))     ? "Name: " . implode(" ", $response3->StructuredName->Name) . "<br />": "";
+    echo (!empty($response3->StructuredName->Suffix))   ? "Suffix: " . implode(" ", $response3->StructuredName->Suffix) . "<br />": "";
+    echo (!empty($response3->StructuredName->After))    ? "After: " . implode(" ", $response3->StructuredName->After) . "<br />": "";
+    echo "<br />";
 }
 echo '<br />';
 echo "</pre>";

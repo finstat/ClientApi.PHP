@@ -22,7 +22,7 @@ class DetailResult
         $OrChange,
         $OrChangeUrl,
         $PaymentOrderWarning,
-        $PaymentOrderUrl, 
+        $PaymentOrderUrl,
         $Revenue,
         $Profit
     ;

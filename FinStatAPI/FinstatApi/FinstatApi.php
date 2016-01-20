@@ -293,7 +293,7 @@ class FinstatApi
         if (!empty($detail->IcDphAdditional)) {
             $response->IcDphAdditional = $this->parseIcDphAdditional($detail->IcDphAdditional);
         }
-        
+
         if (!empty($detail->Offices)) {
             $response->Offices = array();
             foreach ($detail->Offices->Office as $office) {
@@ -315,16 +315,46 @@ class FinstatApi
                 $response->Offices[] = $o;
             }
         }
-        
+
          if (!empty($detail->Subjects)) {
-              $response->Subjects = array();
-               foreach ($detail->Subjects->Subject as $subject) {
-                   $o = new SubjectResult();
-                   $o->Title = (string)$subject->Title;
-                   $o->ValidFrom = $this->parseDate($subject->ValidFrom);
-                   $o->SuspendedFrom = $this->parseDate($subject->SuspendedFrom);
-                   $response->Subjects[] = $o;  
-               }
+            $response->Subjects = array();
+            foreach ($detail->Subjects->Subject as $subject) {
+                $o = new SubjectResult();
+                $o->Title = (string)$subject->Title;
+                $o->ValidFrom = $this->parseDate($subject->ValidFrom);
+                $o->SuspendedFrom = $this->parseDate($subject->SuspendedFrom);
+                $response->Subjects[] = $o;
+            }
+         }
+
+
+         if($response->SelfEmployed && !empty($detail->StructuredName)) {
+            $o = new NamePartsResult();
+            if(!empty($detail->StructuredName->Prefix)) {
+                $o->Prefix = array();
+                foreach ($detail->StructuredName->Prefix->string as $s) {
+                   $o->Prefix[] = (string)$s;
+                }
+            }
+            if(!empty($detail->StructuredName->Name)) {
+                $o->Name = array();
+                foreach ($detail->StructuredName->Name->string as $s) {
+                   $o->Name[] = (string)$s;
+                }
+            }
+            if(!empty($detail->StructuredName->Suffix)) {
+                $o->Suffix = array();
+                foreach ($detail->StructuredName->Suffix->string as $s) {
+                   $o->Suffix[] = (string)$s;
+                }
+            }
+            if(!empty($detail->StructuredName->After)) {
+                $o->After = array();
+                foreach ($detail->StructuredName->After->string as $s) {
+                   $o->After[] = (string)$s;
+                }
+            }
+            $response->StructuredName = $o;
          }
 
         return $response;

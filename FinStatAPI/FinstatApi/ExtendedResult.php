@@ -51,6 +51,16 @@ class SubjectResult
     ;
 }
 
+class NamePartsResult
+{
+public
+        $Prefix,
+        $Name,
+        $Suffix,
+        $After
+    ;
+}
+
 class ExtendedResult
 {
     public
@@ -104,6 +114,7 @@ class ExtendedResult
         $WarningLiquidation,
         $SelfEmployed,
         $Offices,
-        $Subjects
+        $Subjects,
+        $StructuredName
         ;
     }
