@@ -1,6 +1,6 @@
 <?php
 
-class BaseResultCZ
+class DetailResult
 {
     public
         $Ico,
@@ -21,7 +21,10 @@ class BaseResultCZ
         $Url,
         $Warning,
         $WarningUrl,
-        $CZNACE
+        $CzNaceCode,
+        $CzNaceText,
+        $CzNaceDicision,
+        $CzNaceGroup
     ;
 }
 ?>

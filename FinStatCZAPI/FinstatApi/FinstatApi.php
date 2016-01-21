@@ -1,7 +1,7 @@
 <?php
 
 require_once('Requests.php');
-require_once('BaseResultCZ.php');
+require_once('DetailResult.php');
 require_once('AutoCompleteResult.php');
 
 class FinstatApi
@@ -161,25 +161,28 @@ class FinstatApi
             return $detail;
         }
 
-        $response = new BaseResultCZ();
-        $response->Ico                  = "{$detail->Ico}";
-        $response->CZNACE               = "{$detail->CZNACE}";
-        $response->Name                 = "{$detail->Name}";
-        $response->Street               = "{$detail->Street}";
-        $response->StreetNumber         = "{$detail->StreetNumber}";
-        $response->ZipCode              = "{$detail->ZipCode}";
-        $response->City                 = "{$detail->City}";
-        $response->Region               = "{$detail->Region}";
-        $response->District             = "{$detail->District}";
+        $response = new DetailResult();
+        $response->Ico                  = (string)$detail->Ico;
+        $response->CzNaceCode           = (string)$detail->CzNaceCode;
+        $response->CzNaceText           = (string)$detail->CzNaceText;
+        $response->CzNaceDivision       = (string)$detail->CzNaceDivision;
+        $response->CzNaceGroup          = (string)$detail->CzNaceGroup;
+        $response->Name                 = (string)$detail->Name;
+        $response->Street               = (string)$detail->Street;
+        $response->StreetNumber         = (string)$detail->StreetNumber;
+        $response->ZipCode              = (string)$detail->ZipCode;
+        $response->City                 = (string)$detail->City;
+        $response->Region               = (string)$detail->Region;
+        $response->District             = (string)$detail->District;
         $response->Created              = $this->parseDate($detail->Created);
         $response->Cancelled            = $this->parseDate($detail->Cancelled);
-        $response->Activity             = "{$detail->Activity}";
-        $response->Url                  = "{$detail->Url}";
+        $response->Activity             = (string)$detail->Activity;
+        $response->Url                  = (string)$detail->Url;
         $response->Warning              = "{$detail->Warning}"  == 'true' ;
-        $response->WarningUrl           = "{$detail->WarningUrl}";
-        $response->LegalForm            = "{$detail->LegalForm}";
-        $response->OwnershipType        = "{$detail->OwnershipType}";
-        $response->EmployeeCount        = "{$detail->EmployeeCount}";
+        $response->WarningUrl           = (string)$detail->WarningUrl;
+        $response->LegalForm            = (string)$detail->LegalForm;
+        $response->OwnershipType        = (string)$detail->OwnershipType;
+        $response->EmployeeCount        = (string)$detail->EmployeeCount;
 
         return $response;
     }
@@ -222,16 +225,6 @@ class FinstatApi
         return hash('sha256', $data);
     }
 
-    private function parseIcDphAdditional(SimpleXMLElement $icDphAdditional) {
-        $result = new IcDphAdditionalResult();
-        $result->IcDph = (string) $icDphAdditional->IcDph;
-        $result->Paragraph = (string) $icDphAdditional->Paragraph;
-        $result->CancelListDetectedDate = $this->parseDate($icDphAdditional->CancelListDetectedDate);
-        $result->RemoveListDetectedDate = $this->parseDate($icDphAdditional->RemoveListDetectedDate);
-
-        return $result;
-    }
-
     /**
      * Parses date string received from API and returns DateTime object or null.
      *
@@ -244,7 +237,7 @@ class FinstatApi
           return null;
         }
 
-        return new DateTime($date);
+        return new DateTime((string)$date);
     }
 
 }
