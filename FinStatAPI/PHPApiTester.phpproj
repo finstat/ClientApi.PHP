@@ -1,3 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -14,6 +15,7 @@
     <IncludeDebugInformation>false</IncludeDebugInformation>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FinstatApi\BaseResult.php" />
     <Compile Include="FinstatApi\Requests\Auth\Basic.php" />
     <Compile Include="FinstatApi\Requests\Response\Headers.php" />
     <Compile Include="FinstatApi\Requests\Transport\cURL.php" />

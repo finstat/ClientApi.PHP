@@ -1,6 +1,7 @@
 <?php
 
 require_once('Requests.php');
+require_once('BaseResult.php');
 require_once('DetailResult.php');
 require_once('ExtendedResult.php');
 require_once('UltimateResult.php');
@@ -172,72 +173,61 @@ class FinstatApi
         return $detail;
     }
 
-    private function parseDetail($detail)
+    private function parseBase($detail , $response = null)
     {
-        if  ($detail === FALSE) {
+         if  ($detail === FALSE) {
             return $detail;
         }
+        $response = ($response == null)? new BaseResult() : $response;
 
-        $response = new DetailResult();
-        $response->Ico                  = "{$detail->Ico}";
-        $response->RegisterNumberText   = "{$detail->RegisterNumberText}";
-        $response->Dic                  = "{$detail->Dic}";
-        $response->IcDPH                = "{$detail->IcDPH}";
-        $response->Name                 = "{$detail->Name}";
-        $response->Street               = "{$detail->Street}";
-        $response->StreetNumber         = "{$detail->StreetNumber}";
-        $response->ZipCode              = "{$detail->ZipCode}";
-        $response->City                 = "{$detail->City}";
+        $response->Ico                  = (string)$detail->Ico;
+        $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
+        $response->Dic                  = (string)$detail->Dic;
+        $response->IcDPH                = (string)$detail->IcDPH;
+        $response->Name                 = (string)$detail->Name;
+        $response->Street               = (string)$detail->Street;
+        $response->StreetNumber         = (string)$detail->StreetNumber;
+        $response->ZipCode              = (string)$detail->ZipCode;
+        $response->City                 = (string)$detail->City;
         $response->Created              = $this->parseDate($detail->Created);
         $response->Cancelled            = $this->parseDate($detail->Cancelled);
         $response->SuspendedAsPerson    = "{$detail->SuspendedAsPerson}"  == 'true' ;
-        $response->Activity             = "{$detail->Activity}";
-        $response->Url                  = "{$detail->Url}";
+        $response->Activity             = (string)$detail->Activity;
+        $response->Url                  = (string)$detail->Url;
         $response->Warning              = "{$detail->Warning}"  == 'true' ;
-        $response->WarningUrl           = "{$detail->WarningUrl}";
+        $response->WarningUrl           = (string)$detail->WarningUrl;
         $response->PaymentOrderWarning  = "{$detail->PaymentOrderWarning}"  == 'true';
-        $response->PaymentOrderUrl      = "{$detail->PaymentOrderUrl}";
+        $response->PaymentOrderUrl      = (string)$detail->PaymentOrderUrl;
         $response->OrChange             = "{$detail->OrChange}"  == 'true';
-        $response->OrChangeUrl          = "{$detail->OrChangeURL}";
-        $response->Revenue              = "{$detail->Revenue}";
-        $response->Profit               = "{$detail->Profit}";
+        $response->OrChangeUrl          = (string)$detail->OrChangeURL;
+        $response->SkNaceCode           = (string)$detail->SkNaceCode;
+        $response->SkNaceText           = (string)$detail->SkNaceText;
+        $response->SkNaceDivision       = (string)$detail->SkNaceDivision;
+        $response->SkNaceGroup          = (string)$detail->SkNaceGroup;
+
+        return $response;
+    }
+
+    private function parseDetail($detail , $response = null)
+    {
+        $response = ($response == null)? new DetailResult() : $response;
+        $this->parseBase($detail, $response);
+
+        $response->Revenue              = (string)$detail->Revenue;
+        $response->Profit               = (string)$detail->Profit;
 
         return $response;
     }
 
     private function parseExtended($detail, $response = null)
     {
-        if  ($detail === FALSE) {
-            return $detail;
-        }
-
         $response = ($response == null)? new ExtendedResult() : $response;
-        $response->Ico                  = "{$detail->Ico}";
-        $response->RegisterNumberText   = "{$detail->RegisterNumberText}";
-        $response->Dic                  = "{$detail->Dic}";
-        $response->IcDPH                = "{$detail->IcDPH}";
-        $response->Name                 = "{$detail->Name}";
-        $response->Street               = "{$detail->Street}";
-        $response->StreetNumber         = "{$detail->StreetNumber}";
-        $response->ZipCode              = "{$detail->ZipCode}";
-        $response->City                 = "{$detail->City}";
-        $response->District             = "{$detail->District}";
-        $response->Region               = "{$detail->Region}";
-        $response->Created              = $this->parseDate($detail->Created);
-        $response->Cancelled            = $this->parseDate($detail->Cancelled);
-        $response->Activity             = "{$detail->Activity}";
-        $response->Url                  = "{$detail->Url}";
-        $response->Warning              = "{$detail->Warning}"  == 'true' ;
-        $response->WarningUrl           = "{$detail->WarningUrl}";
-        $response->PaymentOrderWarning  = "{$detail->PaymentOrderWarning}"  == 'true';
-        $response->OrChange             = "{$detail->OrChange}"  == 'true';
-        $response->OrChangeUrl          = "{$detail->OrChangeURL}";
-        $response->SkNaceCode           = "{$detail->SkNaceCode}";
-        $response->SkNaceText           = "{$detail->SkNaceText}";
-        $response->SkNaceDivision       = "{$detail->SkNaceDivision}";
-        $response->SkNaceGroup          = "{$detail->SkNaceGroup}";
-        $response->EmployeeCode         = "{$detail->EmployeeCode}";
-        $response->EmployeeText         = "{$detail->EmployeeText}";
+        $responsev= $this->parseBase($detail, $response);
+
+        $response->District             = (string)$detail->District;
+        $response->Region               = (string)$detail->Region;
+        $response->EmployeeCode         = (string)$detail->EmployeeCode;
+        $response->EmployeeText         = (string)$detail->EmployeeText;
         $response->LegalFormCode        = (string)$detail->LegalFormCode;
         $response->LegalFormText        = (string)$detail->LegalFormText;
         $response->OwnershipTypeCode    = (string)$detail->OwnershipTypeCode;
@@ -258,13 +248,13 @@ class FinstatApi
         $response->Phones = array();
         if (!empty($detail->Phones)) {
             foreach ($detail->Phones->string as $s) {
-                $response->Phones[] = "{$s}";
+                $response->Phones[] = (string)$s;
             }
         }
         $response->Emails = array();
         if (!empty($detail->Emails)) {
             foreach ($detail->Emails->string as $s) {
-                $response->Emails[] = "{$s}";
+                $response->Emails[] = (string)$s;
             }
         }
         $response->Debts = array();

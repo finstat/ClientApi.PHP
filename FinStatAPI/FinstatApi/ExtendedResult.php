@@ -61,35 +61,12 @@ public
     ;
 }
 
-class ExtendedResult
+class ExtendedResult extends BaseResult
 {
     public
-        $Ico,
-        $RegisterNumberText,
-        $Dic,
-        $IcDPH,
-        $Name,
-        $Street,
-        $StreetNumber,
-        $ZipCode,
-        $City,
-        $Activity,
         $IcDphAdditional,
-        $Created,
         $District,
         $Region,
-        $Cancelled,
-        $Url,
-        $Warning,
-        $WarningUrl,
-        $PaymentOrderWarning,
-        $PaymentOrderUrl,
-        $OrChange,
-        $OrChangeUrl,
-        $SkNaceCode,
-        $SkNaceText,
-        $SkNaceDivision,
-        $SkNaceGroup,
         $Phones = array(),
         $Emails = array(),
         $EmployeeCode,

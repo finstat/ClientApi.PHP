@@ -27,7 +27,7 @@ class PersonResult
 class UltimateResult extends ExtendedResult
 {
     public
-        $ORSection, 
+        $ORSection,
         $ORInsertNo,
         $Persons = array()
     ;
