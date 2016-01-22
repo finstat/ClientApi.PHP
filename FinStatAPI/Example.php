@@ -1,5 +1,10 @@
 <?php
 require_once('FinstatApi/FinstatApi.php');
+require_once('FinstatApi/BaseResult.php');
+require_once('FinstatApi/DetailResult.php');
+require_once('FinstatApi/ExtendedResult.php');
+require_once('FinstatApi/UltimateResult.php');
+require_once('FinstatApi/AutoCompleteResult.php');
 
 function echoBase($response)
 {
@@ -7,19 +12,69 @@ function echoBase($response)
     echo '<b>Reg. Číslo: </b>'.             $response->RegisterNumberText.'<br />';
     echo '<b>DIČ: </b>'.                    $response->Dic.'<br />';
     echo '<b>IčDPH: </b>'.                  $response->IcDPH.'<br />';
+    if($response instanceof UltimateResult)
+    {
+        echo '<b>OR Odiel: </b>'.                                   $response->ORSection.'<br />';
+        echo '<b>OR Vložka: </b>'.                                  $response->ORInsertNo.'<br />';
+    }
+    if($response instanceof ExtendedResult)
+    {
+        echo '<b>Detail IČDPH: IČDPH: </b>'.                        $response->IcDphAdditional->IcDph.'<br />';
+        echo '<b>Detail IČDPH: Paragraf: </b>'.                     $response->IcDphAdditional->Paragraph.'<br />';
+        echo '<b>Detail IČDPH: Dátum detekovania v zozname subjektov, u ktorých nastali dôvody na zrušenie: </b>'.
+        (($response->IcDphAdditional->CancelListDetectedDate) ? $response->IcDphAdditional->CancelListDetectedDate->format('d.m.Y') : '').'<br />';
+        echo '<b>Detail IČDPH: Dátum detekovania v zozname vymazaných subjektov: </b>'.
+        (($response->IcDphAdditional->RemoveListDetectedDate) ? $response->IcDphAdditional->RemoveListDetectedDate->format('d.m.Y') : '').'<br />';
+    }
     echo '<b>Názov: </b>'.                  $response->Name.'<br />';
     echo '<b>Ulica: </b>'.                  $response->Street.'<br />';
     echo '<b>Číslo ulice: </b>'.            $response->StreetNumber.'<br />';
     echo '<b>PSČ: </b>'.                    $response->ZipCode.'<br />';
     echo '<b>Mesto: </b>'.                  $response->City.'<br />';
+    if($response instanceof ExtendedResult)
+    {
+        echo '<b>Okres: </b>'.                                      $response->District.'<br />';
+        echo '<b>Kraj: </b>'.                                       $response->Region.'<br />';
+        echo '<b>Tel. čisla: </b>'.                                 implode(', ', $response->Phones).'<br />';
+        echo '<b>Emaily: </b>'.                                     implode(', ', $response->Emails).'<br />';
+    }
     echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
     echo '<b>Založená: </b>'.               (($response->Created) ? $response->Created->format('d.m.Y') : '').'<br />';
     echo '<b>Zrušená: </b>'.                (($response->Cancelled) ? $response->Cancelled->format('d.m.Y') : '') .'<br />';
+    if($response instanceof ExtendedResult)
+    {
+        echo '<b>Právna forma kód: </b>'.                           $response->LegalFormCode.'<br />';
+        echo '<b>Právna forma popis: </b>'.                         $response->LegalFormText.'<br />';
+        echo '<b>Druh vlastníctva kód: </b>'.                       $response->OwnershipTypeCode.'<br />';
+        echo '<b>Druh vlastníctva popis: </b>'.                     $response->OwnershipTypeText.'<br />';
+    }
     echo '<b>SK Nace kód: </b>'.            $response->SkNaceCode.'<br />';
     echo '<b>SK Nace popis: </b>'.          $response->SkNaceText.'<br />';
     echo '<b>SK Nace divízia: </b>'.        $response->SkNaceDivision.'<br />';
+    if($response instanceof ExtendedResult)
+    {
+    echo '<b>Príznak, či sa daná firma je živnostník: </b>';
+        if($response->SelfEmployed) echo 'Áno <br />'; else echo 'Nie<br />';
+    }
     echo '<b>SK Nace skupina: </b>'.        $response->SkNaceGroup.'<br />';
     echo '<b>Pozastavená(živnosť): </b>'.   (($response->SuspendedAsPerson)? "Ano": "Nie").'<br />';
+    if($response instanceof ExtendedResult)
+    {
+        echo '<b>Kód počtu zamestnancov: </b>'.                     $response->EmployeeCode.'<br />';
+        echo '<b>Text počtu zamestnancov: </b>'.                    $response->EmployeeText.'<br />';
+        echo '<b>Aktuálny rok: </b>'.                               $response->ActualYear.'<br />';
+        echo '<b>Credit scoring: </b>'.                             $response->CreditScoreValue.'<br />';
+        echo '<b>Credit scoring - text: </b>'.                      $response->CreditScoreState.'<br />';
+        echo '<b>Zisk za aktuálny rok: </b>'.                       $response->ProfitActual.'<br />';
+        echo '<b>Zisk za predošlý rok: </b>'.                       $response->ProfitPrev.'<br />';
+        echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response->RevenueActual.'<br />';
+        echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response->RevenuePrev.'<br />';
+        echo '<b>Pomer cudzích zdrojov za aktuálny rok : </b>'.     $response->ForeignResources.'<br />';
+        echo '<b>Hrubá marža za aktuálny rok: </b>'.                $response->GrossMargin.'<br />';
+        echo '<b>ROA výnosov za aktuálny rok: </b>'.                $response->ROA.'<br />';
+        echo '<b>Posledný dátum zmeny v Konkurzoch a Reštrukturalizáciach: </b>'. (($response->WarningKaR) ? $response->WarningKaR->format('d.m.Y') : '').'<br />';
+        echo '<b>Posledný dátum zmeny v Likvidáciach: </b>'.        (($response->WarningLiquidation) ? $response->WarningLiquidation->format('d.m.Y') : '').'<br />';
+    }
     echo '<b>Url: </b>'.            $response->Url.'<br />';
     echo '<b>Príznak, či sa daná firma nachádza v zoznamoch dlžníkov, konkurzov alebo likvidácií: </b>';
     if($response->Warning) echo 'Áno (<a href="'.$response->WarningUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
@@ -27,184 +82,144 @@ function echoBase($response)
     if($response->PaymentOrderWarning) echo 'Áno (<a href="'.$response->PaymentOrderUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
     echo '<b>Príznak, či nastala pre danú firmu zmena v ORSR počas posledných 3 mesiacov: </b> ';
     if($response->OrChange) echo 'Áno (<a href="'.$response->OrChangeUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
-}
-
-function echoDetail($response)
-{
-    echoBase($response);
-    echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
-    switch($response->Revenue)
+    if($response instanceof DetailResult)
     {
-        case 'Unknown': echo 'Neznámy'; break;
-        case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
-        case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
-    }
-    echo '<br />';
-    echo '<b>Príznak nárastu/poklesu zisku firmy medzi posledným a predposledným rokom v databáze: </b>';
-    switch($response->Profit)
-    {
-        case 'Unknown': echo 'Neznámy'; break;
-        case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
-        case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
-        case 'Loss': echo 'Firma bola posledný rok v strate (<a href="'.$response->Url.'">viac info</a>)'; break;
-    }
-    echo '<br />';
-}
-
-function echoExtended($response2)
-{
-    echoBase($response2);
-    echo '<b>Detail IČDPH: IČDPH: </b>'.                        $response2->IcDphAdditional->IcDph.'<br />';
-    echo '<b>Detail IČDPH: Paragraf: </b>'.                     $response2->IcDphAdditional->Paragraph.'<br />';
-    echo '<b>Detail IČDPH: Dátum detekovania v zozname subjektov, u ktorých nastali dôvody na zrušenie: </b>'.
-      (($response2->IcDphAdditional->CancelListDetectedDate) ? $response2->IcDphAdditional->CancelListDetectedDate->format('d.m.Y') : '').'<br />';
-    echo '<b>Detail IČDPH: Dátum detekovania v zozname vymazaných subjektov: </b>'.
-      (($response2->IcDphAdditional->RemoveListDetectedDate) ? $response2->IcDphAdditional->RemoveListDetectedDate->format('d.m.Y') : '').'<br />';
-    echo '<b>Okres: </b>'.                                      $response2->District.'<br />';
-    echo '<b>Kraj: </b>'.                                       $response2->Region.'<br />';
-    echo '<b>Tel. čisla: </b>'.                                 implode(', ', $response2->Phones).'<br />';
-    echo '<b>Emaily: </b>'.                                     implode(', ', $response2->Emails).'<br />';
-    echo '<b>Právna forma kód: </b>'.                           $response2->LegalFormCode.'<br />';
-    echo '<b>Právna forma popis: </b>'.                         $response2->LegalFormText.'<br />';
-    echo '<b>Druh vlastníctva kód: </b>'.                       $response2->OwnershipTypeCode.'<br />';
-    echo '<b>Druh vlastníctva popis: </b>'.                     $response2->OwnershipTypeText.'<br />';
-    echo '<b>Kód počtu zamestnancov: </b>'.                     $response2->EmployeeCode.'<br />';
-    echo '<b>Text počtu zamestnancov: </b>'.                    $response2->EmployeeText.'<br />';
-    echo '<b>Aktuálny rok: </b>'.                               $response2->ActualYear.'<br />';
-    echo '<b>Credit scoring: </b>'.                             $response2->CreditScoreValue.'<br />';
-    echo '<b>Credit scoring - text: </b>'.                      $response2->CreditScoreState.'<br />';
-    echo '<b>Zisk za aktuálny rok: </b>'.                       $response2->ProfitActual.'<br />';
-    echo '<b>Zisk za predošlý rok: </b>'.                       $response2->ProfitPrev.'<br />';
-    echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response2->RevenueActual.'<br />';
-    echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response2->RevenuePrev.'<br />';
-    echo '<b>Pomer cudzích zdrojov za aktuálny rok : </b>'.     $response2->ForeignResources.'<br />';
-    echo '<b>Hrubá marža za aktuálny rok: </b>'.                $response2->GrossMargin.'<br />';
-    echo '<b>ROA výnosov za aktuálny rok: </b>'.                $response2->ROA.'<br />';
-    echo '<b>Posledný dátum zmeny v Konkurzoch a Reštrukturalizáciach: </b>'.
-                                                                (($response2->WarningKaR) ? $response2->WarningKaR->format('d.m.Y') : '').'<br />';
-    echo '<b>Posledný dátum zmeny v Likvidáciach: </b>'.        (($response2->WarningLiquidation) ? $response2->WarningLiquidation->format('d.m.Y') : '').'<br />';
-    echo '<b>Url: </b>'.                                        $response2->Url.'<br />';
-    echo '<b>Dlhy: </b><br />';
-    if(!empty($response2->Debts)) {
-        echo "<br /><table>";
-        echo
-                "<tr><th>Zdroj" .
-                "</th><th>Hodnota" .
-                "</th><th>Platné od" .
-                "</th></tr>";
-        foreach($response2->Debts as $debt) {
-            echo "<tr><td>" . $debt->Source. "</td><td>" . $debt->Value.  "</td><td>" . (($debt->ValidFrom) ? $debt->ValidFrom->format('d.m.Y') : '') .'</td></tr>';
-        }
-        echo "</table><br />";
-    }
-    echo '<b>Platobné rozkazy: </b><br />';
-    if(!empty($response2->PaymentOrders)) {
-        echo "<br /><table>";
-        echo
-                "<tr><th>Dátum uverejnenia" .
-                "</th><th>Hodnota" .
-                "</th></tr>";
-        foreach($response2->PaymentOrders as $paymentOrder) {
-            echo "<tr><td>" . (($paymentOrder->PublishDate) ? $paymentOrder->PublishDate->format('d.m.Y') : '') . "</td><td>" . $paymentOrder->Value.  "</td></tr>";
-        }
-        echo "</table><br />";
-    }
-    echo '<b>Príznak, či sa daná firma nachádza v zoznamoch dlžníkov, konkurzov alebo likvidácií: </b>';
-    echo '<b>Príznak, či sa daná firma je živnostník: </b>';
-    if($response2->SelfEmployed) echo 'Áno <br />'; else echo 'Nie<br />';
-    if(!empty($response2->Offices)) {
-        echo '<b>Prevádzky: </b><br />';
-        echo "<br /><table>";
-        echo
-                "<tr><th>Addesa" .
-                "</th><th>Predmety podnikania" .
-                "</th><th>Typ".
-                "</th></tr>";
-        foreach($response2->Offices as $office) {
-            echo    "<tr><td>" .
-                    $office->Street . " " . $office->StreetNumber . ", ".
-                    $office->City . " " . $office->ZipCode . ", ".
-                    $office->District . ", " . $office->Region . ", " . $office->Country .
-                    "</td><td>" .
-                    (!empty($office->Subjects) ? implode(",<br />", $office->Subjects) : "") .
-                    "</td><td>" .
-                    $office->Type .
-                    "</td></tr>";
-        }
-        echo "</table><br />";
-    }
-    if (!empty($response2->Subjects)) {
-        echo '<b>Predmety podnikania: </b><br />';
-        echo "<br /><table>";
-        echo
-                "<tr><th>Názov" .
-                "</th><th>Od" .
-                "</th><th>Pozastavené od".
-                "</th></tr>";
-        foreach($response2->Subjects as $subject) {
-            echo    "<tr><td>" .
-                    $subject->Title .
-                    "</td><td>" .
-                    (($subject->ValidFrom) ? $subject->ValidFrom->format('d.m.Y') : '').
-                    "</td><td>" .
-                    (($subject->SuspendedFrom) ? $subject->SuspendedFrom->format('d.m.Y') : '').
-                    "</td></tr>";
-        }
-        echo "</table><br />";
-    }
-    if ($response2->SelfEmployed && !empty($response2->StructuredName)) {
-        echo '<b>Štrukturovane meno: </b><br />';
-        echo (!empty($response2->StructuredName->Prefix))   ? "Prefix: " . implode(" ", $response2->StructuredName->Prefix) . "<br />": "";
-        echo (!empty($response2->StructuredName->Name))     ? "Name: " . implode(" ", $response2->StructuredName->Name) . "<br />": "";
-        echo (!empty($response2->StructuredName->Suffix))   ? "Suffix: " . implode(" ", $response2->StructuredName->Suffix) . "<br />": "";
-        echo (!empty($response2->StructuredName->After))    ? "After: " . implode(" ", $response2->StructuredName->After) . "<br />": "";
-        echo "<br />";
-    }
-    echo '<br />';
-}
-
-function echoUltimate($response3)
-{
-    echoExtended($response3);
-    echo '<b>OR Odiel: </b>'.                                   $response3->ORSection.'<br />';
-    echo '<b>OR Vložka: </b>'.                                  $response3->ORInsertNo.'<br />';
-    if (!empty($response3->Persons)) {
-    echo "<br /><table>";
-    echo
-        "<tr><th>Meno" .
-        "</th><th>Ulica" .
-        "</th><th>Cislo" .
-        "</th><th>PSC" .
-        "</th><th>Mesto" .
-        "</th><th>Detekovane od" .
-        "</th><th>Detekovane do" .
-        "</th><th>Funckcia" .
-        "</th></tr>";
-    foreach ($response3->Persons as $person) {
-        $functions = "";
-        if (!empty($person->Functions)) {
-            foreach ($person->Functions as $function) {
-                $functions .= $function->Type . " - ";
-                $functions .= $function->Description;
-                if ($function->From) {
-                    $functions .= " (" . $function->From->format('d.m.Y') . ")";
-                }
-                $functions .="<br />";
+            echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
+            switch($response->Revenue)
+            {
+                case 'Unknown': echo 'Neznámy'; break;
+                case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
+                case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
             }
-        }
-        echo
-            "<tr><td>" . $person->FullName .
-            "</td><td>" . $person->Street .
-            "</td><td>" . $person->StreetNumber.
-            "</td><td>" . $person->ZipCode .
-            "</td><td>" . $person->City .
-            "</td><td>" . (($person->DetectedFrom) ? $person->DetectedFrom->format('d.m.Y') : '') .
-            "</td><td>" . (($person->DetectedTo) ? $person->DetectedTo->format('d.m.Y') : '') .
-            "</td><td>" . $functions .
-            "</td></tr>";
+            echo '<br />';
+            echo '<b>Príznak nárastu/poklesu zisku firmy medzi posledným a predposledným rokom v databáze: </b>';
+            switch($response->Profit)
+            {
+                case 'Unknown': echo 'Neznámy'; break;
+                case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
+                case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
+                case 'Loss': echo 'Firma bola posledný rok v strate (<a href="'.$response->Url.'">viac info</a>)'; break;
+            }
+            echo '<br />';
     }
-    echo "</table><br />";
-}
+    if($response instanceof ExtendedResult)
+    {
+        echo '<b>Dlhy: </b><br />';
+        if(!empty($response2->Debts)) {
+            echo "<br /><table>";
+            echo
+                    "<tr><th>Zdroj" .
+                    "</th><th>Hodnota" .
+                    "</th><th>Platné od" .
+                    "</th></tr>";
+            foreach($response2->Debts as $debt) {
+                echo "<tr><td>" . $debt->Source. "</td><td>" . $debt->Value.  "</td><td>" . (($debt->ValidFrom) ? $debt->ValidFrom->format('d.m.Y') : '') .'</td></tr>';
+            }
+            echo "</table><br />";
+        }
+        echo '<b>Platobné rozkazy: </b><br />';
+        if(!empty($response2->PaymentOrders)) {
+            echo "<br /><table>";
+            echo
+                    "<tr><th>Dátum uverejnenia" .
+                    "</th><th>Hodnota" .
+                    "</th></tr>";
+            foreach($response2->PaymentOrders as $paymentOrder) {
+                echo "<tr><td>" . (($paymentOrder->PublishDate) ? $paymentOrder->PublishDate->format('d.m.Y') : '') . "</td><td>" . $paymentOrder->Value.  "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+        if(!empty($response->Offices)) {
+            echo '<b>Prevádzky: </b><br />';
+            echo "<br /><table>";
+            echo
+                    "<tr><th>Addesa" .
+                    "</th><th>Predmety podnikania" .
+                    "</th><th>Typ".
+                    "</th></tr>";
+            foreach($response->Offices as $office) {
+                echo    "<tr><td>" .
+                        $office->Street . " " . $office->StreetNumber . ", ".
+                        $office->City . " " . $office->ZipCode . ", ".
+                        $office->District . ", " . $office->Region . ", " . $office->Country .
+                        "</td><td>" .
+                        (!empty($office->Subjects) ? implode(",<br />", $office->Subjects) : "") .
+                        "</td><td>" .
+                        $office->Type .
+                        "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+        if (!empty($response->Subjects)) {
+            echo '<b>Predmety podnikania: </b><br />';
+            echo "<br /><table>";
+            echo
+                    "<tr><th>Názov" .
+                    "</th><th>Od" .
+                    "</th><th>Pozastavené od".
+                    "</th></tr>";
+            foreach($response->Subjects as $subject) {
+                echo    "<tr><td>" .
+                        $subject->Title .
+                        "</td><td>" .
+                        (($subject->ValidFrom) ? $subject->ValidFrom->format('d.m.Y') : '').
+                        "</td><td>" .
+                        (($subject->SuspendedFrom) ? $subject->SuspendedFrom->format('d.m.Y') : '').
+                        "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+        if ($response->SelfEmployed && !empty($response->StructuredName)) {
+            echo '<b>Štrukturovane meno: </b><br />';
+            echo (!empty($response->StructuredName->Prefix))   ? "Prefix: " . implode(" ", $response->StructuredName->Prefix) . "<br />": "";
+            echo (!empty($response->StructuredName->Name))     ? "Name: " . implode(" ", $response->StructuredName->Name) . "<br />": "";
+            echo (!empty($response->StructuredName->Suffix))   ? "Suffix: " . implode(" ", $response->StructuredName->Suffix) . "<br />": "";
+            echo (!empty($response->StructuredName->After))    ? "After: " . implode(" ", $response->StructuredName->After) . "<br />": "";
+            echo "<br />";
+        }
+        echo '<br />';
+    }
+    if($response instanceof UltimateResult)
+    {
+        if (!empty($response->Persons)) {
+            echo '<b>Osoby: </b><br />';
+            echo "<br /><table>";
+            echo
+                "<tr><th>Meno" .
+                "</th><th>Ulica" .
+                "</th><th>Cislo" .
+                "</th><th>PSC" .
+                "</th><th>Mesto" .
+                "</th><th>Detekovane od" .
+                "</th><th>Detekovane do" .
+                "</th><th>Funckcia" .
+                "</th></tr>";
+            foreach ($response->Persons as $person) {
+                $functions = "";
+                if (!empty($person->Functions)) {
+                    foreach ($person->Functions as $function) {
+                        $functions .= $function->Type . " - ";
+                        $functions .= $function->Description;
+                        if ($function->From) {
+                            $functions .= " (" . $function->From->format('d.m.Y') . ")";
+                        }
+                        $functions .="<br />";
+                    }
+                }
+                echo
+                    "<tr><td>" . $person->FullName .
+                    "</td><td>" . $person->Street .
+                    "</td><td>" . $person->StreetNumber.
+                    "</td><td>" . $person->ZipCode .
+                    "</td><td>" . $person->City .
+                    "</td><td>" . (($person->DetectedFrom) ? $person->DetectedFrom->format('d.m.Y') : '') .
+                    "</td><td>" . (($person->DetectedTo) ? $person->DetectedTo->format('d.m.Y') : '') .
+                    "</td><td>" . $functions .
+                    "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+    }
 }
 
 // zakladne prihlasovacie udaje a nastavenia klienta
@@ -243,7 +258,7 @@ catch (Exception $e)
 // priklad vypisu ziskanych udajov z Finstatu
 header('Content-Type: text/html; charset=utf-8');
 echo "<pre>";
-echoDetail($response);
+echoBase($response);
 echo "</pre>";
 echo '<hr />';
 ?>
@@ -262,7 +277,7 @@ catch (Exception $e)
     throw new Exception("Load Fails with exception code: " . $e->getCode() . " and message: " . $e->getMessage());
 }
 echo "<pre>";
-echoExtended($response2);
+echoBase($response2);
 echo "</pre>";
 echo '<hr />';
 ?>
@@ -281,7 +296,7 @@ catch (Exception $e)
     throw new Exception("Load Fails with exception code: " . $e->getCode() . " and message: " . $e->getMessage());
 }
 echo "<pre>";
-echoUltimate($response3);
+echoBase($response3);
 echo "</pre>";
 echo '<hr />';
 ?>
