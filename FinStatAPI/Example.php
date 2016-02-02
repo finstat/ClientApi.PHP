@@ -222,6 +222,17 @@ function echoBase($response)
     }
 }
 
+function echoException($e)
+{
+    echo "<h1 style=\"color: red\">Exception</h1>";
+    echo"<table>";
+    echo"<tr><th>Code:</th><td>{$e->getCode()}</td></tr>";
+    echo"<tr><th>Message:</th><td> {$e->getMessage()}</td></tr>";
+    echo"<tr><th>Body:</th><td>{$e->getData()}</td></tr>";
+    echo"</table>";
+    die();
+}
+
 // zakladne prihlasovacie udaje a nastavenia klienta
 $apiUrl = 'http://www.finstat.sk/api/';    // URL adresa Finstat API
 $apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
@@ -251,8 +262,7 @@ try
 }
 catch (Exception $e)
 {
-    // popis a kod chyby, ktora nastala
-    throw new Exception("Load Fails with exception code: " . $e->getCode() . " and message: " . $e->getMessage());
+    echoException($e);
 }
 
 // priklad vypisu ziskanych udajov z Finstatu
@@ -273,8 +283,7 @@ try
 }
 catch (Exception $e)
 {
-    // popis a kod chyby, ktora nastala
-    throw new Exception("Load Fails with exception code: " . $e->getCode() . " and message: " . $e->getMessage());
+    echoException($e);
 }
 echo "<pre>";
 echoBase($response2);
@@ -292,8 +301,7 @@ try
 }
 catch (Exception $e)
 {
-    // popis a kod chyby, ktora nastala
-    throw new Exception("Load Fails with exception code: " . $e->getCode() . " and message: " . $e->getMessage());
+    echoException($e);
 }
 echo "<pre>";
 echoBase($response3);
@@ -308,8 +316,7 @@ try
 }
 catch (Exception $e)
 {
-    // popis a kod chyby, ktora nastala
-    throw new Exception("Load Fails with exception code: " . $e->getCode() . " and message: " . $e->getMessage());
+    echoException($e);
 }
 echo "<pre>";
 echo '<b>Výsledky: </b><br />';
