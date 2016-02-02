@@ -61,7 +61,7 @@ class FinstatApi
             throw $e;
         }
 
-        $detail = $this->parseResponse($response);
+        $detail = $this->parseResponse($response, $url, $query);
 
         return $this->parseAutoComplete($detail);
     }
@@ -109,7 +109,7 @@ class FinstatApi
             throw $e;
         }
 
-        $detail = $this->parseResponse($response);
+        $detail = $this->parseResponse($response, $url, $ico);
 
         switch($type) {
             case 'detail':
@@ -121,7 +121,7 @@ class FinstatApi
         return $detail;
     }
 
-    private function parseResponse($response)
+    private function parseResponse($response, $url, $parameter)
     {
         if(!$response->success)
         {
@@ -130,7 +130,7 @@ class FinstatApi
             switch($response->status_code)
             {
                 case 404:
-                    throw new Requests_Exception("Not valid URL: '$url' or specified ico: '$ico' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
+                    throw new Requests_Exception("Not valid URL: '{$url}' or specified parameter: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
 
                 case 403:
                     throw new Requests_Exception('Not valid API key!', 'FinstatApi', $dom->textContent, $response->status_code);
