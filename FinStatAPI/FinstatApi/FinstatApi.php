@@ -78,7 +78,7 @@ class FinstatApi
             switch($response->status_code)
             {
                 case 404:
-                    throw new Requests_Exception("Not valid URL: '{$url}' or specified ico: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
+                    throw new Requests_Exception("Not valid URL: '{$url}' or specified parameter: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
 
                 case 403:
                     throw new Requests_Exception('Not valid API key!', 'FinstatApi', $dom->textContent, $response->status_code);
