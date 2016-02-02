@@ -71,7 +71,6 @@ class FinstatApi
 
     private function parseResponse($response)
     {
-
         if(!$response->success)
         {
             $dom = new DOMDocument();

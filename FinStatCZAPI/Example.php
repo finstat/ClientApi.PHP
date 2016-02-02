@@ -31,7 +31,13 @@ try
 catch (Exception $e)
 {
     // popis a kod chyby, ktora nastala
-    throw new Exception("Load Fails with exception code: " . $e->getCode() . " and message: " . $e->getMessage());
+    echo "<h1 style=\"color: red\">Exception</h1>";
+    echo"<table>";
+    echo"<tr><th>Code:</th><td>{$e->getCode()}</td></tr>";
+    echo"<tr><th>Message:</th><td> {$e->getMessage()}</td></tr>";
+    echo"<tr><th>Body:</th><td>{$e->getData()}</td></tr>";
+    echo"</table>";
+    die();
 }
 
 // priklad vypisu ziskanych udajov z Finstatu

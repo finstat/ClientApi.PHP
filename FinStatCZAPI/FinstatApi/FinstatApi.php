@@ -61,24 +61,7 @@ class FinstatApi
             throw $e;
         }
 
-        if(!$response->success)
-        {
-            switch($response->status_code)
-            {
-                case 404:
-                    throw new Requests_Exception("Not valid URL: '$url' or specified ico: '$ico' not found in database!", 'FinstatApi', null, $response->status_code);
-
-                case 403:
-                    throw new Requests_Exception('Not valid API key!', 'FinstatApi', null, $response->status_code);
-
-                default:
-                    throw new Requests_Exception('Unknown exception while communication with Finstat api!', 'FinstatApi', null, $response->status_code);
-            }
-        }
-
-        $detail = simplexml_load_string($response->body);
-        if($detail === FALSE)
-            throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
+        $detail = $this->parseResponse($response);
 
         return $this->parseAutoComplete($detail);
     }
@@ -126,24 +109,7 @@ class FinstatApi
             throw $e;
         }
 
-        if(!$response->success)
-        {
-            switch($response->status_code)
-            {
-                case 404:
-                    throw new Requests_Exception("Not valid URL: '$url' or specified ico: '$ico' not found in database!", 'FinstatApi', null, $response->status_code);
-
-                case 403:
-                    throw new Requests_Exception('Not valid API key!', 'FinstatApi', null, $response->status_code);
-
-                default:
-                    throw new Requests_Exception('Unknown exception while communication with Finstat api!', 'FinstatApi', null, $response->status_code);
-            }
-        }
-
-        $detail = simplexml_load_string($response->body);
-        if($detail === FALSE)
-            throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
+        $detail = $this->parseResponse($response);
 
         switch($type) {
             case 'detail':
@@ -151,6 +117,32 @@ class FinstatApi
                 $detail = $this->parseDetail($detail);
                 break;
         }
+
+        return $detail;
+    }
+
+    private function parseResponse($response)
+    {
+        if(!$response->success)
+        {
+            $dom = new DOMDocument();
+            $dom->loadHTML($response->body);
+            switch($response->status_code)
+            {
+                case 404:
+                    throw new Requests_Exception("Not valid URL: '$url' or specified ico: '$ico' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
+
+                case 403:
+                    throw new Requests_Exception('Not valid API key!', 'FinstatApi', $dom->textContent, $response->status_code);
+
+                default:
+                    throw new Requests_Exception('Unknown exception while communication with Finstat api!', 'FinstatApi', $dom->textContent, $response->status_code);
+            }
+        }
+
+        $detail = simplexml_load_string($response->body);
+        if($detail === FALSE)
+            throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
 
         return $detail;
     }
