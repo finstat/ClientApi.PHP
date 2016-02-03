@@ -130,10 +130,10 @@ class FinstatApi
             switch($response->status_code)
             {
                 case 404:
-                    throw new Requests_Exception("Not valid URL: '{$url}' or specified parameter: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
+                    throw new Requests_Exception("Invalid URL: '{$url}' or specified parameter: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
 
                 case 403:
-                    throw new Requests_Exception('Not valid API key!', 'FinstatApi', $dom->textContent, $response->status_code);
+                    throw new Requests_Exception('Access Forbidden!', 'FinstatApi', $dom->textContent, $response->status_code);
 
                 default:
                     throw new Requests_Exception('Unknown exception while communication with Finstat api!', 'FinstatApi', $dom->textContent, $response->status_code);
