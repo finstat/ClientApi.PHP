@@ -130,7 +130,11 @@ class FinstatApi
             switch($response->status_code)
             {
                 case 404:
-                    throw new Requests_Exception("Invalid URL: '{$url}' or specified parameter: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
+                   if(isset($parameter) && !empty($parameter)) {
+                        throw new Requests_Exception("Invalid URL: '{$url}' or specified parameter: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
+                    } else {
+                        throw new Requests_Exception("Invalid URL: '{$url}'!", 'FinstatApi', $dom->textContent, $response->status_code);
+                    }
 
                 case 403:
                     throw new Requests_Exception('Access Forbidden!', 'FinstatApi', $dom->textContent, $response->status_code);
@@ -210,9 +214,9 @@ class FinstatApi
     //
     // Compute verification hash
     //
-    private function ComputeVerificationHash($ico)
+    private function ComputeVerificationHash($parameter)
     {
-        $data = sprintf("SomeSalt+%s+%s++%s+ended", $this->apiKey, $this->privateKey, $ico);
+        $data = sprintf("SomeSalt+%s+%s++%s+ended", $this->apiKey, $this->privateKey, $parameter);
 
         return hash('sha256', $data);
     }

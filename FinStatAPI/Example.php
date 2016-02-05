@@ -8,6 +8,7 @@ require_once('FinstatApi/AutoCompleteResult.php');
 
 function echoBase($response)
 {
+    echo "<pre>";
     echo '<b>IČO: </b>'.                    $response->Ico.'<br />';
     echo '<b>Reg. Číslo: </b>'.             $response->RegisterNumberText.'<br />';
     echo '<b>DIČ: </b>'.                    $response->Dic.'<br />';
@@ -220,6 +221,7 @@ function echoBase($response)
             echo "</table><br />";
         }
     }
+    echo "</pre>";
 }
 
 function echoException($e)
@@ -231,6 +233,39 @@ function echoException($e)
     echo"<tr><th>Body:</th><td>{$e->getData()}</td></tr>";
     echo"</table>";
     die();
+}
+
+function echoAutoComplete($response)
+{
+    echo "<pre>";
+    echo '<b>Výsledky: </b><br />';
+    if (!empty($response->Results)) {
+        echo "<table>";
+        echo
+            "<tr><th>ICO" .
+            "</td><th>Nazov" .
+            "</td><th>Mesto" .
+            "</td><th>Zrusena" .
+            "</th></tr>"
+        ;
+        foreach ($response->Results as $company) {
+            echo
+                "<tr><td>" . $company->Ico .
+                "</td><td>" . $company->Name .
+                "</td><td>" . $company->City .
+                "</td><td>" . (($company->Cancelled) ? "true" : 'false') .
+                "</td></tr>"
+            ;
+        }
+        echo "</table>";
+    }
+    echo '<br /><b>Návrhy: </b>';
+    if (!empty($response->Suggestions)) {
+        echo implode(', ', $response->Suggestions);
+    }
+    echo '<br />';
+    echo '<hr />';
+    echo "</pre>";
 }
 
 // zakladne prihlasovacie udaje a nastavenia klienta
@@ -267,9 +302,7 @@ catch (Exception $e)
 
 // priklad vypisu ziskanych udajov z Finstatu
 header('Content-Type: text/html; charset=utf-8');
-echo "<pre>";
 echoBase($response);
-echo "</pre>";
 echo '<hr />';
 ?>
 <h1>Extended test:</h1>
@@ -285,9 +318,7 @@ catch (Exception $e)
 {
     echoException($e);
 }
-echo "<pre>";
 echoBase($response2);
-echo "</pre>";
 echo '<hr />';
 ?>
 <h1>Ultimate test:</h1>
@@ -303,9 +334,7 @@ catch (Exception $e)
 {
     echoException($e);
 }
-echo "<pre>";
 echoBase($response3);
-echo "</pre>";
 echo '<hr />';
 ?>
 <h1>AutoComplete test "volkswagen":</h1>
@@ -318,32 +347,4 @@ catch (Exception $e)
 {
     echoException($e);
 }
-echo "<pre>";
-echo '<b>Výsledky: </b><br />';
-if (!empty($response4->Results)) {
-    echo "<table>";
-    echo
-            "<tr><th>ICO" .
-            "</td><th>Nazov" .
-            "</td><th>Mesto" .
-            "</td><th>Zrusena" .
-            "</th></tr>"
-        ;
-    foreach ($response4->Results as $company) {
-        echo
-            "<tr><td>" . $company->Ico .
-            "</td><td>" . $company->Name .
-            "</td><td>" . $company->City .
-            "</td><td>" . (($company->Cancelled) ? "true" : 'false') .
-            "</td></tr>"
-        ;
-    }
-    echo "</table>";
-}
-echo '<br /><b>Návrhy: </b>';
-if (!empty($response4->Suggestions)) {
-    echo implode(', ', $response4->Suggestions);
-}
-echo '<br />';
-echo '<hr />';
-echo "</pre>";
+echoAutoComplete($response4);
