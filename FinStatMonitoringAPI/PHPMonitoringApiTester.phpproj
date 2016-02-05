@@ -1,0 +1,41 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>PHPMonitoringApiTester</Name>
+    <ProjectGuid>{85082fda-1717-4923-8598-8dd6d92e4181}</ProjectGuid>
+    <RootNamespace>PHPMonitoringApiTester</RootNamespace>
+    <OutputType>Library</OutputType>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="MonitoringApi\Requests\Auth\Basic.php" />
+    <Compile Include="MonitoringApi\Requests\Response\Headers.php" />
+    <Compile Include="MonitoringApi\Requests\Transport\cURL.php" />
+    <Compile Include="MonitoringApi\Requests\Transport\fsockopen.php" />
+    <Compile Include="MonitoringApi\Requests\Auth.php" />
+    <Compile Include="MonitoringApi\Requests\Exception.php" />
+    <Compile Include="MonitoringApi\Requests\Hooks.php" />
+    <Compile Include="MonitoringApi\Requests\IDNAEncoder.php" />
+    <Compile Include="MonitoringApi\Requests\IPv6.php" />
+    <Compile Include="MonitoringApi\Requests\IRI.php" />
+    <Compile Include="MonitoringApi\Requests\Response.php" />
+    <Compile Include="MonitoringApi\Requests\Transport.php" />
+    <Compile Include="MonitoringApi\FinstatMonitoringApi.php" />
+    <Compile Include="MonitoringApi\MonitoringReportResult.php" />
+    <Compile Include="MonitoringApi\Requests.php" />
+    <Compile Include="Example.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MonitoringApi\Requests\Auth" />
+    <Folder Include="MonitoringApi\Requests\Response" />
+    <Folder Include="MonitoringApi\Requests\Transport" />
+    <Folder Include="MonitoringApi\Requests" />
+    <Folder Include="MonitoringApi" />
+  </ItemGroup>
+</Project>
