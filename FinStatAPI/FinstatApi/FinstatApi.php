@@ -356,6 +356,8 @@ class FinstatApi
         if ($response !== FALSE) {
             $response->ORSection = (string)$detail->ORSection;
             $response->ORInsertNo = (string)$detail->ORInsertNo;
+            $response->BasicCapital  = (!empty($detail->BasicCapital)) ? (float)$detail->BasicCapital : null;
+            $response->PaybackRange  = (!empty($detail->PaybackRange)) ? (float)$detail->PaybackRange : null;
             $response->Persons = array();
             if (!empty($detail->Persons)) {
                 foreach ($detail->Persons->Person as $person) {
@@ -365,8 +367,13 @@ class FinstatApi
                     $o->StreetNumber = (string)$person->StreetNumber;
                     $o->ZipCode = (string)$person->ZipCode;
                     $o->City = (string)$person->City;
+                    $o->Region = (string)$person->Region;
+                    $o->Country = (string)$person->Country;
+                    $o->District = (string)$person->District;
                     $o->DetectedFrom = $this->parseDate($person->DetectedFrom);
                     $o->DetectedTo  = $this->parseDate($person->DetectedTo);
+                    $o->DepositAmount  = (!empty($person->DepositAmount)) ? (float)$person->DepositAmount : null;
+                    $o->PaybackRange  = (!empty($person->PaybackRange)) ? (float)$person->PaybackRange : null;
                     $o->Functions = array();
                     if (!empty($person->Functions) && !empty($person->Functions->FunctionAssigment)) {
                         foreach($person->Functions->FunctionAssigment as $function) {
@@ -379,6 +386,18 @@ class FinstatApi
                     }
                     $response->Persons[] = $o;
                 }
+            }
+            if (!empty($detail->RegistrationCourt)) {
+                $o = new PersonResult();
+                $o->Name = (string)$detail->RegistrationCourt->Name;
+                $o->Street = (string)$detail->RegistrationCourt->Street;
+                $o->StreetNumber = (string)$detail->RegistrationCourt->StreetNumber;
+                $o->ZipCode = (string)$detail->RegistrationCourt->ZipCode;
+                $o->City = (string)$detail->RegistrationCourt->City;
+                $o->Region = (string)$detail->RegistrationCourt->Region;
+                $o->Country = (string)$detail->RegistrationCourt->Country;
+                $o->District = (string)$detail->RegistrationCourt->District;
+                $response->RegistrationCourt = $o;
             }
         }
 

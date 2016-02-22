@@ -18,9 +18,28 @@ class PersonResult
         $StreetNumber,
         $ZipCode,
         $City,
+        $Country,
+        $Region,
+        $District,
         $DetectedFrom,
         $DetectedTo,
-        $Functions = array()
+        $Functions = array(),
+        $DepositAmount,
+        $PaybackRange
+    ;
+}
+
+class CourtResult
+{
+    public
+        $Name,
+        $Street,
+        $StreetNumber,
+        $ZipCode,
+        $City,
+        $Country,
+        $Region,
+        $District
     ;
 }
 
@@ -29,7 +48,10 @@ class UltimateResult extends ExtendedResult
     public
         $ORSection,
         $ORInsertNo,
-        $Persons = array()
+        $Persons = array(),
+        $BasicCapital,
+        $PaybackRange,
+        $RegistrationCourt
     ;
 }
 ?>

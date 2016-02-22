@@ -17,6 +17,12 @@ function echoBase($response)
     {
         echo '<b>OR Odiel: </b>'.                                   $response->ORSection.'<br />';
         echo '<b>OR Vložka: </b>'.                                  $response->ORInsertNo.'<br />';
+        echo '<b>Základné imanie: </b>'.                             $response->BasicCapital.'<br />';
+        echo '<b>Rozsah splatenia: </b>'.                            $response->PaybackRange.'<br />';
+        if(!empty($response->RegistrationCourt))
+        {
+            echo '<b>Registrovane na: </b>'.                        $response->RegistrationCourt->Name . ', ' . $response->RegistrationCourt->Street . ' ' . $response->RegistrationCourt->StreetNumber.  ", " . $response->RegistrationCourt->ZipCode . ", " . $response->RegistrationCourt->City .  ", " . $response->RegistrationCourt->District .  ", " . $response->RegistrationCourt->Region .  ", " . $response->RegistrationCourt->Country .'<br />';
+        }
     }
     if($response instanceof ExtendedResult)
     {
@@ -187,13 +193,11 @@ function echoBase($response)
             echo "<br /><table>";
             echo
                 "<tr><th>Meno" .
-                "</th><th>Ulica" .
-                "</th><th>Cislo" .
-                "</th><th>PSC" .
-                "</th><th>Mesto" .
+                "</th><th>Adresa" .
                 "</th><th>Detekovane od" .
                 "</th><th>Detekovane do" .
                 "</th><th>Funckcia" .
+                "</th><th>Podiel / Vyska splatenia" .
                 "</th></tr>";
             foreach ($response->Persons as $person) {
                 $functions = "";
@@ -209,13 +213,11 @@ function echoBase($response)
                 }
                 echo
                     "<tr><td>" . $person->FullName .
-                    "</td><td>" . $person->Street .
-                    "</td><td>" . $person->StreetNumber.
-                    "</td><td>" . $person->ZipCode .
-                    "</td><td>" . $person->City .
+                    "</td><td>" . $person->Street ." " . $person->StreetNumber. ", " . $person->ZipCode . ", " . $person->City .  ", " . $person->District .  ", " . $person->Region .  ", " . $person->Country .
                     "</td><td>" . (($person->DetectedFrom) ? $person->DetectedFrom->format('d.m.Y') : '') .
                     "</td><td>" . (($person->DetectedTo) ? $person->DetectedTo->format('d.m.Y') : '') .
                     "</td><td>" . $functions .
+                    "</td><td>" . $person->DepositAmount . "/" . $person->PaybackRange .
                     "</td></tr>";
             }
             echo "</table><br />";
