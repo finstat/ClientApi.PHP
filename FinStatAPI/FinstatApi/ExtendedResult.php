@@ -27,17 +27,10 @@ class IcDphAdditionalResult
     ;
 }
 
-class OfficeResult
+class OfficeResult extends AddressResult
 {
     public
-        $City,
-        $Country,
-        $District,
-        $Region,
-        $Street,
-        $StreetNumber,
         $Subjects,
-        $ZipCode,
         $Type
         ;
 }
@@ -65,8 +58,6 @@ class ExtendedResult extends BaseResult
 {
     public
         $IcDphAdditional,
-        $District,
-        $Region,
         $Phones = array(),
         $Emails = array(),
         $EmployeeCode,

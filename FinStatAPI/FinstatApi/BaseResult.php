@@ -1,17 +1,26 @@
 <?php
 
-class BaseResult
+class AddressResult
+{
+    public
+        $Name,
+        $Street,
+        $StreetNumber,
+        $ZipCode,
+        $City,
+        $District,
+        $Region,
+        $Country
+    ;
+}
+
+class BaseResult extends AddressResult
 {
     public
         $Ico,
         $RegisterNumberText,
         $Dic,
         $IcDPH,
-        $Name,
-        $Street,
-        $StreetNumber,
-        $ZipCode,
-        $City,
         $Activity,
         $Created,
         $Cancelled,

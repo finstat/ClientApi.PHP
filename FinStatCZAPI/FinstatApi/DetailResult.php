@@ -1,17 +1,24 @@
 <?php
-
-class DetailResult
+class AddressResult
 {
     public
-        $Ico,
-        $IcDPH,
         $Name,
         $Street,
         $StreetNumber,
         $ZipCode,
         $City,
-        $Region,
         $District,
+        $Region,
+        $Country
+    ;
+}
+
+class DetailResult extends AddressResult
+{
+    public
+        $Ico,
+        $IcDPH,
+        $Name,
         $LegalForm,
         $OwnershipType,
         $EmployeeCount,

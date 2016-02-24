@@ -38,10 +38,11 @@ function echoBase($response)
     echo '<b>Číslo ulice: </b>'.            $response->StreetNumber.'<br />';
     echo '<b>PSČ: </b>'.                    $response->ZipCode.'<br />';
     echo '<b>Mesto: </b>'.                  $response->City.'<br />';
+    echo '<b>Okres: </b>'.                  $response->District.'<br />';
+    echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
+    echo '<b>Štát: </b>'.                   $response->Country.'<br />';
     if($response instanceof ExtendedResult)
     {
-        echo '<b>Okres: </b>'.                                      $response->District.'<br />';
-        echo '<b>Kraj: </b>'.                                       $response->Region.'<br />';
         echo '<b>Tel. čisla: </b>'.                                 implode(', ', $response->Phones).'<br />';
         echo '<b>Emaily: </b>'.                                     implode(', ', $response->Emails).'<br />';
     }
@@ -112,26 +113,26 @@ function echoBase($response)
     if($response instanceof ExtendedResult)
     {
         echo '<b>Dlhy: </b><br />';
-        if(!empty($response2->Debts)) {
+        if(!empty($response->Debts)) {
             echo "<br /><table>";
             echo
                     "<tr><th>Zdroj" .
                     "</th><th>Hodnota" .
                     "</th><th>Platné od" .
                     "</th></tr>";
-            foreach($response2->Debts as $debt) {
+            foreach($response->Debts as $debt) {
                 echo "<tr><td>" . $debt->Source. "</td><td>" . $debt->Value.  "</td><td>" . (($debt->ValidFrom) ? $debt->ValidFrom->format('d.m.Y') : '') .'</td></tr>';
             }
             echo "</table><br />";
         }
         echo '<b>Platobné rozkazy: </b><br />';
-        if(!empty($response2->PaymentOrders)) {
+        if(!empty($response->PaymentOrders)) {
             echo "<br /><table>";
             echo
                     "<tr><th>Dátum uverejnenia" .
                     "</th><th>Hodnota" .
                     "</th></tr>";
-            foreach($response2->PaymentOrders as $paymentOrder) {
+            foreach($response->PaymentOrders as $paymentOrder) {
                 echo "<tr><td>" . (($paymentOrder->PublishDate) ? $paymentOrder->PublishDate->format('d.m.Y') : '') . "</td><td>" . $paymentOrder->Value.  "</td></tr>";
             }
             echo "</table><br />";
@@ -218,6 +219,32 @@ function echoBase($response)
                     "</td><td>" . (($person->DetectedTo) ? $person->DetectedTo->format('d.m.Y') : '') .
                     "</td><td>" . $functions .
                     "</td><td>" . $person->DepositAmount . "/" . $person->PaybackRange .
+                    "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+        if (!empty($response->ProcurationAction)) {
+            echo '<b>Konanie prokúry: </b>' .                   $response->ProcurationAction.'<br />';
+        }
+        if (!empty($response->StatutoryAction)) {
+            echo '<b>Konanie štatutárov: </b>' .                   $response->StatutoryAction.'<br />';
+        }
+        if (!empty($response->WebPages)) {
+            echo '<b>Web stránky: </b>' .                   implode(", ", $response->WebPages).'<br />';
+        }
+        if (!empty($response->AddressHistory)) {
+            echo '<b>História adries: </b><br />';
+            echo "<br /><table>";
+            echo
+                "</th><th>Adresa" .
+                "</th><th>Platná od" .
+                "</th><th>Platná do" .
+                "</th></tr>";
+            foreach ($response->AddressHistory as $address) {
+                echo
+                    "<tr></td><td>" . $address->Street ." " . $address->StreetNumber. ", " . $address->ZipCode . ", " . $address->City .  ", " . $address->District .  ", " . $address->Region .  ", " . $address->Country .
+                    "</td><td>" . (($address->ValidFrom) ? $address->ValidFrom->format('d.m.Y') : '') .
+                    "</td><td>" . (($address->ValidTo) ? $address->ValidTo->format('d.m.Y') : '') .
                     "</td></tr>";
             }
             echo "</table><br />";

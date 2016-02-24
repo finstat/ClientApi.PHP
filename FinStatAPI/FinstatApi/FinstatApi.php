@@ -169,22 +169,31 @@ class FinstatApi
         return $detail;
     }
 
+    private function parseAddress($detail, $response)
+    {
+        $response->Street           = (string)$detail->Street;
+        $response->StreetNumber     = (string)$detail->StreetNumber;
+        $response->ZipCode          = (string)$detail->ZipCode;
+        $response->City             = (string)$detail->City;
+        $response->District         = (string)$detail->District;
+        $response->Region           = (string)$detail->Region;
+        $response->Country          = (string)$detail->Country;
+
+        return $response;
+    }
+
     private function parseBase($detail , $response = null)
     {
          if  ($detail === FALSE) {
             return $detail;
         }
         $response = ($response == null)? new BaseResult() : $response;
-
+        $response = $this->parseAddress($detail, $response);
         $response->Ico                  = (string)$detail->Ico;
         $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
         $response->Dic                  = (string)$detail->Dic;
         $response->IcDPH                = (string)$detail->IcDPH;
         $response->Name                 = (string)$detail->Name;
-        $response->Street               = (string)$detail->Street;
-        $response->StreetNumber         = (string)$detail->StreetNumber;
-        $response->ZipCode              = (string)$detail->ZipCode;
-        $response->City                 = (string)$detail->City;
         $response->Created              = $this->parseDate($detail->Created);
         $response->Cancelled            = $this->parseDate($detail->Cancelled);
         $response->SuspendedAsPerson    = "{$detail->SuspendedAsPerson}"  == 'true' ;
@@ -220,8 +229,6 @@ class FinstatApi
         $response = ($response == null)? new ExtendedResult() : $response;
         $responsev= $this->parseBase($detail, $response);
 
-        $response->District             = (string)$detail->District;
-        $response->Region               = (string)$detail->Region;
         $response->EmployeeCode         = (string)$detail->EmployeeCode;
         $response->EmployeeText         = (string)$detail->EmployeeText;
         $response->LegalFormCode        = (string)$detail->LegalFormCode;
@@ -284,13 +291,7 @@ class FinstatApi
             $response->Offices = array();
             foreach ($detail->Offices->Office as $office) {
                 $o = new OfficeResult();
-                $o->City = (string)$office->City;
-                $o->Country = (string)$office->Country;
-                $o->District = (string)$office->District;
-                $o->Region = (string)$office->Region;
-                $o->Street = (string)$office->Street;
-                $o->StreetNumber = (string)$office->StreetNumber;
-                $o->ZipCode = (string)$office->ZipCode;
+                $o = $this->parseAddress($office, $o);
                 $o->Type = (string)$office->Type;
                 if(!empty($office->Subjects)) {
                      $o->Subjects = array();
@@ -362,14 +363,8 @@ class FinstatApi
             if (!empty($detail->Persons)) {
                 foreach ($detail->Persons->Person as $person) {
                     $o = new PersonResult();
+                    $o = $this->parseAddress($person, $o);
                     $o->FullName = (string)$person->FullName;
-                    $o->Street = (string)$person->Street;
-                    $o->StreetNumber = (string)$person->StreetNumber;
-                    $o->ZipCode = (string)$person->ZipCode;
-                    $o->City = (string)$person->City;
-                    $o->Region = (string)$person->Region;
-                    $o->Country = (string)$person->Country;
-                    $o->District = (string)$person->District;
                     $o->DetectedFrom = $this->parseDate($person->DetectedFrom);
                     $o->DetectedTo  = $this->parseDate($person->DetectedTo);
                     $o->DepositAmount  = (!empty($person->DepositAmount)) ? (float)$person->DepositAmount : null;
@@ -389,15 +384,35 @@ class FinstatApi
             }
             if (!empty($detail->RegistrationCourt)) {
                 $o = new PersonResult();
+                $o = $this->parseAddress($detail->RegistrationCourt, $o);
                 $o->Name = (string)$detail->RegistrationCourt->Name;
-                $o->Street = (string)$detail->RegistrationCourt->Street;
-                $o->StreetNumber = (string)$detail->RegistrationCourt->StreetNumber;
-                $o->ZipCode = (string)$detail->RegistrationCourt->ZipCode;
-                $o->City = (string)$detail->RegistrationCourt->City;
-                $o->Region = (string)$detail->RegistrationCourt->Region;
-                $o->Country = (string)$detail->RegistrationCourt->Country;
-                $o->District = (string)$detail->RegistrationCourt->District;
                 $response->RegistrationCourt = $o;
+            }
+
+            if (!empty($detail->WebPages)) {
+                $response->WebPages = array();
+                foreach ($detail->WebPages->string as $s) {
+                   $response->WebPages[] = (string)$s;
+                }
+            }
+
+            if (!empty($detail->StatutoryAction)) {
+                $response->StatutoryAction = (string)$detail->StatutoryAction;
+            }
+
+            if (!empty($detail->ProcurationAction)) {
+                $response->ProcurationAction = (string)$detail->ProcurationAction;
+            }
+
+            if (!empty($detail->AddressHistory)) {
+                $response->AddressHistory = array();
+                foreach ($detail->AddressHistory->HistoryAddress as $address) {
+                    $o = new AddressResult();
+                    $o = $this->parseAddress($address, $o);
+                    $o->ValidFrom = $this->parseDate($person->ValidFrom);
+                    $o->ValidTo = $this->parseDate($person->ValidTo);
+                    $response->AddressHistory[] = $o;
+                }
             }
         }
 

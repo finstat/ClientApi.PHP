@@ -151,6 +151,19 @@ class FinstatApi
         return $detail;
     }
 
+    private function parseAddress($detail, $response)
+    {
+        $response->Street           = (string)$detail->Street;
+        $response->StreetNumber     = (string)$detail->StreetNumber;
+        $response->ZipCode          = (string)$detail->ZipCode;
+        $response->City             = (string)$detail->City;
+        $response->District         = (string)$detail->District;
+        $response->Region           = (string)$detail->Region;
+        $response->Country          = (string)$detail->Country;
+
+        return $response;
+    }
+
     private function parseDetail($detail)
     {
         if  ($detail === FALSE) {
@@ -158,18 +171,13 @@ class FinstatApi
         }
 
         $response = new DetailResult();
+        $response = $this->parseAddress($detail, $response);
         $response->Ico                  = (string)$detail->Ico;
         $response->CzNaceCode           = (string)$detail->CzNaceCode;
         $response->CzNaceText           = (string)$detail->CzNaceText;
         $response->CzNaceDivision       = (string)$detail->CzNaceDivision;
         $response->CzNaceGroup          = (string)$detail->CzNaceGroup;
         $response->Name                 = (string)$detail->Name;
-        $response->Street               = (string)$detail->Street;
-        $response->StreetNumber         = (string)$detail->StreetNumber;
-        $response->ZipCode              = (string)$detail->ZipCode;
-        $response->City                 = (string)$detail->City;
-        $response->Region               = (string)$detail->Region;
-        $response->District             = (string)$detail->District;
         $response->Created              = $this->parseDate($detail->Created);
         $response->Cancelled            = $this->parseDate($detail->Cancelled);
         $response->Activity             = (string)$detail->Activity;

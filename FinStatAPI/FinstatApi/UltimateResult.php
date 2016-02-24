@@ -10,17 +10,10 @@ class FunctionResult
     ;
 }
 
-class PersonResult
+class PersonResult extends AddressResult
 {
     public
         $FullName,
-        $Street,
-        $StreetNumber,
-        $ZipCode,
-        $City,
-        $Country,
-        $Region,
-        $District,
         $DetectedFrom,
         $DetectedTo,
         $Functions = array(),
@@ -29,17 +22,18 @@ class PersonResult
     ;
 }
 
-class CourtResult
+class CourtResult extends AddressResult
 {
     public
-        $Name,
-        $Street,
-        $StreetNumber,
-        $ZipCode,
-        $City,
-        $Country,
-        $Region,
-        $District
+        $Name
+    ;
+}
+
+class HistoryAddressResult extends AddressResult
+{
+    public
+        $ValidFrom,
+        $ValidTo
     ;
 }
 
@@ -51,7 +45,11 @@ class UltimateResult extends ExtendedResult
         $Persons = array(),
         $BasicCapital,
         $PaybackRange,
-        $RegistrationCourt
+        $RegistrationCourt,
+        $WebPages,
+        $AddressHistory,
+        $StatutoryAction,
+        $ProcurationAction
     ;
 }
 ?>

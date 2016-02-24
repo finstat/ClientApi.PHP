@@ -9,11 +9,9 @@ function echoBase($response)
     echo '<b>Číslo ulice: </b>'.            $response->StreetNumber.'<br />';
     echo '<b>PSČ: </b>'.                    $response->ZipCode.'<br />';
     echo '<b>Mesto: </b>'.                  $response->City.'<br />';
-    if($response instanceof DetailResult)
-    {
-        echo '<b>Okres: </b>'.                  $response->District.'<br />';
-        echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
-    }
+    echo '<b>Okres: </b>'.                  $response->District.'<br />';
+    echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
+    echo '<b>Štát: </b>'.                   $response->Country.'<br />';
     echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
     if($response instanceof DetailResult)
     {
