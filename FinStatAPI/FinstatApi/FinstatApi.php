@@ -409,8 +409,8 @@ class FinstatApi
                 foreach ($detail->AddressHistory->HistoryAddress as $address) {
                     $o = new AddressResult();
                     $o = $this->parseAddress($address, $o);
-                    $o->ValidFrom = $this->parseDate($person->ValidFrom);
-                    $o->ValidTo = $this->parseDate($person->ValidTo);
+                    $o->ValidFrom = $this->parseDate($address->ValidFrom);
+                    $o->ValidTo = $this->parseDate($address->ValidTo);
                     $response->AddressHistory[] = $o;
                 }
             }
