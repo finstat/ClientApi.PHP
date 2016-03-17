@@ -347,6 +347,27 @@ class FinstatApi
         return $response;
     }
 
+    private function pasrePerson($person)
+    {
+        $o = new PersonResult();
+        $o = $this->parseAddress($person, $o);
+        $o->FullName = (string)$person->FullName;
+        $o->DetectedFrom = $this->parseDate($person->DetectedFrom);
+        $o->DetectedTo  = $this->parseDate($person->DetectedTo);
+        $o->Functions = array();
+        if (!empty($person->Functions) && !empty($person->Functions->FunctionAssigment)) {
+            foreach($person->Functions->FunctionAssigment as $function) {
+                $of = new FunctionResult();
+                $of->Type = (string)$function->Type;
+                $of->Description = (string)$function->Description;
+                $of->From = $this->parseDate($function->From);
+                $o->Functions[] = $of;
+            }
+        }
+
+        return $o;
+    }
+
     private function parseUltimate($detail)
     {
         if ($detail === FALSE) {
@@ -362,23 +383,9 @@ class FinstatApi
             $response->Persons = array();
             if (!empty($detail->Persons)) {
                 foreach ($detail->Persons->Person as $person) {
-                    $o = new PersonResult();
-                    $o = $this->parseAddress($person, $o);
-                    $o->FullName = (string)$person->FullName;
-                    $o->DetectedFrom = $this->parseDate($person->DetectedFrom);
-                    $o->DetectedTo  = $this->parseDate($person->DetectedTo);
+                    $o = $this->pasrePerson($person);
                     $o->DepositAmount  = (!empty($person->DepositAmount)) ? (float)$person->DepositAmount : null;
                     $o->PaybackRange  = (!empty($person->PaybackRange)) ? (float)$person->PaybackRange : null;
-                    $o->Functions = array();
-                    if (!empty($person->Functions) && !empty($person->Functions->FunctionAssigment)) {
-                        foreach($person->Functions->FunctionAssigment as $function) {
-                            $of = new FunctionResult();
-                            $of->Type = (string)$function->Type;
-                            $of->Description = (string)$function->Description;
-                            $of->From = $this->parseDate($function->From);
-                            $o->Functions[] = $of;
-                        }
-                    }
                     $response->Persons[] = $o;
                 }
             }
@@ -413,6 +420,39 @@ class FinstatApi
                     $o->ValidTo = $this->parseDate($address->ValidTo);
                     $response->AddressHistory[] = $o;
                 }
+            }
+
+            if (!empty($detail->ORCancelled)) {
+                $response->ORCancelled = $this->parseDate($detail->ORCancelled);
+            }
+
+            if (!empty($detail->LastTender)) {
+                $o = new TenderResult();
+                $o->EnterDate = $this->parseDate($detail->LastTender->EnterDate);
+                $o->EnterReason = (string) $detail->LastTender->EnterReason;
+                $o->ExitDate = $this->parseDate($detail->LastTender->ExitDate);
+                $o->ExitReason = (string) $detail->LastTender->ExitReason;
+                $o->Officer = $this->pasrePerson($detail->LastTender->Officer);
+                $response->LastTender = $o;
+            }
+
+            if (!empty($detail->LastRestructuring)) {
+                $o = new RestructuringResult();
+                $o->EnterDate = $this->parseDate($detail->LastRestructuring->EnterDate);
+                $o->EnterReason = (string) $detail->LastRestructuring->EnterReason;
+                $o->ExitDate = $this->parseDate($detail->LastRestructuring->ExitDate);
+                $o->ExitReason = (string) $detail->LastRestructuring->ExitReason;
+                $o->Officer = $this->pasrePerson($detail->LastRestructuring->Officer);
+                $response->LastRestructuring = $o;
+            }
+
+            if (!empty($detail->LastLiquidation)) {
+                $o = new LiquidationResult();
+                $o->EnterDate = $this->parseDate($detail->LastLiquidation->EnterDate);
+                $o->EnterReason = (string) $detail->LastLiquidation->EnterReason;
+                $o->ExitDate = $this->parseDate($detail->LastLiquidation->ExitDate);
+                $o->Officer = $this->pasrePerson($detail->LastLiquidation->Officer);
+                $response->LastLiquidation = $o;
             }
         }
 
@@ -473,9 +513,9 @@ class FinstatApi
      * @param SimpleXMLElement $date
      * @return DateTime|null
      */
-    private function parseDate(SimpleXMLElement $date) {
+    private function parseDate(SimpleXMLElement $date = null) {
 
-        if (!((string) $date)) {
+        if (empty($date) || !((string) $date)) {
           return null;
         }
 

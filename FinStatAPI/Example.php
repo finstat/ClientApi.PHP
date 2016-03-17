@@ -49,6 +49,10 @@ function echoBase($response)
     echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
     echo '<b>Založená: </b>'.               (($response->Created) ? $response->Created->format('d.m.Y') : '').'<br />';
     echo '<b>Zrušená: </b>'.                (($response->Cancelled) ? $response->Cancelled->format('d.m.Y') : '') .'<br />';
+    if($response instanceof UltimateResult)
+    {
+        echo '<b>Zrušená podľa OR: </b>'.                (($response->ORCancelled) ? $response->ORCancelled->format('d.m.Y') : '') .'<br />';
+    }
     if($response instanceof ExtendedResult)
     {
         echo '<b>Právna forma kód: </b>'.                           $response->LegalFormCode.'<br />';
@@ -234,7 +238,7 @@ function echoBase($response)
         }
         if (!empty($response->AddressHistory)) {
             echo '<b>História adries: </b><br />';
-            echo "<br /><table>";
+            echo "<br /><table><tr>";
             echo
                 "</th><th>Adresa" .
                 "</th><th>Platná od" .
@@ -245,6 +249,48 @@ function echoBase($response)
                     "<tr></td><td>" . $address->Street ." " . $address->StreetNumber. ", " . $address->ZipCode . ", " . $address->City .  ", " . $address->District .  ", " . $address->Region .  ", " . $address->Country .
                     "</td><td>" . (($address->ValidFrom) ? $address->ValidFrom->format('d.m.Y') : '') .
                     "</td><td>" . (($address->ValidTo) ? $address->ValidTo->format('d.m.Y') : '') .
+                    "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+
+        if(!empty($response->LastTender) || !empty($response->LastRestructuring) || !empty($responset->LastLiquidation)) {
+            echo '<b>Konkurz / Reštruktualizácia / Likvidácia: </b><br />';
+            echo "<br /><table><tr>";
+            echo "<tr>";
+            echo
+                "</th><th>" .
+                "</th><th>Dátum vstupu" .
+                "</th><th>" .
+                "</th><th>Dátum výstupu" .
+                "</th><th>" .
+                "</th><th> Dohladajúca osoba" .
+                "</th></tr>";
+            if(!empty($response->LastTender)) {
+                echo "<tr><th>Posledný konkurz</th></td><td>".
+                    (($response->LastTender->EnterDate) ? $response->LastTender->EnterDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->LastTender->EnterReason."</td><td>".
+                    (($response->LastTender->ExitDate) ? $response->LastTender->ExitDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->LastTender->ExitReason."</td><td>".
+                    (($response->LastTender->Officer) ? $response->LastTender->Officer->FullName : '')."</td><td>".
+                    "</td></tr>";
+            }
+            if(!empty($response->LastRestructuring)) {
+                echo "<tr><th>Posledná reštrukturalizácia</th></td><td>".
+                    (($response->LastRestructuring->EnterDate) ? $response->LastRestructuring->EnterDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->LastRestructuring->EnterReason."</td><td>".
+                    (($response->LastRestructuring->ExitDate) ? $response->LastRestructuring->ExitDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->LastRestructuring->ExitReason."</td><td>".
+                    (($response->LastRestructuring->Officer) ? $response->LastRestructuring->Officer->FullName : '')."</td><td>".
+                    "</td></tr>";
+            }
+            if(!empty($response->LastLiquidation)) {
+                echo "<tr><th>Posledná likvidácia</th></td><td>".
+                    (($response->LastLiquidation->EnterDate) ? $response->LastLiquidation->EnterDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->LastLiquidation->EnterReason."</td><td>".
+                    (($response->LastLiquidation->ExitDate) ? $response->LastLiquidation->ExitDate->format('d.m.Y') : '') ."</td><td>".
+                    "</td><td>".
+                    (($response->LastLiquidation->Officer) ? $response->LastLiquidation->Officer->FullName : '')."</td><td>".
                     "</td></tr>";
             }
             echo "</table><br />";

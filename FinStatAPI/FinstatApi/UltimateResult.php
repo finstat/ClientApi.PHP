@@ -37,6 +37,26 @@ class HistoryAddressResult extends AddressResult
     ;
 }
 
+class LiquidationResult
+{
+    public
+        $EnterDate,
+        $EnterReason,
+        $ExitDate,
+        $Officer
+    ;
+}
+
+class TenderResult extends LiquidationResult
+{
+    public
+        $ExitReason
+    ;
+}
+class RestructuringResult extends TenderResult
+{
+}
+
 class UltimateResult extends ExtendedResult
 {
     public
@@ -49,7 +69,11 @@ class UltimateResult extends ExtendedResult
         $WebPages,
         $AddressHistory,
         $StatutoryAction,
-        $ProcurationAction
+        $ProcurationAction,
+        $LastTender,
+        $LastRestructuring,
+        $LastLiquidation,
+        $ORCancelled
     ;
 }
 ?>
