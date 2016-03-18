@@ -426,33 +426,31 @@ class FinstatApi
                 $response->ORCancelled = $this->parseDate($detail->ORCancelled);
             }
 
-            if (!empty($detail->LastTender)) {
-                $o = new TenderResult();
-                $o->EnterDate = $this->parseDate($detail->LastTender->EnterDate);
-                $o->EnterReason = (string) $detail->LastTender->EnterReason;
-                $o->ExitDate = $this->parseDate($detail->LastTender->ExitDate);
-                $o->ExitReason = (string) $detail->LastTender->ExitReason;
-                $o->Officer = $this->pasrePerson($detail->LastTender->Officer);
-                $response->LastTender = $o;
+            if (!empty($detail->Bankrupt)) {
+                $o = new BankruptResult();
+                $o->EnterDate = $this->parseDate($detail->Bankrupt->EnterDate);
+                $o->EnterReason = (string) $detail->Bankrupt->EnterReason;
+                $o->ExitDate = $this->parseDate($detail->Bankrupt->ExitDate);
+                $o->ExitReason = (string) $detail->Bankrupt->ExitReason;
+                $o->Officer = $this->pasrePerson($detail->Bankrupt->Officer);
+                $response->Bankrupt = $o;
             }
-
-            if (!empty($detail->LastRestructuring)) {
+            if (!empty($detail->Restructuring)) {
                 $o = new RestructuringResult();
-                $o->EnterDate = $this->parseDate($detail->LastRestructuring->EnterDate);
-                $o->EnterReason = (string) $detail->LastRestructuring->EnterReason;
-                $o->ExitDate = $this->parseDate($detail->LastRestructuring->ExitDate);
-                $o->ExitReason = (string) $detail->LastRestructuring->ExitReason;
-                $o->Officer = $this->pasrePerson($detail->LastRestructuring->Officer);
-                $response->LastRestructuring = $o;
+                $o->EnterDate = $this->parseDate($detail->Restructuring->EnterDate);
+                $o->EnterReason = (string) $detail->Restructuring->EnterReason;
+                $o->ExitDate = $this->parseDate($detail->Restructuring->ExitDate);
+                $o->ExitReason = (string) $detail->Restructuring->ExitReason;
+                $o->Officer = $this->pasrePerson($detail->Restructuring->Officer);
+                $response->Restructuring = $o;
             }
-
-            if (!empty($detail->LastLiquidation)) {
+            if (!empty($detail->Liquidation)) {
                 $o = new LiquidationResult();
-                $o->EnterDate = $this->parseDate($detail->LastLiquidation->EnterDate);
-                $o->EnterReason = (string) $detail->LastLiquidation->EnterReason;
-                $o->ExitDate = $this->parseDate($detail->LastLiquidation->ExitDate);
-                $o->Officer = $this->pasrePerson($detail->LastLiquidation->Officer);
-                $response->LastLiquidation = $o;
+                $o->EnterDate = $this->parseDate($detail->Liquidation->EnterDate);
+                $o->EnterReason = (string) $detail->Liquidation->EnterReason;
+                $o->ExitDate = $this->parseDate($detail->Liquidation->ExitDate);
+                $o->Officer = $this->pasrePerson($detail->Liquidation->Officer);
+                $response->Liquidation = $o;
             }
         }
 

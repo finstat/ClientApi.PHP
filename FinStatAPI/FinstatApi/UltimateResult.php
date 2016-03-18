@@ -47,13 +47,13 @@ class LiquidationResult
     ;
 }
 
-class TenderResult extends LiquidationResult
+class BankruptResult extends LiquidationResult
 {
     public
         $ExitReason
     ;
 }
-class RestructuringResult extends TenderResult
+class RestructuringResult extends BankruptResult
 {
 }
 
@@ -70,9 +70,9 @@ class UltimateResult extends ExtendedResult
         $AddressHistory,
         $StatutoryAction,
         $ProcurationAction,
-        $LastTender,
-        $LastRestructuring,
-        $LastLiquidation,
+        $Bankrupt,
+        $Restructuring,
+        $Liquidation,
         $ORCancelled
     ;
 }

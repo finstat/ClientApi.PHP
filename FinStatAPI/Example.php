@@ -254,7 +254,7 @@ function echoBase($response)
             echo "</table><br />";
         }
 
-        if(!empty($response->LastTender) || !empty($response->LastRestructuring) || !empty($responset->LastLiquidation)) {
+        if(!empty($response->Bankrupt) || !empty($response->Restructuring) || !empty($response->Liquidation)) {
             echo '<b>Konkurz / Reštruktualizácia / Likvidácia: </b><br />';
             echo "<br /><table><tr>";
             echo "<tr>";
@@ -264,33 +264,33 @@ function echoBase($response)
                 "</th><th>" .
                 "</th><th>Dátum výstupu" .
                 "</th><th>" .
-                "</th><th> Dohladajúca osoba" .
+                "</th><th> Správca" .
                 "</th></tr>";
-            if(!empty($response->LastTender)) {
-                echo "<tr><th>Posledný konkurz</th></td><td>".
-                    (($response->LastTender->EnterDate) ? $response->LastTender->EnterDate->format('d.m.Y') : '') ."</td><td>".
-                    $response->LastTender->EnterReason."</td><td>".
-                    (($response->LastTender->ExitDate) ? $response->LastTender->ExitDate->format('d.m.Y') : '') ."</td><td>".
-                    $response->LastTender->ExitReason."</td><td>".
-                    (($response->LastTender->Officer) ? $response->LastTender->Officer->FullName : '')."</td><td>".
+            if(!empty($response->Bankrupt)) {
+                echo "<tr><th>Konkurz</th></td><td>".
+                    (($response->Bankrupt->EnterDate) ? $response->Bankrupt->EnterDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->Bankrupt->EnterReason."</td><td>".
+                    (($response->Bankrupt->ExitDate) ? $response->Bankrupt->ExitDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->Bankrupt->ExitReason."</td><td>".
+                    (($response->Bankrupt->Officer) ? $response->Bankrupt->Officer->FullName : '')."</td><td>".
                     "</td></tr>";
             }
-            if(!empty($response->LastRestructuring)) {
-                echo "<tr><th>Posledná reštrukturalizácia</th></td><td>".
-                    (($response->LastRestructuring->EnterDate) ? $response->LastRestructuring->EnterDate->format('d.m.Y') : '') ."</td><td>".
-                    $response->LastRestructuring->EnterReason."</td><td>".
-                    (($response->LastRestructuring->ExitDate) ? $response->LastRestructuring->ExitDate->format('d.m.Y') : '') ."</td><td>".
-                    $response->LastRestructuring->ExitReason."</td><td>".
-                    (($response->LastRestructuring->Officer) ? $response->LastRestructuring->Officer->FullName : '')."</td><td>".
+            if(!empty($response->Restructuring)) {
+                echo "<tr><th>Reštrukturalizácia</th></td><td>".
+                    (($response->Restructuring->EnterDate) ? $response->Restructuring->EnterDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->Restructuring->EnterReason."</td><td>".
+                    (($response->Restructuring->ExitDate) ? $response->Restructuring->ExitDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->Restructuring->ExitReason."</td><td>".
+                    (($response->Restructuring->Officer) ? $response->Restructuring->Officer->FullName : '')."</td><td>".
                     "</td></tr>";
             }
-            if(!empty($response->LastLiquidation)) {
-                echo "<tr><th>Posledná likvidácia</th></td><td>".
-                    (($response->LastLiquidation->EnterDate) ? $response->LastLiquidation->EnterDate->format('d.m.Y') : '') ."</td><td>".
-                    $response->LastLiquidation->EnterReason."</td><td>".
-                    (($response->LastLiquidation->ExitDate) ? $response->LastLiquidation->ExitDate->format('d.m.Y') : '') ."</td><td>".
+            if(!empty($response->Liquidation)) {
+                echo "<tr><th>Likvidácia</th></td><td>".
+                    (($response->Liquidation->EnterDate) ? $response->Liquidation->EnterDate->format('d.m.Y') : '') ."</td><td>".
+                    $response->Liquidation->EnterReason."</td><td>".
+                    (($response->Liquidation->ExitDate) ? $response->Liquidation->ExitDate->format('d.m.Y') : '') ."</td><td>".
                     "</td><td>".
-                    (($response->LastLiquidation->Officer) ? $response->LastLiquidation->Officer->FullName : '')."</td><td>".
+                    (($response->Liquidation->Officer) ? $response->Liquidation->Officer->FullName : '')."</td><td>".
                     "</td></tr>";
             }
             echo "</table><br />";
