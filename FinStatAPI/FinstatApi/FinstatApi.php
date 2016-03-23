@@ -227,7 +227,7 @@ class FinstatApi
     private function parseExtended($detail, $response = null)
     {
         $response = ($response == null)? new ExtendedResult() : $response;
-        $responsev= $this->parseBase($detail, $response);
+        $response = $this->parseBase($detail, $response);
 
         $response->EmployeeCode         = (string)$detail->EmployeeCode;
         $response->EmployeeText         = (string)$detail->EmployeeText;
