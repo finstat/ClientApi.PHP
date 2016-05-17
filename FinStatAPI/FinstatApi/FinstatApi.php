@@ -344,6 +344,21 @@ class FinstatApi
             $response->StructuredName = $o;
          }
 
+         if (!empty($detail->ContactSources)) {
+             $response->ContactSources = array();
+             foreach ($detail->ContactSources->ContactSource as $c) {
+                $o = new ContactSourceResult();
+                $o->Contact = (string) $c->Contact;
+                if(!empty($c->Sources)) {
+                    $o->Sources = array();
+                    foreach ($c->Sources->string as $s) {
+                       $o->Sources[] = (string)$s;
+                    }
+                }
+                $response->ContactSources[] = $o;
+             }
+         }
+
         return $response;
     }
 

@@ -45,6 +45,14 @@ function echoBase($response)
     {
         echo '<b>Tel. čisla: </b>'.                                 implode(', ', $response->Phones).'<br />';
         echo '<b>Emaily: </b>'.                                     implode(', ', $response->Emails).'<br />';
+        if(!empty($response->ContactSources))
+        {
+            echo '<b>Zdroje:</b> <br />';
+            foreach($response->ContactSources as $source) {
+                echo $source->Contact . ' -'. (!empty($source->Sources) ? implode(', ', $source->Sources): '' ) .'<br />';
+            }
+        }
+
     }
     echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
     echo '<b>Založená: </b>'.               (($response->Created) ? $response->Created->format('d.m.Y') : '').'<br />';
@@ -345,7 +353,7 @@ function echoAutoComplete($response)
 
 // zakladne prihlasovacie udaje a nastavenia klienta
 $apiUrl = 'http://www.finstat.sk/api/';    // URL adresa Finstat API
-$apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
+$apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY9';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
                                         // prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
 $privateKey = 'PLEASE_FILL_IN_YOUR_PRIVATE_KEY';// PLEASE_FILL_IN_YOUR_PRIVATE_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
                                         // prosim poziadajte o svoj privatny kluc na info@finstat.sk.

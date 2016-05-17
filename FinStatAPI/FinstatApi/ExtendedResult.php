@@ -54,6 +54,14 @@ public
     ;
 }
 
+class ContactSourceResult
+{
+public
+        $Contact,
+        $Sources
+    ;
+}
+
 class ExtendedResult extends BaseResult
 {
     public
@@ -83,6 +91,7 @@ class ExtendedResult extends BaseResult
         $SelfEmployed,
         $Offices,
         $Subjects,
-        $StructuredName
+        $StructuredName,
+        $ContactSources
         ;
     }
