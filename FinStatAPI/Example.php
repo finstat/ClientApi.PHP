@@ -353,7 +353,7 @@ function echoAutoComplete($response)
 
 // zakladne prihlasovacie udaje a nastavenia klienta
 $apiUrl = 'http://www.finstat.sk/api/';    // URL adresa Finstat API
-$apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY9';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
+$apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
                                         // prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
 $privateKey = 'PLEASE_FILL_IN_YOUR_PRIVATE_KEY';// PLEASE_FILL_IN_YOUR_PRIVATE_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
                                         // prosim poziadajte o svoj privatny kluc na info@finstat.sk.
