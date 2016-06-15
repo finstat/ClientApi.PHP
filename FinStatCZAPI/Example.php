@@ -77,6 +77,29 @@ function echoAutoComplete($response)
     echo "</pre>";
 }
 
+function echoLimits($limits) {
+    if(!empty($limits)) {
+        echo '<h2>Limity</h2>';
+        echo '<table>';
+        echo '<tr>'.
+                '<th></th>'.
+                '<th>Aktuálny</th>'.
+                '<th>MAX</th>'.
+             '</tr>';
+         echo '<tr>'.
+                '<th>Denný</th>'.
+                '<th>'. ((isset($limits['daily']) && isset($limits['daily']['current'])) ? $limits['daily']['current'] : "---") .'</th>'.
+                '<th>'. ((isset($limits['daily']) && isset($limits['daily']['max'])) ? $limits['daily']['max'] : "---") .'</th>'.
+             '</tr>';
+         echo '<tr>'.
+                '<th>Mesačný</th>'.
+                '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['current'])) ? $limits['monthly']['current'] : "---") .'</th>'.
+                '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['max'])) ? $limits['monthly']['max'] : "---") .'</th>'.
+             '</tr>';
+        echo '</table>';
+    }
+}
+
 // zakladne prihlasovacie udaje a nastavenia klienta
 $apiUrl = 'http://cz.finstat.sk/api/';    // URL adresa Finstat API
 $apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
@@ -106,6 +129,7 @@ try
 }
 catch (Exception $e)
 {
+    echoLimits($api->GetAPILimits());
     echoException($e);
 }
 
@@ -115,6 +139,7 @@ header('Content-Type: text/html; charset=utf-8');
 <h1>Detail test:</h1>
 <?php
 echoBase($response);
+echoLimits($api->GetAPILimits());
 echo '<hr />';
 ?>
 

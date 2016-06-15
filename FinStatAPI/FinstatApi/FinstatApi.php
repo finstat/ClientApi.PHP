@@ -15,7 +15,8 @@ class FinstatApi
         $privateKey,
         $stationId,
         $stationName,
-        $timeout;
+        $timeout,
+        $limits;
 
     //
     // Constructor
@@ -28,6 +29,7 @@ class FinstatApi
         $this->stationId = $stationId;
         $this->stationName = $stationName;
         $this->timeout = $timeout;
+        $this->limits = null;
     }
 
     public function RequestAutoComplete($query)
@@ -71,6 +73,18 @@ class FinstatApi
 
     private function parseResponse($response, $url, $parameter)
     {
+        //parse limits
+        $this->limits = array(
+            "daily" => array(
+                "current" => ($response->headers->offsetExists('finstat-daily-limit-current')) ? $response->headers->offsetGet('finstat-daily-limit-current') : null,
+                "max"=> ($response->headers->offsetExists('finstat-daily-limit-max')) ? $response->headers->offsetGet('finstat-daily-limit-max') : null
+            ),
+            "monthly" => array(
+                "current" => ($response->headers->offsetExists('finstat-monthly-limit-current')) ? $response->headers->offsetGet('finstat-monthly-limit-current') : null,
+                "max"=> ($response->headers->offsetExists('finstat-monthly-limit-max')) ? $response->headers->offsetGet('finstat-monthly-limit-max') : null
+            ),
+        );
+
         if(!$response->success)
         {
             $dom = new DOMDocument();
@@ -84,6 +98,9 @@ class FinstatApi
                         throw new Requests_Exception("Invalid URL: '{$url}'!", 'FinstatApi', $dom->textContent, $response->status_code);
                     }
 
+                case 402:
+                    throw new Requests_Exception('Limit reached!', 'FinstatApi', $dom->textContent, $response->status_code);
+
                 case 403:
                     throw new Requests_Exception('Access Forbidden!', 'FinstatApi', $dom->textContent, $response->status_code);
 
@@ -93,10 +110,21 @@ class FinstatApi
         }
 
         $detail = simplexml_load_string($response->body);
+
         if($detail === FALSE)
             throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
 
         return $detail;
+    }
+
+    public function GetAPILimits()
+    {
+        if(empty($this->limits))
+        {
+            throw new  Exception('Limits are available after API call');
+        }
+
+        return $this->limits;
     }
 
     public function RequestDetail($ico)
