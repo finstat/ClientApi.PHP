@@ -92,6 +92,12 @@ class ExtendedResult extends BaseResult
         $Offices,
         $Subjects,
         $StructuredName,
-        $ContactSources
+        $ContactSources,
+        $KaRUrl,
+        $DebtUrl,
+        $DisposalUrl,
+        $HasKaR,
+        $HasDebt,
+        $HasDisposal
         ;
     }

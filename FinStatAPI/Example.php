@@ -98,29 +98,38 @@ function echoBase($response)
     echo '<b>Url: </b>'.            $response->Url.'<br />';
     echo '<b>Príznak, či sa daná firma nachádza v zoznamoch dlžníkov, konkurzov alebo likvidácií: </b>';
     if($response->Warning) echo 'Áno (<a href="'.$response->WarningUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
+    if($response instanceof ExtendedResult)
+    {
+        echo '<b>Príznak, či sa daná firma má evidované konkurzy: </b>';
+        if($response->HasKaR) echo 'Áno (<a href="'.$response->KaRUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
+        echo '<b>Príznak, či sa daná firma má evidované dlhy: </b>';
+        if($response->HasDebt) echo 'Áno (<a href="'.$response->DebtUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
+        echo '<b>Príznak, či sa daná firma má evidované likvidácie: </b>';
+        if($response->HasDisposal) echo 'Áno (<a href="'.$response->DisposalUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
+    }
     echo '<b>Príznak, či má platobné príkazy: </b> ';
     if($response->PaymentOrderWarning) echo 'Áno (<a href="'.$response->PaymentOrderUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
     echo '<b>Príznak, či nastala pre danú firmu zmena v ORSR počas posledných 3 mesiacov: </b> ';
     if($response->OrChange) echo 'Áno (<a href="'.$response->OrChangeUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
     if($response instanceof DetailResult)
     {
-            echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
-            switch($response->Revenue)
-            {
-                case 'Unknown': echo 'Neznámy'; break;
-                case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
-                case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
-            }
-            echo '<br />';
-            echo '<b>Príznak nárastu/poklesu zisku firmy medzi posledným a predposledným rokom v databáze: </b>';
-            switch($response->Profit)
-            {
-                case 'Unknown': echo 'Neznámy'; break;
-                case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
-                case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
-                case 'Loss': echo 'Firma bola posledný rok v strate (<a href="'.$response->Url.'">viac info</a>)'; break;
-            }
-            echo '<br />';
+        echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
+        switch($response->Revenue)
+        {
+            case 'Unknown': echo 'Neznámy'; break;
+            case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
+            case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
+        }
+        echo '<br />';
+        echo '<b>Príznak nárastu/poklesu zisku firmy medzi posledným a predposledným rokom v databáze: </b>';
+        switch($response->Profit)
+        {
+            case 'Unknown': echo 'Neznámy'; break;
+            case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
+            case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
+            case 'Loss': echo 'Firma bola posledný rok v strate (<a href="'.$response->Url.'">viac info</a>)'; break;
+        }
+        echo '<br />';
     }
     if($response instanceof ExtendedResult)
     {

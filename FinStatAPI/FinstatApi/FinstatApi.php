@@ -275,6 +275,12 @@ class FinstatApi
         $response->ROA                  = empty($detail->ROA) ? null : (double)"{$detail->ROA}";
         $response->WarningKaR           = $this->parseDate($detail->WarningKaR);
         $response->WarningLiquidation   = $this->parseDate($detail->WarningLiquidation);
+        $response->KaRUrl               = (string)$detail->KaRUrl;
+        $response->DebtUrl              = (string)$detail->DebtUrl;
+        $response->DisposalUrl          = (string)$detail->DisposalUrl;
+        $response->HasKaR               = "{$detail->HasKaR}"  == 'true';
+        $response->HasDebt              = "{$detail->HasDebt}"  == 'true';
+        $response->HasDisposal          = "{$detail->HasDisposal}"  == 'true';
         $response->SelfEmployed         = "{$detail->SelfEmployed}"  == 'true';
         $response->Phones = array();
         if (!empty($detail->Phones)) {
