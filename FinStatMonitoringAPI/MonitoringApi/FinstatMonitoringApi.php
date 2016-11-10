@@ -211,38 +211,6 @@ class FinstatMonitoringApi
         return $this->parseMonitoringReport($detail);
     }
 
-    public function RequestZRSRScan($ico, $email = null)
-    {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'ico' => $ico,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash('requestzrsr'),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        if(isset($email) && !empty($email)) {
-            $data["email"] = $email;
-        }
-
-        $url = $this->apiUrl . "RequestZRSRScan";
-        try
-        {
-            $response = Requests::post($url, null, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, $ico);
-        $parse = (string)$detail;
-
-        return ($parse == 'true');
-    }
-
     private function parseMonitoringList($detail)
     {
         if  ($detail === FALSE) {

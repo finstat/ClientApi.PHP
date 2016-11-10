@@ -141,27 +141,6 @@ echo '<b>OK: </b>'.            ($response ? "true" : "false") .'<br />';
 echo "</pre>";
 echo '<hr />';
 ?>
-<h1>ZRSRSCanTest test:</h1>
-<p>ICO existujuce v Databaze FinStat</p>
-<?php
-try
-{
-    // funkcia $api->RequestZRSRScan(string) vracia stav úspechu operácie
-    if (!empty($ico)) {
-        $response = $api->RequestZRSRScan($ico);
-    }
-}
-catch (Exception $e)
-{
-     echoException($e);
-}
-
-// priklad vypisu ziskanych udajov z Finstatu
-echo "<pre>";
-echo '<b>FAIL: </b>'.            ($response ? "true" : "false") .'<br />';
-echo "</pre>";
-echo '<hr />';
-?>
 
 <h1>MonitoringList test:</h1>
 <?php
