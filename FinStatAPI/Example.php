@@ -26,12 +26,12 @@ function echoBase($response)
     }
     if($response instanceof ExtendedResult)
     {
-        echo '<b>Detail IČDPH: IČDPH: </b>'.                        $response->IcDphAdditional->IcDph.'<br />';
-        echo '<b>Detail IČDPH: Paragraf: </b>'.                     $response->IcDphAdditional->Paragraph.'<br />';
+        echo '<b>Detail IČDPH: IČDPH: </b>'.                         (!empty($response->IcDphAdditional) ? $response->IcDphAdditional->IcDph  : '') .'<br />';
+        echo '<b>Detail IČDPH: Paragraf: </b>'.                      (!empty($response->IcDphAdditional) ?$response->IcDphAdditional->Paragraph  : '') .'<br />';
         echo '<b>Detail IČDPH: Dátum detekovania v zozname subjektov, u ktorých nastali dôvody na zrušenie: </b>'.
-        (($response->IcDphAdditional->CancelListDetectedDate) ? $response->IcDphAdditional->CancelListDetectedDate->format('d.m.Y') : '').'<br />';
+        (!empty($response->IcDphAdditional) && ($response->IcDphAdditional->CancelListDetectedDate) ? $response->IcDphAdditional->CancelListDetectedDate->format('d.m.Y') : '').'<br />';
         echo '<b>Detail IČDPH: Dátum detekovania v zozname vymazaných subjektov: </b>'.
-        (($response->IcDphAdditional->RemoveListDetectedDate) ? $response->IcDphAdditional->RemoveListDetectedDate->format('d.m.Y') : '').'<br />';
+        (!empty($response->IcDphAdditional) && ($response->IcDphAdditional->RemoveListDetectedDate) ? $response->IcDphAdditional->RemoveListDetectedDate->format('d.m.Y') : '').'<br />';
     }
     echo '<b>Názov: </b>'.                  $response->Name.'<br />';
     echo '<b>Ulica: </b>'.                  $response->Street.'<br />';
@@ -61,10 +61,10 @@ function echoBase($response)
     {
         echo '<b>Zrušená podľa OR: </b>'.                (($response->ORCancelled) ? $response->ORCancelled->format('d.m.Y') : '') .'<br />';
     }
+    echo '<b>Právna forma kód: </b>'.                           $response->LegalFormCode.'<br />';
+        echo '<b>Právna forma popis: </b>'.                         $response->LegalFormText.'<br />';
     if($response instanceof ExtendedResult)
     {
-        echo '<b>Právna forma kód: </b>'.                           $response->LegalFormCode.'<br />';
-        echo '<b>Právna forma popis: </b>'.                         $response->LegalFormText.'<br />';
         echo '<b>Druh vlastníctva kód: </b>'.                       $response->OwnershipTypeCode.'<br />';
         echo '<b>Druh vlastníctva popis: </b>'.                     $response->OwnershipTypeText.'<br />';
     }
@@ -279,35 +279,43 @@ function echoBase($response)
                 "</th><th>" .
                 "</th><th>Dátum vstupu" .
                 "</th><th>" .
+                "</th><th>Dátum začiatku" .
                 "</th><th>Dátum výstupu" .
                 "</th><th>" .
                 "</th><th> Správca" .
+                "</th><th> Zdroj" .
                 "</th></tr>";
             if(!empty($response->Bankrupt)) {
                 echo "<tr><th>Konkurz</th></td><td>".
                     (($response->Bankrupt->EnterDate) ? $response->Bankrupt->EnterDate->format('d.m.Y') : '') ."</td><td>".
                     $response->Bankrupt->EnterReason."</td><td>".
+                    (($response->Bankrupt->StartDate) ? $response->Bankrupt->StartDate->format('d.m.Y') : '') ."</td><td>".
                     (($response->Bankrupt->ExitDate) ? $response->Bankrupt->ExitDate->format('d.m.Y') : '') ."</td><td>".
                     $response->Bankrupt->ExitReason."</td><td>".
                     (($response->Bankrupt->Officer) ? $response->Bankrupt->Officer->FullName : '')."</td><td>".
+                     $response->Bankrupt->Source."</td><td>".
                     "</td></tr>";
             }
             if(!empty($response->Restructuring)) {
                 echo "<tr><th>Reštrukturalizácia</th></td><td>".
                     (($response->Restructuring->EnterDate) ? $response->Restructuring->EnterDate->format('d.m.Y') : '') ."</td><td>".
                     $response->Restructuring->EnterReason."</td><td>".
+                    (($response->Bankrupt->StartDate) ? $response->Bankrupt->StartDate->format('d.m.Y') : '') ."</td><td>".
                     (($response->Restructuring->ExitDate) ? $response->Restructuring->ExitDate->format('d.m.Y') : '') ."</td><td>".
                     $response->Restructuring->ExitReason."</td><td>".
                     (($response->Restructuring->Officer) ? $response->Restructuring->Officer->FullName : '')."</td><td>".
+                    $response->Bankrupt->Source."</td><td>".
                     "</td></tr>";
             }
             if(!empty($response->Liquidation)) {
                 echo "<tr><th>Likvidácia</th></td><td>".
                     (($response->Liquidation->EnterDate) ? $response->Liquidation->EnterDate->format('d.m.Y') : '') ."</td><td>".
                     $response->Liquidation->EnterReason."</td><td>".
+                    "</td><td>".
                     (($response->Liquidation->ExitDate) ? $response->Liquidation->ExitDate->format('d.m.Y') : '') ."</td><td>".
                     "</td><td>".
                     (($response->Liquidation->Officer) ? $response->Liquidation->Officer->FullName : '')."</td><td>".
+                    $response->Bankrupt->Source."</td><td>".
                     "</td></tr>";
             }
             echo "</table><br />";

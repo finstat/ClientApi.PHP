@@ -70,8 +70,6 @@ class ExtendedResult extends BaseResult
         $Emails = array(),
         $EmployeeCode,
         $EmployeeText,
-        $LegalFormCode,
-        $LegalFormText,
         $OwnershipTypeCode,
         $OwnershipTypeText,
         $ActualYear,

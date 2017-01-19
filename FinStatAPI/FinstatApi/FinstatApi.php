@@ -237,6 +237,8 @@ class FinstatApi
         $response->SkNaceText           = (string)$detail->SkNaceText;
         $response->SkNaceDivision       = (string)$detail->SkNaceDivision;
         $response->SkNaceGroup          = (string)$detail->SkNaceGroup;
+        $response->LegalFormCode        = (string)$detail->LegalFormCode;
+        $response->LegalFormText        = (string)$detail->LegalFormText;
 
         return $response;
     }
@@ -259,8 +261,6 @@ class FinstatApi
 
         $response->EmployeeCode         = (string)$detail->EmployeeCode;
         $response->EmployeeText         = (string)$detail->EmployeeText;
-        $response->LegalFormCode        = (string)$detail->LegalFormCode;
-        $response->LegalFormText        = (string)$detail->LegalFormText;
         $response->OwnershipTypeCode    = (string)$detail->OwnershipTypeCode;
         $response->OwnershipTypeText    = (string)$detail->OwnershipTypeText;
         $response->ActualYear           = (int)"{$detail->ActualYear}";
@@ -477,6 +477,8 @@ class FinstatApi
 
             if (!empty($detail->Bankrupt)) {
                 $o = new BankruptResult();
+                $o->Source = (string) $detail->Bankrupt->Source;
+                $o->StartDate = $this->parseDate($detail->Bankrupt->StartDate);
                 $o->EnterDate = $this->parseDate($detail->Bankrupt->EnterDate);
                 $o->EnterReason = (string) $detail->Bankrupt->EnterReason;
                 $o->ExitDate = $this->parseDate($detail->Bankrupt->ExitDate);
@@ -486,6 +488,8 @@ class FinstatApi
             }
             if (!empty($detail->Restructuring)) {
                 $o = new RestructuringResult();
+                $o->Source = (string) $detail->Restructuring->Source;
+                $o->StartDate = $this->parseDate($detail->Restructuring->StartDate);
                 $o->EnterDate = $this->parseDate($detail->Restructuring->EnterDate);
                 $o->EnterReason = (string) $detail->Restructuring->EnterReason;
                 $o->ExitDate = $this->parseDate($detail->Restructuring->ExitDate);
@@ -495,6 +499,7 @@ class FinstatApi
             }
             if (!empty($detail->Liquidation)) {
                 $o = new LiquidationResult();
+                $o->Source = (string) $detail->Liquidation->Source;
                 $o->EnterDate = $this->parseDate($detail->Liquidation->EnterDate);
                 $o->EnterReason = (string) $detail->Liquidation->EnterReason;
                 $o->ExitDate = $this->parseDate($detail->Liquidation->ExitDate);

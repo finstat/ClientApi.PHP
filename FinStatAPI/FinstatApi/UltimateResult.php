@@ -43,13 +43,15 @@ class LiquidationResult
         $EnterDate,
         $EnterReason,
         $ExitDate,
-        $Officer
+        $Officer,
+        $Source
     ;
 }
 
 class BankruptResult extends LiquidationResult
 {
     public
+        $StartDate,
         $ExitReason
     ;
 }

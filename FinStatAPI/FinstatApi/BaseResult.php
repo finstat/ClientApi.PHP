@@ -35,7 +35,9 @@ class BaseResult extends AddressResult
         $SkNaceCode,
         $SkNaceText,
         $SkNaceDivision,
-        $SkNaceGroup
+        $SkNaceGroup,
+        $LegalFormCode,
+        $LegalFormText
     ;
 }
 ?>
