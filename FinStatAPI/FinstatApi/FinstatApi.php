@@ -484,6 +484,7 @@ class FinstatApi
                 $o->ExitDate = $this->parseDate($detail->Bankrupt->ExitDate);
                 $o->ExitReason = (string) $detail->Bankrupt->ExitReason;
                 $o->Officer = $this->pasrePerson($detail->Bankrupt->Officer);
+                $o->Status = (string) $detail->Bankrupt->Status;
                 $response->Bankrupt = $o;
             }
             if (!empty($detail->Restructuring)) {
@@ -495,6 +496,7 @@ class FinstatApi
                 $o->ExitDate = $this->parseDate($detail->Restructuring->ExitDate);
                 $o->ExitReason = (string) $detail->Restructuring->ExitReason;
                 $o->Officer = $this->pasrePerson($detail->Restructuring->Officer);
+                $o->Status = (string) $detail->Restructurin->Status;
                 $response->Restructuring = $o;
             }
             if (!empty($detail->Liquidation)) {

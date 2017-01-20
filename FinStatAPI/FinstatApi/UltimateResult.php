@@ -52,7 +52,8 @@ class BankruptResult extends LiquidationResult
 {
     public
         $StartDate,
-        $ExitReason
+        $ExitReason,
+        $Status
     ;
 }
 class RestructuringResult extends BankruptResult
