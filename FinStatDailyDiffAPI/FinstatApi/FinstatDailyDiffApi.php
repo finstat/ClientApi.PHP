@@ -29,7 +29,7 @@ class FinstatDailyDiffApi
         $this->limits = null;
     }
 
-    private function parseResponseRaw($response, $url, $parameter)
+    private function parseResponseRaw($response, $url, $parameter, $json = false)
     {
         //parse limits
         $this->limits = array(
@@ -66,13 +66,18 @@ class FinstatDailyDiffApi
                     throw new Requests_Exception('Unknown exception while communication with Finstat api!', 'FinstatApi', $dom->textContent, $response->status_code);
             }
         }
-}
+    }
 
-    private function parseResponse($response, $url, $parameter)
+    private function parseResponse($response, $url, $parameter, $json = false)
     {
 
-        $this->parseResponseRaw($response, $url, $parameter);
-        $detail = simplexml_load_string($response->body);
+        $this->parseResponseRaw($response, $url, $parameter, $json);
+        $detail = false;
+        if($json) {
+            $detail = json_decode($response->body);
+        } else {
+            $detail = simplexml_load_string($response->body);
+        }
 
         if($detail === FALSE)
             throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
@@ -80,7 +85,7 @@ class FinstatDailyDiffApi
         return $detail;
     }
 
-    public function RequestListOfDailyDiffs()
+    public function RequestListOfDailyDiffs($json = false)
     {
         if(!class_exists('Requests'))
         {
@@ -107,7 +112,11 @@ class FinstatDailyDiffApi
 
         try
         {
-            $response = Requests::post($url, null, $data, $options);
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
         }
         catch(Requests_Exception $e)
         {
@@ -115,19 +124,24 @@ class FinstatDailyDiffApi
         }
 
 
-        $detail = $this->parseResponse($response, $url, null);
+        $detail = $this->parseResponse($response, $url, null, $json);
         if($detail != false)
         {
-            $result = new DailyDiffList();
-            $result->Version = (string) $detail->Version;
-            $result->Files = array();
-            if (!empty($detail->Files) && isset($detail->Files->DailyDiff) && !empty($detail->Files->DailyDiff)) {
-                foreach ($detail->Files->DailyDiff as $element) {
-                    $result->Files[] = $this->ParseDailyDiff($element);
+            if(!$json)
+            {
+                $result = new DailyDiffList();
+                $result->Version = (string) $detail->Version;
+                $result->Files = array();
+                if (!empty($detail->Files) && isset($detail->Files->DailyDiff) && !empty($detail->Files->DailyDiff)) {
+                    foreach ($detail->Files->DailyDiff as $element) {
+                        $result->Files[] = $this->ParseDailyDiff($element);
+                    }
                 }
-            }
 
-            return $result;
+                return $result;
+            } else {
+                return $detail;
+            }
         }
 
         return null;

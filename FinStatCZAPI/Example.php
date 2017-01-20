@@ -1,6 +1,20 @@
 <?php
 require_once('FinstatApi/FinstatApi.php');
-function echoBase($response)
+
+function echoDate($date, $json = false)
+{
+    if($date && !empty($date))
+    {
+        if($json)
+        {
+            $date = new DateTime($date);
+        }
+        return $date->format('d.m.Y');
+    }
+    return '';
+}
+
+function echoBase($response, $json = false)
 {
     echo "<pre>";
     echo '<b>IČO: </b>'.                    $response->Ico.'<br />';
@@ -13,7 +27,7 @@ function echoBase($response)
     echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
     echo '<b>Štát: </b>'.                   $response->Country.'<br />';
     echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
-    if($response instanceof DetailResult)
+    if($response instanceof DetailResult || isset($response->Created))
     {
         echo '<b>CZ Nace Kod: </b>'.            $response->CzNaceCode.'<br />';
         echo '<b>CZ Nace Text: </b>'.           $response->CzNaceText.'<br />';
@@ -23,8 +37,8 @@ function echoBase($response)
         echo '<b>Druh vlastníctva: </b>'.       $response->OwnershipType.'<br />';
         echo '<b>Počet zamestnancov: </b>'.     $response->EmployeeCount.'<br />';
     }
-    echo '<b>Založená: </b>'.               (($response->Created) ? $response->Created->format('d.m.Y') : '').'<br />';
-    echo '<b>Zrušená: </b>'.                (($response->Cancelled) ? $response->Cancelled->format('d.m.Y') : '') .'<br />';
+    echo '<b>Založená: </b>'.               (($response->Created) ? echoDate($response->Created, $json) : '').'<br />';
+    echo '<b>Zrušená: </b>'.                (($response->Cancelled) ?echoDate( $response->Cancelled, $json) : '') .'<br />';
 
     echo '<b>Url: </b>'.            $response->Url.'<br />';
     echo '<b>Príznak, či sa daná firma nachádza insolvenčnom registry: </b>';
@@ -111,6 +125,7 @@ $stationId = 'Api test';                // Identifikátor stanice, ktorá dopyt 
 $stationName = 'Api test';                // Názov alebo opis stanice, ktorá dopyt vygenerovala.
                                         // Môže byť ľubovolný reťazec.
 $timeout = 10;                            // Dĺžka čakania na odozvu zo servera v sekundách.
+$json =  false;                         // Flag ci ma API vraciat odpoved ako JSON
 
 // inicializacia klienta
 $api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
@@ -124,7 +139,7 @@ try
 {
     // funkcia $api->RequestDetail(string) vracia naplneny objekt typu BaseResultCZ s udajmi o dopytovanej firme
     if (!empty($ico)) {
-        $response = $api->Request($ico);
+        $response = $api->Request($ico, "detail", $json);
     }
 }
 catch (Exception $e)
@@ -138,7 +153,7 @@ header('Content-Type: text/html; charset=utf-8');
 ?>
 <h1>Detail test:</h1>
 <?php
-echoBase($response);
+echoBase($response, $json);
 echoLimits($api->GetAPILimits());
 echo '<hr />';
 ?>
@@ -147,11 +162,11 @@ echo '<hr />';
 <?php
 try
 {
-    $response2 = $api->RequestAutoComplete('volkswagen');
+    $response2 = $api->RequestAutoComplete('volkswagen', $json);
 }
 catch (Exception $e)
 {
     // popis a kod chyby, ktora nastala
     echoException($e);
 }
-echoAutoComplete($response2);
+echoAutoComplete($response2, $json);

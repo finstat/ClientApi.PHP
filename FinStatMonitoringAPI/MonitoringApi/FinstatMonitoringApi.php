@@ -47,7 +47,7 @@ class FinstatMonitoringApi
         return $options;
     }
 
-    public function AddToMonitoring($ico)
+    public function AddToMonitoring($ico, $json = false)
     {
         $options = $this->InitRequests();
 
@@ -62,20 +62,24 @@ class FinstatMonitoringApi
         $url = $this->apiUrl . "AddToMonitoring";
         try
         {
-            $response = Requests::post($url, null, $data, $options);
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
         }
         catch(Requests_Exception $e)
         {
             throw $e;
         }
 
-        $detail = $this->parseResponse($response, $url, $ico);
-        $parse = (string)$detail;
+        $detail = $this->parseResponse($response, $url, $ico, $json);
 
-        return ($parse == 'true');
+        $parse = (string)$detail;
+        return ($json) ? $detail : ($parse == 'true');
     }
 
-    private function parseResponse($response, $url, $parameter = null)
+    private function parseResponse($response, $url, $parameter = null, $json = false)
     {
         //parse limits
         $this->limits = array(
@@ -113,7 +117,12 @@ class FinstatMonitoringApi
             }
         }
 
-        $detail = simplexml_load_string($response->body);
+        $detail = false;
+        if($json) {
+            $detail = json_decode($response->body);
+        } else {
+            $detail = simplexml_load_string($response->body);
+        }
 
         if($detail === FALSE)
             throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
@@ -131,7 +140,7 @@ class FinstatMonitoringApi
         return $this->limits;
     }
 
-    public function RemoveFromMonitoring($ico)
+    public function RemoveFromMonitoring($ico, $json = false)
     {
         $options = $this->InitRequests();
 
@@ -146,20 +155,24 @@ class FinstatMonitoringApi
         $url = $this->apiUrl . "RemoveFromMonitoring";
         try
         {
-            $response = Requests::post($url, null, $data, $options);
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
         }
         catch(Requests_Exception $e)
         {
             throw $e;
         }
 
-        $detail = $this->parseResponse($response, $url, $ico);
+        $detail = $this->parseResponse($response, $url, $ico, $json);
         $parse = (string)$detail;
 
-        return ($parse == 'true');
+         return ($json) ? $detail : ($parse == 'true');
     }
 
-    public function MonitoringList()
+    public function MonitoringList($json = false)
     {
         $options = $this->InitRequests();
 
@@ -173,19 +186,22 @@ class FinstatMonitoringApi
         $url = $this->apiUrl . "MonitoringList";
         try
         {
-            $response = Requests::post($url, null, $data, $options);
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
         }
         catch(Requests_Exception $e)
         {
             throw $e;
         }
+        $detail = $this->parseResponse($response, $url, null, $json);
 
-        $detail = $this->parseResponse($response, $url);
-
-        return $this->parseMonitoringList($detail);
+        return ($json) ? $detail : $this->parseMonitoringList($detail);
     }
 
-    public function MonitoringReport()
+    public function MonitoringReport($json = false)
     {
         $options = $this->InitRequests();
 
@@ -199,16 +215,20 @@ class FinstatMonitoringApi
         $url = $this->apiUrl . "MonitoringReport";
         try
         {
-            $response = Requests::post($url, null, $data, $options);
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
         }
         catch(Requests_Exception $e)
         {
             throw $e;
         }
 
-        $detail = $this->parseResponse($response, $url);
+        $detail = $this->parseResponse($response, $url, null, $json);
 
-        return $this->parseMonitoringReport($detail);
+        return ($json) ? $detail : $this->parseMonitoringReport($detail);
     }
 
     private function parseMonitoringList($detail)

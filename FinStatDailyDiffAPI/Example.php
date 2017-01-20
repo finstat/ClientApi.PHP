@@ -4,6 +4,19 @@ require_once('FinstatApi/FinstatDailyDiffApi.php');
 require_once('FinstatApi/DailyDiff.php');
 require_once('FinstatApi/DailyDiffList.php');
 
+function echoDate($date, $json = false)
+{
+    if($date && !empty($date))
+    {
+        if($json)
+        {
+            $date = new DateTime($date);
+        }
+        return $date->format('d.m.Y');
+    }
+    return '';
+}
+
 // zakladne prihlasovacie udaje a nastavenia klienta
 $apiUrl = 'http://www.finstat.sk/api/';    // URL adresa Finstat API
 $apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
@@ -15,6 +28,7 @@ $stationId = 'Api test';                // Identifikátor stanice, ktorá dopyt vy
 $stationName = 'Api test';                // Názov alebo opis stanice, ktorá dopyt vygenerovala.
                                         // Môže by ¾ubovolný reazec.
 $timeout = 10;                            // Dåžka èakania na odozvu zo servera v sekundách.
+$json =  false;                         // Flag ci ma API vraciat odpoved ako JSON
 
 // inicializacia klienta
 $api = new FinstatDailyDiffApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
@@ -24,7 +38,7 @@ if(!empty($file))
 {
     $data = $api->DownloadDailyDiffFile($file, $file);
 }
-$list = $api->RequestListOfDailyDiffs();
+$list = $api->RequestListOfDailyDiffs($json);
 
 if($list != null) {
 
@@ -40,7 +54,7 @@ if($list != null) {
                 "</th><th>Velkost" .
                 "</th></tr>";
         foreach($list->Files as $file) {
-            echo "<tr><td><a href=\"?file=".$file->FileName. "\">" . $file->FileName. "</a></td><td>" . (($file->GeneratedDate) ? $file->GeneratedDate->format('d.m.Y') : '').  "</td><td>" . $file->FileSize .' bytov</td></tr>';
+            echo "<tr><td><a href=\"?file=".$file->FileName. "\">" . $file->FileName. "</a></td><td>" . (($file->GeneratedDate) ? echoDate($file->GeneratedDate, $json) : '').  "</td><td>" . $file->FileSize .' bytov</td></tr>';
         }
         echo "</table><br />";
     }

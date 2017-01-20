@@ -1,6 +1,19 @@
 <?php
 require_once('MonitoringApi/FinstatMonitoringApi.php');
 
+function echoDate($date, $json = false)
+{
+    if($date && !empty($date))
+    {
+        if($json)
+        {
+            $date = new DateTime($date);
+        }
+        return $date->format('d.m.Y H:i:s');
+    }
+    return '';
+}
+
 function echoException($e)
 {
     echo "<h1 style=\"color: red\">Exception</h1>";
@@ -32,7 +45,7 @@ function echoMonitoringReport($response)
             '<td>'. $report->Ident .'</td>'.
             '<td>'. $report->ICO .'</td>'.
             '<td>'. $report->Name .'</td>'.
-            '<td>'. (($report->PublishDate) ? $report->PublishDate->format('d.m.Y H:i:s') : '') .'</td>'.
+            '<td>'. (($report->PublishDate) ? echoDate($report->PublishDate, $json) : '') .'</td>'.
             '<td>'. $report->Type .'</td>'.
             '<td>'. $report->Description .'</td>'.
             '<td>'. $report->Url .'</td>'.
@@ -85,12 +98,13 @@ $apiUrl = 'http://www.finstat.sk/api/';    // URL adresa Finstat API
 $apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
                                         // prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
 $privateKey = 'PLEASE_FILL_IN_YOUR_PRIVATE_KEY';// PLEASE_FILL_IN_YOUR_PRIVATE_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-                                        // prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
+                                        // prosim poziadajte o svoj privatny kluc na info@finstat.sk.
 $stationId = 'Api test';                // Identifikátor stanice, ktorá dopyt vygenerovala.
                                         // Môže byť ľubovolný reťazec.
 $stationName = 'Api test';                // Názov alebo opis stanice, ktorá dopyt vygenerovala.
                                         // Môže byť ľubovolný reťazec.
 $timeout = 10;                            // Dĺžka čakania na odozvu zo servera v sekundách.
+$json =  false;                         // Flag ci ma API vraciat odpoved ako JSON
 
 // inicializacia klienta
 $api = new FinstatMonitoringApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
@@ -104,8 +118,8 @@ try
 {
     // funkcia $api->AddToMonitoring(string) vracia stav úspechu operácie
     if (!empty($ico)) {
-        $response = $api->AddToMonitoring($ico);
-        $response2 = $api->AddToMonitoring($ico + 'blaaa');
+        $response = $api->AddToMonitoring($ico, $json);
+        $response2 = $api->AddToMonitoring($ico + 'blaaa', $json);
     }
 }
 catch (Exception $e)
@@ -127,7 +141,7 @@ try
 {
     // funkcia $api->RemoveFromMonitoring(string) vracia stav úspechu operácie
     if (!empty($ico)) {
-        $response = $api->RemoveFromMonitoring($ico);
+        $response = $api->RemoveFromMonitoring($ico, $json);
     }
 }
 catch (Exception $e)
@@ -148,7 +162,7 @@ try
 {
     // funkcia $api->MonitoringList() vracia zoznam monitorovanych ICO
     if (!empty($ico)) {
-        $response = $api->MonitoringList();
+        $response = $api->MonitoringList($json);
     }
 }
 catch (Exception $e)
@@ -166,7 +180,7 @@ try
 {
     // funkcia $api->MonitoringReport() vracia zoznam MonitoringReportResult objektov
     if (!empty($ico)) {
-        $response = $api->MonitoringReport();
+        $response = $api->MonitoringReport($json);
     }
 }
 catch (Exception $e)

@@ -32,7 +32,7 @@ class FinstatApi
         $this->limits = null;
     }
 
-    public function RequestAutoComplete($query)
+    public function RequestAutoComplete($query, $json = false)
     {
         if(!class_exists('Requests'))
         {
@@ -59,19 +59,27 @@ class FinstatApi
         $url = $this->apiUrl . "autocomplete";
         try
         {
-            $response = Requests::post($url, null, $data, $options);
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
         }
         catch(Requests_Exception $e)
         {
             throw $e;
         }
 
-        $detail = $this->parseResponse($response, $url, $query);
-
-        return $this->parseAutoComplete($detail);
+        $detail = $this->parseResponse($response, $url, $query, $json);
+        if(!$json) {
+            return $this->parseAutoComplete($detail);
+        } else
+        {
+            return $detail;
+        }
     }
 
-    private function parseResponse($response, $url, $parameter)
+    private function parseResponse($response, $url, $parameter, $json = false)
     {
         //parse limits
         $this->limits = array(
@@ -109,7 +117,15 @@ class FinstatApi
             }
         }
 
-        $detail = simplexml_load_string($response->body);
+        $detail = false;
+        if($json)
+        {
+            $detail = json_decode($response->body);
+        }
+        else
+        {
+            $detail = simplexml_load_string($response->body);
+        }
 
         if($detail === FALSE)
             throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
@@ -127,25 +143,25 @@ class FinstatApi
         return $this->limits;
     }
 
-    public function RequestDetail($ico)
+    public function RequestDetail($ico, $json = false)
     {
-        return $this->Request($ico);
+        return $this->Request($ico, 'detail', $json);
     }
 
-    public function RequestExtended($ico)
+    public function RequestExtended($ico, $json = false)
     {
-        return $this->Request($ico, 'extended');
+        return $this->Request($ico, 'extended', $json);
     }
 
-    public function RequestUltimate($ico)
+    public function RequestUltimate($ico, $json = false)
     {
-        return $this->Request($ico, 'ultimate');
+        return $this->Request($ico, 'ultimate', $json);
     }
     //
     // Requests the detail for specified ico
     //
     // Returns: details or FALSE
-    public function Request($ico, $type="detail")
+    public function Request($ico, $type="detail", $json = false)
     {
         if(!class_exists('Requests'))
         {
@@ -172,26 +188,30 @@ class FinstatApi
         $url = $this->apiUrl. $type;
         try
         {
-            $response = Requests::post($url, null, $data, $options);
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
         }
         catch(Requests_Exception $e)
         {
             throw $e;
         }
-
-        $detail = $this->parseResponse($response, $url, $ico);
-
-        switch($type) {
-            case 'ultimate':
-                $detail = $this->parseUltimate($detail);
-                break;
-            case 'extended':
-                $detail = $this->parseExtended($detail);
-                break;
-            case 'detail':
-            default:
-                $detail = $this->parseDetail($detail);
-                break;
+        $detail = $this->parseResponse($response, $url, $ico, $json);
+        if(!$json) {
+            switch($type) {
+                case 'ultimate':
+                    $detail = $this->parseUltimate($detail);
+                    break;
+                case 'extended':
+                    $detail = $this->parseExtended($detail);
+                    break;
+                case 'detail':
+                default:
+                    $detail = $this->parseDetail($detail);
+                    break;
+            }
         }
 
         return $detail;
