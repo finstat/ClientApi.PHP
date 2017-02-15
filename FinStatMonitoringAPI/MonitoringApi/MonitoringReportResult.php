@@ -1,14 +1,27 @@
 <?php
 
-class MonitoringReportResult
+class AbstractMonitoringReportResult
 {
     public
         $Ident,
-        $Ico,
         $Name,
         $PublishDate,
         $Type,
         $Description,
         $Url;
+}
+
+class MonitoringReportResult extends AbstractMonitoringReportResult
+{
+    public
+        $Ico
+    ;
+}
+
+class MonitoringDateReportResult extends AbstractMonitoringReportResult
+{
+    public
+        $Date
+    ;
 }
 ?>

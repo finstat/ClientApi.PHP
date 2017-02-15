@@ -1,5 +1,6 @@
 <?php
 require_once('MonitoringApi/FinstatMonitoringApi.php');
+require_once('MonitoringApi/MonitoringReportResult.php');
 
 function echoDate($date, $json = false)
 {
@@ -25,15 +26,21 @@ function echoException($e)
     die();
 }
 
-function echoMonitoringReport($response)
+function echoMonitoringReport($response, $json)
 {
     echo "<pre>";
     echo '<b>Report: </b>'.           '<br />';
     if (!empty($response)) {
+        $icodate = "";
+        if($report[0] instanceof MonitoringDateReportResult) {
+             $icodate  = "Dátum";
+        } else {
+            $icodate  = "Ičo";
+        }
         echo "<table>";
         echo '<tr>'.
             '<th>Identifikátor</th>'.
-            '<th>Ičo</th>'.
+            '<th>' . $icodate . '</th>'.
             '<th>Názov</th>'.
             '<th>Dátum zverejnenia</th>'.
             '<th>Typ</th>'.
@@ -41,9 +48,15 @@ function echoMonitoringReport($response)
             '<th>Url</th>'.
             '</tr>';
         foreach($response as $report) {
+            $icodate = "";
+            if($report instanceof MonitoringDateReportResult) {
+                 $icodate  = $report->Date;
+            } else {
+                $icodate  = $report->Ico;
+            }
             echo '<tr>'.
             '<td>'. $report->Ident .'</td>'.
-            '<td>'. $report->ICO .'</td>'.
+            '<td>'. $icodate .'</td>'.
             '<td>'. $report->Name .'</td>'.
             '<td>'. (($report->PublishDate) ? echoDate($report->PublishDate, $json) : '') .'</td>'.
             '<td>'. $report->Type .'</td>'.
@@ -111,6 +124,7 @@ $api = new FinstatMonitoringApi($apiUrl, $apiKey, $privateKey, $stationId, $stat
 
 // priklad dopytu na detail firmy, ktora ma ICO 35757442
 $ico = (isset($_GET['ico']) && !empty($_GET['ico'])) ? $_GET['ico'] : '35757442';
+$date = (isset($_GET['date']) && !empty($_GET['date'])) ? $_GET['date'] : "1.1.1991";
 ?>
 <h1>Add test:</h1>
 <?php
@@ -121,6 +135,9 @@ try
         $response = $api->AddToMonitoring($ico, $json);
         $response2 = $api->AddToMonitoring($ico + 'blaaa', $json);
     }
+    if (!empty($date)) {
+        $response3 = $api->AddDateToMonitoring($date, $json);
+    }
 }
 catch (Exception $e)
 {
@@ -130,32 +147,12 @@ catch (Exception $e)
 // priklad vypisu ziskanych udajov z Finstatu
 header('Content-Type: text/html; charset=utf-8');
 echo "<pre>";
-echo '<b>OK: </b>'.            ($response ? "true" : "false") .'<br />';
-echo '<b>Fail: </b>'.           ($response2 ? "true" : "false") .'<br />';
+echo '<b>OK: </b>'.                 ($response ? "true" : "false") .'<br />';
+echo '<b>Fail: </b>'.               ($response2 ? "true" : "false") .'<br />';
+echo '<b>OK Date: </b>'.            ($response3 ? "true" : "false") .'<br />';
 echo "</pre>";
 echo '<hr />';
 ?>
-<h1>Remove test:</h1>
-<?php
-try
-{
-    // funkcia $api->RemoveFromMonitoring(string) vracia stav úspechu operácie
-    if (!empty($ico)) {
-        $response = $api->RemoveFromMonitoring($ico, $json);
-    }
-}
-catch (Exception $e)
-{
-     echoException($e);
-}
-
-// priklad vypisu ziskanych udajov z Finstatu
-echo "<pre>";
-echo '<b>OK: </b>'.            ($response ? "true" : "false") .'<br />';
-echo "</pre>";
-echo '<hr />';
-?>
-
 <h1>MonitoringList test:</h1>
 <?php
 try
@@ -163,6 +160,10 @@ try
     // funkcia $api->MonitoringList() vracia zoznam monitorovanych ICO
     if (!empty($ico)) {
         $response = $api->MonitoringList($json);
+    }
+    if (!empty($date)) {
+        $response2 = $api->MonitoringDateList($json);
+
     }
 }
 catch (Exception $e)
@@ -172,8 +173,35 @@ catch (Exception $e)
 
 // priklad vypisu ziskanych udajov z Finstatu
 echoMonitoringList($response);
+echoMonitoringList($response2);
 echo '<hr />';
 ?>
+
+<h1>Remove test:</h1>
+<?php
+try
+{
+    // funkcia $api->RemoveFromMonitoring(string) vracia stav úspechu operácie
+    if (!empty($ico)) {
+        $response = $api->RemoveFromMonitoring($ico, $json);
+    }
+    if (!empty($date)) {
+        $response2 = $api->RemoveDateFromMonitoring($date, $json);
+    }
+}
+catch (Exception $e)
+{
+     echoException($e);
+}
+
+// priklad vypisu ziskanych udajov z Finstatu
+echo "<pre>";
+echo '<b>OK: </b>'.                 ($response ? "true" : "false") .'<br />';
+echo '<b>OK Date: </b>'.            ($response2 ? "true" : "false") .'<br />';
+echo "</pre>";
+echo '<hr />';
+?>
+
 <h1>MonitoringReport test:</h1>
 <?php
 try
@@ -182,6 +210,9 @@ try
     if (!empty($ico)) {
         $response = $api->MonitoringReport($json);
     }
+    if (!empty($date)) {
+        $response2 = $api->MonitoringDateReport($json);
+    }
 }
 catch (Exception $e)
 {
@@ -189,7 +220,8 @@ catch (Exception $e)
      echoException($e);
 }
 
-echoMonitoringReport($response);
+echoMonitoringReport($response, $json);
+echoMonitoringReport($response2, $json);
 echoLimits($api->GetAPILimits());
 echo '<hr />';
 ?>

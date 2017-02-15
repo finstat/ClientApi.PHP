@@ -79,6 +79,38 @@ class FinstatMonitoringApi
         return ($json) ? $detail : ($parse == 'true');
     }
 
+    public function AddDateToMonitoring($date, $json = false)
+    {
+        $options = $this->InitRequests();
+
+        $data = array(
+            'date' => $date,
+            'apiKey' => $this->apiKey,
+            'Hash' => $this->ComputeVerificationHash($date),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        );
+
+        $url = $this->apiUrl . "AddDateToMonitoring";
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+
+        $detail = $this->parseResponse($response, $url, $date, $json);
+
+        $parse = (string)$detail;
+        return ($json) ? $detail : ($parse == 'true');
+    }
+
     private function parseResponse($response, $url, $parameter = null, $json = false)
     {
         //parse limits
@@ -172,6 +204,38 @@ class FinstatMonitoringApi
          return ($json) ? $detail : ($parse == 'true');
     }
 
+    public function RemoveDateFromMonitoring($date, $json = false)
+    {
+        $options = $this->InitRequests();
+
+        $data = array(
+            'date' => $date,
+            'apiKey' => $this->apiKey,
+            'Hash' => $this->ComputeVerificationHash($date),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        );
+
+        $url = $this->apiUrl . "RemoveDateFromMonitoring";
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+
+        $detail = $this->parseResponse($response, $url, $date, $json);
+        $parse = (string)$detail;
+
+         return ($json) ? $detail : ($parse == 'true');
+    }
+
     public function MonitoringList($json = false)
     {
         $options = $this->InitRequests();
@@ -184,6 +248,35 @@ class FinstatMonitoringApi
         );
 
         $url = $this->apiUrl . "MonitoringList";
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+        $detail = $this->parseResponse($response, $url, null, $json);
+
+        return ($json) ? $detail : $this->parseMonitoringList($detail);
+    }
+
+    public function MonitoringDateList($json = false)
+    {
+        $options = $this->InitRequests();
+
+        $data = array(
+            'apiKey' => $this->apiKey,
+            'Hash' => $this->ComputeVerificationHash('datelist'),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        );
+
+        $url = $this->apiUrl . "MonitoringDateList";
         try
         {
             $headers = null;
@@ -231,6 +324,35 @@ class FinstatMonitoringApi
         return ($json) ? $detail : $this->parseMonitoringReport($detail);
     }
 
+    public function MonitoringDateReport($json = false)
+    {
+        $options = $this->InitRequests();
+
+        $data = array(
+            'apiKey' => $this->apiKey,
+            'Hash' => $this->ComputeVerificationHash('datereport'),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        );
+
+        $url = $this->apiUrl . "MonitoringDateReport";
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+
+        $detail = $this->parseResponse($response, $url, null, $json);
+        return ($json) ? $detail : $this->parseMonitoringDateReport($detail);
+    }
+
     private function parseMonitoringList($detail)
     {
         if  ($detail === FALSE) {
@@ -259,6 +381,30 @@ class FinstatMonitoringApi
                 $o = new MonitoringReportResult();
                 $o->Ident        = (string)$element->Ident;
                 $o->Ico          = (string)$element->Ico;
+                $o->Name         = (string)$element->Name;
+                $o->PublishDate  = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
+                $o->Type         = (string)$element->Type;
+                $o->Description  = (string)$element->Description;
+                $o->Url          = (string)$element->Url;
+                $response[] = $o;
+            }
+        }
+
+        return $response;
+    }
+
+    private function parseMonitoringDateReport($detail)
+    {
+        if  ($detail === FALSE) {
+            return $detail;
+        }
+
+        $response =  array();
+        if (!empty($detail->MonitoringDate)) {
+            foreach ($detail->MonitoringDate as $element) {
+                $o = new MonitoringDateReportResult();
+                $o->Ident        = (string)$element->Ident;
+                $o->Date          = (string)$element->Date;
                 $o->Name         = (string)$element->Name;
                 $o->PublishDate  = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
                 $o->Type         = (string)$element->Type;
