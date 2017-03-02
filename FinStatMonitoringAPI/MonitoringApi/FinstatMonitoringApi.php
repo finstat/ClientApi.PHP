@@ -19,6 +19,14 @@ class FinstatMonitoringApi
     //
     public function __construct($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout = 10)
     {
+        if (!empty($apiUrl)) {
+            if(strpos($apiUrl, "http://") !== false) {
+                $apiUrl = str_replace("http://", "https://", $apiUrl);
+            }
+            if(strpos($apiUrl, "https://") === false) {
+                $apiUrl = "https://" . $apiUrl;
+            }
+        }
         $this->apiUrl = $apiUrl;
         $this->apiKey = $apiKey;
         $this->stationId = $stationId;
