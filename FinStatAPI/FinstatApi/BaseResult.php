@@ -14,6 +14,14 @@ class AddressResult
     ;
 }
 
+class JudgementIndicatorResult
+{
+    public
+    $Name,
+    $Value
+    ;
+}
+
 class BaseResult extends AddressResult
 {
     public
@@ -37,7 +45,13 @@ class BaseResult extends AddressResult
         $SkNaceDivision,
         $SkNaceGroup,
         $LegalFormCode,
-        $LegalFormText
+        $LegalFormText,
+        $ProfitActual,
+        $RevenueActual,
+        $SalesCategory,
+        $IcDphAdditional,
+        $JudgementIndicators  = array(),
+        $JudgementFinstatLink
     ;
 }
 ?>

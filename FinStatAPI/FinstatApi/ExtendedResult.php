@@ -46,7 +46,7 @@ class SubjectResult
 
 class NamePartsResult
 {
-public
+    public
         $Prefix,
         $Name,
         $Suffix,
@@ -56,16 +56,37 @@ public
 
 class ContactSourceResult
 {
-public
+    public
         $Contact,
         $Sources
     ;
+}
+class JudgementCountResult
+{
+    public
+        $Name,
+        $Value
+    ;
+}
+
+class RatioResult
+{
+    public
+    $Name,
+    $Values
+    ;
+}
+
+class RatioItemResult
+{
+    public
+    $Year,
+    $Value;
 }
 
 class ExtendedResult extends BaseResult
 {
     public
-        $IcDphAdditional,
         $Phones = array(),
         $Emails = array(),
         $EmployeeCode,
@@ -75,9 +96,8 @@ class ExtendedResult extends BaseResult
         $ActualYear,
         $CreditScoreValue,
         $CreditScoreState,
-        $ProfitActual,
+        $BasicCapital,
         $ProfitPrev,
-        $RevenueActual,
         $RevenuePrev,
         $ForeignResources,
         $GrossMargin,
@@ -96,6 +116,9 @@ class ExtendedResult extends BaseResult
         $DisposalUrl,
         $HasKaR,
         $HasDebt,
-        $HasDisposal
+        $HasDisposal,
+        $JudgementCounts = array(),
+        $JudgementLastPublishedDate,
+        $Ratios  = array()
         ;
     }

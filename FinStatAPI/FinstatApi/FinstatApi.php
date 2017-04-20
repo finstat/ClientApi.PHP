@@ -267,6 +267,24 @@ class FinstatApi
         $response->SkNaceGroup          = (string)$detail->SkNaceGroup;
         $response->LegalFormCode        = (string)$detail->LegalFormCode;
         $response->LegalFormText        = (string)$detail->LegalFormText;
+        $response->SalesCategory        = (string)$detail->SalesCategory;
+        $response->RevenueActual        = empty($detail->RevenueActual) ? null :(double)"{$detail->RevenueActual}";
+        $response->ProfitActual         = empty($detail->ProfitActual) ? null :(double)"{$detail->ProfitActual}";
+
+        if (!empty($detail->IcDphAdditional)) {
+            $response->IcDphAdditional = $this->parseIcDphAdditional($detail->IcDphAdditional);
+        }
+
+        if (!empty($detail->JudgementIndicators)) {
+            $response->JudgementIndicators = array();
+            foreach ($detail->JudgementIndicators->JudgementIndicator as $c) {
+                $o = new JudgementIndicatorResult();
+                $o->Name = (string) $c->Name;
+                $o->Value = "{$c->Value}"  == 'true';
+                $response->JudgementIndicators[] = $o;
+            }
+        }
+        $response->JudgementFinstatLink =  (string)$detail->JudgementFinstatLink;
 
         return $response;
     }
@@ -294,9 +312,8 @@ class FinstatApi
         $response->ActualYear           = (int)"{$detail->ActualYear}";
         $response->CreditScoreValue     = (float)$detail->CreditScoreValue;
         $response->CreditScoreState     = (string)$detail->CreditScoreState;
-        $response->RevenueActual        = empty($detail->RevenueActual) ? null :(double)"{$detail->RevenueActual}";
+        $response->BasicCapital         = (!empty($detail->BasicCapital)) ? (float)$detail->BasicCapital : null;
         $response->RevenuePrev          = empty($detail->RevenuePrev) ? null :(double)"{$detail->RevenuePrev}";
-        $response->ProfitActual         = empty($detail->ProfitActual) ? null :(double)"{$detail->ProfitActual}";
         $response->ProfitPrev           = empty($detail->ProfitPrev) ? null :(double)"{$detail->ProfitPrev}";
         $response->ForeignResources     = empty($detail->ForeignResources) ? null :(double)"{$detail->ForeignResources}";
         $response->GrossMargin          = empty($detail->GrossMargin) ? null :(double)"{$detail->GrossMargin}";
@@ -345,10 +362,6 @@ class FinstatApi
             }
         }
 
-        if (!empty($detail->IcDphAdditional)) {
-            $response->IcDphAdditional = $this->parseIcDphAdditional($detail->IcDphAdditional);
-        }
-
         if (!empty($detail->Offices)) {
             $response->Offices = array();
             foreach ($detail->Offices->Office as $office) {
@@ -365,7 +378,7 @@ class FinstatApi
             }
         }
 
-         if (!empty($detail->Subjects)) {
+        if (!empty($detail->Subjects)) {
             $response->Subjects = array();
             foreach ($detail->Subjects->Subject as $subject) {
                 $o = new SubjectResult();
@@ -373,16 +386,16 @@ class FinstatApi
                 $o->ValidFrom = $this->parseDate($subject->ValidFrom);
                 $o->SuspendedFrom = $this->parseDate($subject->SuspendedFrom);
                 $response->Subjects[] = $o;
-            }
-         }
+           }
+        }
 
 
-         if($response->SelfEmployed && !empty($detail->StructuredName)) {
+        if($response->SelfEmployed && !empty($detail->StructuredName)) {
             $o = new NamePartsResult();
             if(!empty($detail->StructuredName->Prefix)) {
                 $o->Prefix = array();
                 foreach ($detail->StructuredName->Prefix->string as $s) {
-                   $o->Prefix[] = (string)$s;
+                    $o->Prefix[] = (string)$s;
                 }
             }
             if(!empty($detail->StructuredName->Name)) {
@@ -404,22 +417,50 @@ class FinstatApi
                 }
             }
             $response->StructuredName = $o;
-         }
+        }
 
-         if (!empty($detail->ContactSources)) {
-             $response->ContactSources = array();
-             foreach ($detail->ContactSources->ContactSource as $c) {
-                $o = new ContactSourceResult();
-                $o->Contact = (string) $c->Contact;
-                if(!empty($c->Sources)) {
-                    $o->Sources = array();
-                    foreach ($c->Sources->string as $s) {
-                       $o->Sources[] = (string)$s;
+        if (!empty($detail->ContactSources)) {
+            $response->ContactSources = array();
+            foreach ($detail->ContactSources->ContactSource as $c) {
+               $o = new ContactSourceResult();
+               $o->Contact = (string) $c->Contact;
+               if(!empty($c->Sources)) {
+                   $o->Sources = array();
+                   foreach ($c->Sources->string as $s) {
+                      $o->Sources[] = (string)$s;
+                   }
+               }
+               $response->ContactSources[] = $o;
+            }
+        }
+
+        if (!empty($detail->Ratios)) {
+            $response->Ratios = array();
+            foreach ($detail->Ratios->Ratio as $c) {
+                $o = new RatioResult();
+                $o->Name = (string) $c->Name;
+                if (!empty($c->Values)) {
+                    foreach ($c->Values->Item as $v) {
+                        $ov = new  RatioItemResult();
+                        $ov->Year = (int)$v->Year;
+                        $ov->Value = (float)$v->Value;
+                        $o->Values[] = $ov;
                     }
                 }
-                $response->ContactSources[] = $o;
-             }
-         }
+                $response->Ratios[] = $o;
+            }
+        }
+
+        if (!empty($detail->JudgementCounts)) {
+            $response->JudgementCounts = array();
+            foreach ($detail->JudgementCounts->JudgementCount as $c) {
+                $o = new JudgementCountResult();
+                $o->Name = (string) $c->Name;
+                $o->Value = (int) $c->Value;
+                $response->JudgementCounts[] = $o;
+            }
+        }
+        $response->JudgementLastPublishedDate = $this->parseDate($detail->JudgementLastPublishedDate);
 
         return $response;
     }
@@ -455,7 +496,6 @@ class FinstatApi
         if ($response !== FALSE) {
             $response->ORSection = (string)$detail->ORSection;
             $response->ORInsertNo = (string)$detail->ORInsertNo;
-            $response->BasicCapital  = (!empty($detail->BasicCapital)) ? (float)$detail->BasicCapital : null;
             $response->PaybackRange  = (!empty($detail->PaybackRange)) ? (float)$detail->PaybackRange : null;
             $response->Persons = array();
             if (!empty($detail->Persons)) {

@@ -26,26 +26,26 @@ function echoBase($response, $json = false)
     echo '<b>Reg. Číslo: </b>'.             $response->RegisterNumberText.'<br />';
     echo '<b>DIČ: </b>'.                    $response->Dic.'<br />';
     echo '<b>IčDPH: </b>'.                  $response->IcDPH.'<br />';
-    if($response instanceof UltimateResult || isset($response->ORSection))
+    if($response instanceof ExtendedResult)
     {
-        echo '<b>OR Odiel: </b>'.                                   $response->ORSection.'<br />';
-        echo '<b>OR Vložka: </b>'.                                  $response->ORInsertNo.'<br />';
         echo '<b>Základné imanie: </b>'.                             $response->BasicCapital.'<br />';
-        echo '<b>Rozsah splatenia: </b>'.                            $response->PaybackRange.'<br />';
-        if(!empty($response->RegistrationCourt))
+        if($response instanceof UltimateResult || isset($response->ORSection))
         {
-            echo '<b>Registrovane na: </b>'.                        $response->RegistrationCourt->Name . ', ' . $response->RegistrationCourt->Street . ' ' . $response->RegistrationCourt->StreetNumber.  ", " . $response->RegistrationCourt->ZipCode . ", " . $response->RegistrationCourt->City .  ", " . $response->RegistrationCourt->District .  ", " . $response->RegistrationCourt->Region .  ", " . $response->RegistrationCourt->Country .'<br />';
+            echo '<b>OR Odiel: </b>'.                                   $response->ORSection.'<br />';
+            echo '<b>OR Vložka: </b>'.                                  $response->ORInsertNo.'<br />';
+            echo '<b>Rozsah splatenia: </b>'.                            $response->PaybackRange.'<br />';
+            if(!empty($response->RegistrationCourt))
+            {
+                echo '<b>Registrovane na: </b>'.                        $response->RegistrationCourt->Name . ', ' . $response->RegistrationCourt->Street . ' ' . $response->RegistrationCourt->StreetNumber.  ", " . $response->RegistrationCourt->ZipCode . ", " . $response->RegistrationCourt->City .  ", " . $response->RegistrationCourt->District .  ", " . $response->RegistrationCourt->Region .  ", " . $response->RegistrationCourt->Country .'<br />';
+            }
         }
     }
-    if($response instanceof ExtendedResult|| isset($response->ActualYear))
-    {
-        echo '<b>Detail IČDPH: IČDPH: </b>'.                         (!empty($response->IcDphAdditional) ? $response->IcDphAdditional->IcDph  : '') .'<br />';
-        echo '<b>Detail IČDPH: Paragraf: </b>'.                      (!empty($response->IcDphAdditional) ?$response->IcDphAdditional->Paragraph  : '') .'<br />';
-        echo '<b>Detail IČDPH: Dátum detekovania v zozname subjektov, u ktorých nastali dôvody na zrušenie: </b>'.
-        (!empty($response->IcDphAdditional) && ($response->IcDphAdditional->CancelListDetectedDate) ? echoDate($response->IcDphAdditional->CancelListDetectedDate, $json) : '').'<br />';
-        echo '<b>Detail IČDPH: Dátum detekovania v zozname vymazaných subjektov: </b>'.
-        (!empty($response->IcDphAdditional) && ($response->IcDphAdditional->RemoveListDetectedDate) ? echoDate($response->IcDphAdditional->RemoveListDetectedDate, $json) : '').'<br />';
-    }
+    echo '<b>Detail IČDPH: IČDPH: </b>'.                         (!empty($response->IcDphAdditional) ? $response->IcDphAdditional->IcDph  : '') .'<br />';
+    echo '<b>Detail IČDPH: Paragraf: </b>'.                      (!empty($response->IcDphAdditional) ?$response->IcDphAdditional->Paragraph  : '') .'<br />';
+    echo '<b>Detail IČDPH: Dátum detekovania v zozname subjektov, u ktorých nastali dôvody na zrušenie: </b>'.
+    (!empty($response->IcDphAdditional) && ($response->IcDphAdditional->CancelListDetectedDate) ? echoDate($response->IcDphAdditional->CancelListDetectedDate, $json) : '').'<br />';
+    echo '<b>Detail IČDPH: Dátum detekovania v zozname vymazaných subjektov: </b>'.
+    (!empty($response->IcDphAdditional) && ($response->IcDphAdditional->RemoveListDetectedDate) ? echoDate($response->IcDphAdditional->RemoveListDetectedDate, $json) : '').'<br />';
     echo '<b>Názov: </b>'.                  $response->Name.'<br />';
     echo '<b>Ulica: </b>'.                  $response->Street.'<br />';
     echo '<b>Číslo ulice: </b>'.            $response->StreetNumber.'<br />';
@@ -54,6 +54,7 @@ function echoBase($response, $json = false)
     echo '<b>Okres: </b>'.                  $response->District.'<br />';
     echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
     echo '<b>Štát: </b>'.                   $response->Country.'<br />';
+    echo '<b>Kategoria Tržieb: </b>'.       $response->SalesCategory.'<br />';
     if($response instanceof ExtendedResult|| isset($response->ActualYear))
     {
         echo '<b>Tel. čisla: </b>'.                                 implode(', ', $response->Phones).'<br />';
@@ -91,6 +92,8 @@ function echoBase($response, $json = false)
     }
     echo '<b>SK Nace skupina: </b>'.        $response->SkNaceGroup.'<br />';
     echo '<b>Pozastavená(živnosť): </b>'.   (($response->SuspendedAsPerson)? "Ano": "Nie").'<br />';
+    echo '<b>Zisk za aktuálny rok: </b>'.                       $response->ProfitActual.'<br />';
+    echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response->RevenueActual.'<br />';
     if($response instanceof ExtendedResult|| isset($response->ActualYear))
     {
         echo '<b>Kód počtu zamestnancov: </b>'.                     $response->EmployeeCode.'<br />';
@@ -98,9 +101,7 @@ function echoBase($response, $json = false)
         echo '<b>Aktuálny rok: </b>'.                               $response->ActualYear.'<br />';
         echo '<b>Credit scoring: </b>'.                             $response->CreditScoreValue.'<br />';
         echo '<b>Credit scoring - text: </b>'.                      $response->CreditScoreState.'<br />';
-        echo '<b>Zisk za aktuálny rok: </b>'.                       $response->ProfitActual.'<br />';
         echo '<b>Zisk za predošlý rok: </b>'.                       $response->ProfitPrev.'<br />';
-        echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response->RevenueActual.'<br />';
         echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response->RevenuePrev.'<br />';
         echo '<b>Pomer cudzích zdrojov za aktuálny rok : </b>'.     $response->ForeignResources.'<br />';
         echo '<b>Hrubá marža za aktuálny rok: </b>'.                $response->GrossMargin.'<br />';
@@ -144,6 +145,64 @@ function echoBase($response, $json = false)
         }
         echo '<br />';
     }
+    echo '<b>Link na súdne rozhodnutia: </b>'.                  $response->JudgementFinstatLink.'<br />';
+    if (!empty($response->JudgementIndicators))
+    {
+        echo '<b>Indikátory Súdnych rozhodnutí: </b><br />';
+        if(!empty($response->JudgementIndicators)) {
+            echo "<br /><table>";
+            echo
+            "<tr><th>Názov" .
+            "</th><th>Hodnota" .
+            "</th></tr>";
+            foreach($response->JudgementIndicators as $in) {
+                echo "<tr><td>" . $in->Name;
+                echo "</td><td>" . (($in->Value) ? "true" : "false" );
+                echo "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+    }
+    if ($response instanceof ExtendedResult)
+    {
+        if(!empty($response->JudgementCounts)) {
+            echo '<b>Počty Súdnych rozhodnutí: </b><br />';
+            if(!empty($response->JudgementCounts)) {
+                echo "<br /><table>";
+                echo
+                "<tr><th>Názov" .
+                "</th><th>Hodnota" .
+                "</th></tr>";
+                foreach($response->JudgementCounts as $in) {
+                    echo "<tr><td>" . $in->Name;
+                    echo "</td><td>" . $in->Value;
+                    echo "</td></tr>";
+                }
+                echo "</table><br />";
+            }
+        }
+        echo '<b>Dátum posledného súdneho rozhodnutia: </b>'.           (($response->JudgementLastPublishedDate) ? echoDate($response->JudgementLastPublishedDate, $json) : '') .'<br />';
+        if (!empty($response->Ratios))
+        {
+            echo '<b>Ukazovatele: </b><br />';
+            if(!empty($response->Ratios)) {
+                echo "<br /><table>";
+                echo
+                "<tr><th>Názov" .
+                "</th><th>Hodnota" .
+                "</th></tr>";
+                foreach($response->Ratios as $ratio) {
+                    echo "<tr><td>" . $ratio->Name. "</td><td>";
+                    foreach($ratio->Values as $value) {
+                        echo $value->Year . ":". (($value->Value !== null) ? $value->Value : "") . ", ";
+                    }
+                    echo "</td></tr>";
+                }
+                echo "</table><br />";
+            }
+        }
+    }
+
     if($response instanceof ExtendedResult || isset($response->ActualYear))
     {
         echo '<b>Dlhy: </b><br />';

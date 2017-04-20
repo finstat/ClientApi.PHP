@@ -66,7 +66,6 @@ class UltimateResult extends ExtendedResult
         $ORSection,
         $ORInsertNo,
         $Persons = array(),
-        $BasicCapital,
         $PaybackRange,
         $RegistrationCourt,
         $WebPages,
