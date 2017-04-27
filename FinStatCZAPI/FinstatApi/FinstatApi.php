@@ -37,6 +37,52 @@ class FinstatApi
         $this->limits = null;
     }
 
+    public function RequestAutoLogin($redirecturl, $email = null, $json = false)
+    {
+        if(!class_exists('Requests'))
+        {
+            trigger_error("Unable to load Requests class", E_USER_WARNING);
+            return false;
+        }
+
+        Requests::register_autoloader();
+
+        $options = array(
+            'timeout' => $this->timeout,
+            'follow_redirects' => false,
+            'auth' => false
+        );
+
+        $data = array(
+            'url' => $redirecturl,
+            'apiKey' => $this->apiKey,
+            'Hash' => $this->ComputeVerificationHash("autologin"),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        );
+
+        if (!empty($email)) {
+            $data['email'] = $email;
+        }
+
+        $url = $this->apiUrl . "autologin";
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+
+        $detail = $this->parseResponse($response, $url, "autologin", $json);
+        return (string)$detail;
+    }
+
     public function RequestAutoComplete($query, $json = false)
     {
         if(!class_exists('Requests'))
