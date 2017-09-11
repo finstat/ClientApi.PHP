@@ -46,6 +46,7 @@ function echoBase($response, $json = false)
     (!empty($response->IcDphAdditional) && ($response->IcDphAdditional->CancelListDetectedDate) ? echoDate($response->IcDphAdditional->CancelListDetectedDate, $json) : '').'<br />';
     echo '<b>Detail IČDPH: Dátum detekovania v zozname vymazaných subjektov: </b>'.
     (!empty($response->IcDphAdditional) && ($response->IcDphAdditional->RemoveListDetectedDate) ? echoDate($response->IcDphAdditional->RemoveListDetectedDate, $json) : '').'<br />';
+    echo '<b>Rpvs: </b>'.                   $response->RpvsInsert. ' '. $response->RpvsUrl .'<br />';
     echo '<b>Názov: </b>'.                  $response->Name.'<br />';
     echo '<b>Ulica: </b>'.                  $response->Street.'<br />';
     echo '<b>Číslo ulice: </b>'.            $response->StreetNumber.'<br />';
@@ -282,6 +283,9 @@ function echoBase($response, $json = false)
     }
     if($response instanceof UltimateResult || isset($response->ORSection))
     {
+        if (!empty($response->EmployeesNumber)) {
+            echo '<b>Presny pocet zamestnancov: </b>'.            $response->EmployeesNumber.'<br />';
+        }
         if (!empty($response->Persons)) {
             echo '<b>Osoby: </b><br />';
             echo "<br /><table>";
@@ -313,6 +317,42 @@ function echoBase($response, $json = false)
                     "</td><td>" . $functions .
                     "</td><td>" . $person->DepositAmount . "/" . $person->PaybackRange .
                     "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+        if (!empty($response->RpvsPersons)) {
+            echo '<b>RPVS osoby: </b><br />';
+            echo "<br /><table>";
+            echo
+            "<tr><th>Meno" .
+            "</th><th>Datum nar." .
+            "</th><th>Ico" .
+            "</th><th>Adresa" .
+            "</th><th>Detekovane od" .
+            "</th><th>Detekovane do" .
+            "</th><th>Funckcia" .
+            "</th></tr>";
+            foreach ($response->RpvsPersons as $person) {
+                $functions = "";
+                if (!empty($person->Functions)) {
+                    foreach ($person->Functions as $function) {
+                        $functions .= $function->Type . " - ";
+                        $functions .= $function->Description;
+                        if ($function->From) {
+                            $functions .= " (" . echoDate($function->From, $json) . ")";
+                        }
+                        $functions .="<br />";
+                    }
+                }
+                echo
+                "<tr><td>" . $person->FullName .
+                "</td><td>" . (($person->BirthDate) ? echoDate($person->BirthDate, $json) : '') .
+                "</td><td>" . $person->Ico .
+                "</td><td>" . $person->Street ." " . $person->StreetNumber. ", " . $person->ZipCode . ", " . $person->City .  ", " . $person->District .  ", " . $person->Region .  ", " . $person->Country .
+                "</td><td>" . (($person->DetectedFrom) ? echoDate($person->DetectedFrom, $json) : '') .
+                "</td><td>" . (($person->DetectedTo) ? echoDate($person->DetectedTo, $json) : '') .
+                "</td><td>" . $functions .
+                "</td></tr>";
             }
             echo "</table><br />";
         }
@@ -369,6 +409,15 @@ function echoBase($response, $json = false)
                      $response->Bankrupt->Source."</td><td>".
                      $response->Bankrupt->Status."</td><td>".
                     "</td></tr>";
+                if (!empty($response->Bankrupt->Deadlines)) {
+                    echo "<tr><th colspan='9'>Lehoty</th></tr>";
+                    foreach ($response->Bankrupt->Deadlines as $deadline) {
+                        echo "<tr><td colspan='9'>".
+                        (($deadline->Date) ? echoDate($deadline->Date, $json) : '') . ' '.
+                        $deadline->Type.
+                        "</td></tr>";
+                    }
+                }
             }
             if(!empty($response->Restructuring)) {
                 echo "<tr><th>Reštrukturalizácia</th></td><td>".
@@ -381,6 +430,15 @@ function echoBase($response, $json = false)
                     $response->Bankrupt->Source."</td><td>".
                     $response->Bankrupt->Status."</td><td>".
                     "</td></tr>";
+                if (!empty($response->Restructuring->Deadlines)) {
+                    echo "<tr><th colspan='9'>Lehoty</th></tr>";
+                    foreach ($response->Restructuring->Deadlines as $deadline) {
+                        echo "<tr><td colspan='9'>".
+                        (($deadline->Date) ? echoDate($deadline->Date, $json) : '') . ' '.
+                        $deadline->Type.
+                        "</td></tr>";
+                    }
+                }
             }
             if(!empty($response->Liquidation)) {
                 echo "<tr><th>Likvidácia</th></td><td>".
@@ -393,6 +451,15 @@ function echoBase($response, $json = false)
                     $response->Bankrupt->Source."</td><td>".
                     "</td><td>".
                     "</td></tr>";
+                if (!empty($response->Liquidation->Deadlines)) {
+                    echo "<tr><th colspan='9'>Lehoty</th></tr>";
+                    foreach ($response->Liquidation->Deadlines as $deadline) {
+                        echo "<tr><td colspan='9'>".
+                        (($deadline->Date) ? echoDate($deadline->Date, $json) : '') . ' '.
+                        $deadline->Type.
+                        "</td></tr>";
+                    }
+                }
             }
             echo "</table><br />";
         }

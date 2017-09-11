@@ -46,6 +46,8 @@ class BaseResult extends AddressResult
         $SkNaceGroup,
         $LegalFormCode,
         $LegalFormText,
+        $RpvsInsert,
+        $RpvsUrl,
         $ProfitActual,
         $RevenueActual,
         $SalesCategory,

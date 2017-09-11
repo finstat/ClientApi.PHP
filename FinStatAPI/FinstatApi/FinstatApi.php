@@ -23,7 +23,7 @@ class FinstatApi
     //
     public function __construct($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout = 10)
     {
-        if (!empty($apiUrl)) {
+        if (!empty($apiUrl) && strpos($apiUrl, "localhost") == false) {
             if(strpos($apiUrl, "http://") !== false) {
                 $apiUrl = str_replace("http://", "https://", $apiUrl);
             }
@@ -313,6 +313,8 @@ class FinstatApi
         $response->SkNaceGroup          = (string)$detail->SkNaceGroup;
         $response->LegalFormCode        = (string)$detail->LegalFormCode;
         $response->LegalFormText        = (string)$detail->LegalFormText;
+        $response->RpvsInsert           = (string)$detail->RpvsInsert;
+        $response->RpvsUrl              = (string)$detail->RpvsUrl;
         $response->SalesCategory        = (string)$detail->SalesCategory;
         $response->RevenueActual        = empty($detail->RevenueActual) ? null :(double)"{$detail->RevenueActual}";
         $response->ProfitActual         = empty($detail->ProfitActual) ? null :(double)"{$detail->ProfitActual}";
@@ -540,6 +542,7 @@ class FinstatApi
 
         $response = $this->parseExtended($detail, new UltimateResult());
         if ($response !== FALSE) {
+            $response->EmployeesNumber = (!empty($detail->EmployeesNumber)) ? (int)$detail->EmployeesNumber : null;
             $response->ORSection = (string)$detail->ORSection;
             $response->ORInsertNo = (string)$detail->ORInsertNo;
             $response->PaybackRange  = (!empty($detail->PaybackRange)) ? (float)$detail->PaybackRange : null;
@@ -550,6 +553,15 @@ class FinstatApi
                     $o->DepositAmount  = (!empty($person->DepositAmount)) ? (float)$person->DepositAmount : null;
                     $o->PaybackRange  = (!empty($person->PaybackRange)) ? (float)$person->PaybackRange : null;
                     $response->Persons[] = $o;
+                }
+            }
+            $response->RpvsPersons = array();
+            if (!empty($detail->RpvsPersons)) {
+                foreach ($detail->RpvsPersons->RpvsPerson as $rpvsPerson) {
+                    $o = $this->pasrePerson($rpvsPerson);
+                    $o->BirthDate = (!empty($rpvsPerson->BirthDate)) ? $this->parseDate($rpvsPerson->BirthDate) : null;
+                    $o->Ico = (!empty($rpvsPerson->Ico)) ? (string)$rpvsPerson->Ico : null;
+                    $response->RpvsPersons[] = $o;
                 }
             }
             if (!empty($detail->RegistrationCourt)) {
@@ -599,6 +611,14 @@ class FinstatApi
                 $o->ExitReason = (string) $detail->Bankrupt->ExitReason;
                 $o->Officer = $this->pasrePerson($detail->Bankrupt->Officer);
                 $o->Status = (string) $detail->Bankrupt->Status;
+                if (!empty($detail->Bankrupt->Deadlines)) {
+                    foreach ($detail->Bankrupt->Deadlines->Deadline as $deadline) {
+                        $od = new DeadlineResult();
+                        $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
+                        $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
+                        $o->Deadlines[] = $od;
+                    }
+                }
                 $response->Bankrupt = $o;
             }
             if (!empty($detail->Restructuring)) {
@@ -611,6 +631,14 @@ class FinstatApi
                 $o->ExitReason = (string) $detail->Restructuring->ExitReason;
                 $o->Officer = $this->pasrePerson($detail->Restructuring->Officer);
                 $o->Status = (string) $detail->Restructurin->Status;
+                if (!empty($detail->Deadlines)) {
+                    foreach ($detail->Deadlines->Deadline as $deadline) {
+                        $od = new DeadlineResult();
+                        $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
+                        $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
+                        $o->Deadlines[] = $od;
+                    }
+                }
                 $response->Restructuring = $o;
             }
             if (!empty($detail->Liquidation)) {
@@ -620,6 +648,14 @@ class FinstatApi
                 $o->EnterReason = (string) $detail->Liquidation->EnterReason;
                 $o->ExitDate = $this->parseDate($detail->Liquidation->ExitDate);
                 $o->Officer = $this->pasrePerson($detail->Liquidation->Officer);
+                if (!empty($detail->Deadlines)) {
+                    foreach ($detail->Deadlines->Deadline as $deadline) {
+                        $od = new DeadlineResult();
+                        $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
+                        $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
+                        $o->Deadlines[] = $od;
+                    }
+                }
                 $response->Liquidation = $o;
             }
         }

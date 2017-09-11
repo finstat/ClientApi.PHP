@@ -22,6 +22,18 @@ class PersonResult extends AddressResult
     ;
 }
 
+class RpvsPersonResult extends AddressResult
+{
+    public
+    $FullName,
+    $BirthDate,
+    $Ico,
+    $DetectedFrom,
+    $DetectedTo,
+    $Functions = array()
+    ;
+}
+
 class CourtResult extends AddressResult
 {
     public
@@ -44,7 +56,8 @@ class LiquidationResult
         $EnterReason,
         $ExitDate,
         $Officer,
-        $Source
+        $Source,
+        $Deadlines = array()
     ;
 }
 
@@ -56,16 +69,27 @@ class BankruptResult extends LiquidationResult
         $Status
     ;
 }
+
 class RestructuringResult extends BankruptResult
 {
+}
+
+class DeadlineResult
+{
+    public
+        $Type,
+        $Date
+    ;
 }
 
 class UltimateResult extends ExtendedResult
 {
     public
+        $EmployeesNumber,
         $ORSection,
         $ORInsertNo,
         $Persons = array(),
+        $RpvsPersons = array(),
         $PaybackRange,
         $RegistrationCourt,
         $WebPages,
