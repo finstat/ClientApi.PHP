@@ -14,6 +14,7 @@
     <IncludeDebugInformation>false</IncludeDebugInformation>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="MonitoringApi\ProceedingResult.php" />
     <Compile Include="MonitoringApi\Requests\Auth\Basic.php" />
     <Compile Include="MonitoringApi\Requests\Response\Headers.php" />
     <Compile Include="MonitoringApi\Requests\Transport\cURL.php" />

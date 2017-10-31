@@ -2,6 +2,7 @@
 
 require_once('Requests.php');
 require_once('MonitoringReportResult.php');
+require_once('ProceedingResult.php');
 
 class FinstatMonitoringApi
 {
@@ -19,7 +20,7 @@ class FinstatMonitoringApi
     //
     public function __construct($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout = 10)
     {
-        if (!empty($apiUrl)) {
+        if (!empty($apiUrl) && strpos($apiUrl, "localhost") == false) {
             if(strpos($apiUrl, "http://") !== false) {
                 $apiUrl = str_replace("http://", "https://", $apiUrl);
             }
@@ -361,6 +362,62 @@ class FinstatMonitoringApi
         return ($json) ? $detail : $this->parseMonitoringDateReport($detail);
     }
 
+    public function MonitoringProceedings($json = false)
+    {
+        $options = $this->InitRequests();
+
+        $data = array(
+            'apiKey' => $this->apiKey,
+            'Hash' => $this->ComputeVerificationHash('proceedings'),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        );
+
+        $url = $this->apiUrl . "MonitoringProceedings";
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+        $detail = $this->parseResponse($response, $url, null, $json);
+        return ($json) ? $detail : $this->parseMonitoringProceedings($detail);
+    }
+
+    public function MonitoringDateProceedings($json = false)
+    {
+        $options = $this->InitRequests();
+
+        $data = array(
+            'apiKey' => $this->apiKey,
+            'Hash' => $this->ComputeVerificationHash('dateproceedings'),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        );
+
+        $url = $this->apiUrl . "MonitoringDateProceedings";
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+        $detail = $this->parseResponse($response, $url, null, $json);
+        return ($json) ? $detail : $this->parseMonitoringProceedings($detail);
+    }
+
     private function parseMonitoringList($detail)
     {
         if  ($detail === FALSE) {
@@ -412,12 +469,81 @@ class FinstatMonitoringApi
             foreach ($detail->MonitoringDate as $element) {
                 $o = new MonitoringDateReportResult();
                 $o->Ident        = (string)$element->Ident;
-                $o->Date          = (string)$element->Date;
+                $o->Date         = (string)$element->Date;
                 $o->Name         = (string)$element->Name;
                 $o->PublishDate  = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
                 $o->Type         = (string)$element->Type;
                 $o->Description  = (string)$element->Description;
                 $o->Url          = (string)$element->Url;
+                $response[] = $o;
+            }
+        }
+
+        return $response;
+    }
+
+    private function parseAddress($element, $object = null)
+    {
+        $o = ($object != null) ? $object : new Address();
+        $o->Name            = (string)$element->Name;
+        $o->Street          = (string)$element->Street;
+        $o->StreetNumber    = (string)$element->StreetNumber;
+        $o->ZipCode         = (string)$element->ZipCode;
+        $o->City            = (string)$element->City;
+        $o->Country         = (string)$element->Country;
+        $o->Region          = (string)$element->Region;
+        $o->District        = (string)$element->District;
+        return $o;
+    }
+
+    private function parsePersonAddress($element)
+    {
+        $o = $this->parseAddress($element, new PersonAddress());
+        $o->Ico         = (string)$element->Ico;
+        $o->BirthDate   = (string)$element->BirthDate;
+        return $o;
+    }
+
+    private function parseMonitoringProceedings($detail)
+    {
+        if  ($detail === FALSE) {
+            return $detail;
+        }
+
+        $response =  array();
+        if (!empty($detail->ProceedingResult)) {
+            foreach ($detail->ProceedingResult as $element) {
+                $o = new ProceedingResult();
+                if(!empty($element->Defendant)) {
+                    $array = array();
+                    foreach ($element->Defendant->PersonAddress as $address) {
+                        $array[] = $this->parsePersonAddress($address);
+                    }
+                    $o->Defendant = $array;
+                }
+                if(!empty($element->Proposer)) {
+                    $array = array();
+                    foreach ($element->Proposer->PersonAddress as $address) {
+                        $array[] = $this->parsePersonAddress($address);
+                    }
+                    $o->Proposer = $array;
+                }
+                if(!empty($element->Administrator)) {
+                    $array = array();
+                    foreach ($element->Administrator->PersonAddress as $address) {
+                         $array[] = $this->parsePersonAddress($address);
+                    }
+                    $o->Administrator = $array;
+                }
+                if(!empty($element->Court)) {
+                    $o->Court  = $this->parseAddress($element->Court);
+                }
+                $o->State                   = (string)$element->State;
+                $o->ReferenceFileNumber     = (string)$element->ReferenceFileNumber;
+                $o->EndReason               = (string)$element->EndReason;
+                $o->PublishDate             = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
+                $o->Type                    = (string)$element->Type;
+                $o->Url                     = (string)$element->Url;
                 $response[] = $o;
             }
         }
