@@ -26,7 +26,7 @@ class Address
         $Country,
         $Region;
 }
-class PersonAddress
+class PersonAddress extends Address
 {
     public
         $BirthDate,
