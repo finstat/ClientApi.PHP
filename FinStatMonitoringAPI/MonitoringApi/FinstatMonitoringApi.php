@@ -514,36 +514,37 @@ class FinstatMonitoringApi
         if (!empty($detail->ProceedingResult)) {
             foreach ($detail->ProceedingResult as $element) {
                 $o = new ProceedingResult();
-                if(!empty($element->Defendant)) {
+                if(!empty($element->DebtorsAddress)) {
                     $array = array();
-                    foreach ($element->Defendant->PersonAddress as $address) {
+                    foreach ($element->DebtorsAddress->PersonAddress as $address) {
                         $array[] = $this->parsePersonAddress($address);
                     }
-                    $o->Defendant = $array;
+                    $o->DebtorsAddress = $array;
                 }
-                if(!empty($element->Proposer)) {
+                if(!empty($element->ProposersAddress)) {
                     $array = array();
-                    foreach ($element->Proposer->PersonAddress as $address) {
+                    foreach ($element->ProposersAddress->PersonAddress as $address) {
                         $array[] = $this->parsePersonAddress($address);
                     }
-                    $o->Proposer = $array;
+                    $o->ProposersAddress = $array;
                 }
-                if(!empty($element->Administrator)) {
+                if(!empty($element->AdministratorsAddress)) {
                     $array = array();
-                    foreach ($element->Administrator->PersonAddress as $address) {
+                    foreach ($element->AdministratorsAddress->PersonAddress as $address) {
                          $array[] = $this->parsePersonAddress($address);
                     }
-                    $o->Administrator = $array;
+                    $o->AdministratorsAddress = $array;
                 }
-                if(!empty($element->Court)) {
-                    $o->Court  = $this->parseAddress($element->Court);
+                if(!empty($element->CourtsAddress)) {
+                    $o->CourtsAddress  = $this->parseAddress($element->CourtsAddress);
                 }
-                $o->State                   = (string)$element->State;
                 $o->ReferenceFileNumber     = (string)$element->ReferenceFileNumber;
+                $o->Status                  = (string)$element->Status;
+                $o->Character               = (string)$element->Character;
                 $o->EndReason               = (string)$element->EndReason;
-                $o->PublishDate             = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
-                $o->Type                    = (string)$element->Type;
                 $o->Url                     = (string)$element->Url;
+                $o->Type                    = (string)$element->Type;
+                $o->PublishDate             = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
                 $response[] = $o;
             }
         }

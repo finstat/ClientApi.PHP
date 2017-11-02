@@ -3,16 +3,17 @@
 class ProceedingResult
 {
     public
-        $Defendant,
-        $Proposer,
-        $Administrator,
-        $Court,
-        $State,
+        $DebtorsAddress,
+        $ProposersAddress,
+        $AdministratorsAddress,
+        $CourtsAddress,
         $ReferenceFileNumber,
+        $Status,
+        $Character,
         $EndReason,
-        $PublishDate,
+        $Url,
         $Type,
-        $Url;
+        $PublishDate;
 }
 class Address
 {
