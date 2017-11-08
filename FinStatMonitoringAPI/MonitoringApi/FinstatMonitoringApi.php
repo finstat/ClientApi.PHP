@@ -542,9 +542,11 @@ class FinstatMonitoringApi
                 $o->Status                  = (string)$element->Status;
                 $o->Character               = (string)$element->Character;
                 $o->EndReason               = (string)$element->EndReason;
+                $o->EndStatus               = (string)$element->EndStatus;
                 $o->Url                     = (string)$element->Url;
                 $o->Type                    = (string)$element->Type;
                 $o->PublishDate             = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
+                $o->Deadline                = empty($element->Deadline) ? null : new DateTime($element->Deadline);
                 $response[] = $o;
             }
         }

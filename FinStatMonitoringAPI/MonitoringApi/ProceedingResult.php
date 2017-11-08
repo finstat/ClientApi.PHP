@@ -11,9 +11,11 @@ class ProceedingResult
         $Status,
         $Character,
         $EndReason,
+        $EndStatus,
         $Url,
         $Type,
-        $PublishDate;
+        $PublishDate,
+        $Deadline;
 }
 class Address
 {
