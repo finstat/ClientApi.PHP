@@ -15,7 +15,10 @@ class ProceedingResult
         $Url,
         $Type,
         $PublishDate,
-        $Deadline;
+        $Deadline,
+        $FileIdentifierNumber,
+        $IssuedBy,
+        $PostedBy;
 }
 class Address
 {
@@ -33,5 +36,11 @@ class PersonAddress extends Address
     public
         $BirthDate,
         $Ico;
+}
+class IssuedPerson
+{
+    public
+        $Name,
+        $Function;
 }
 ?>

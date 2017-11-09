@@ -547,6 +547,20 @@ class FinstatMonitoringApi
                 $o->Type                    = (string)$element->Type;
                 $o->PublishDate             = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
                 $o->Deadline                = empty($element->Deadline) ? null : new DateTime($element->Deadline);
+                $o->PostedBy                = (string)$element->PostedBy;
+                if (!empty($element->FileIdentifierNumber)) {
+                    $array  = array();
+                    foreach ($element->FileIdentifierNumber->string as $s) {
+                        $array[] = (string) $s;
+                    }
+                    $o->FileIdentifierNumber = $array;
+                }
+                if(!empty($element->IssuedBy)) {
+                    $p = new IssuedPerson();
+                    $p->Name        = (string)$element->Name;
+                    $p->Function    = (string)$element->Function;
+                    $o->IssuedBy  = $p;
+                }
                 $response[] = $o;
             }
         }
