@@ -548,6 +548,7 @@ class FinstatMonitoringApi
                 $o->PublishDate             = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
                 $o->Deadline                = empty($element->Deadline) ? null : new DateTime($element->Deadline);
                 $o->PostedBy                = (string)$element->PostedBy;
+
                 if (!empty($element->FileIdentifierNumber)) {
                     $array  = array();
                     foreach ($element->FileIdentifierNumber->string as $s) {
@@ -555,13 +556,24 @@ class FinstatMonitoringApi
                     }
                     $o->FileIdentifierNumber = $array;
                 }
+
                 if(!empty($element->IssuedBy)) {
                     $p = new IssuedPerson();
                     $p->Name        = (string)$element->Name;
                     $p->Function    = (string)$element->Function;
                     $o->IssuedBy  = $p;
                 }
-                $response[] = $o;
+
+                if(!empty($element->DatesInProceeding)) {
+                    $array  = array();
+                    foreach ($element->DatesInProceeding->Deadline as $deadline) {
+                         $d = new Deadline();
+                         $d->Type        = (string)$deadline->Type;
+                         $d->Date        = empty($deadline->Date) ? null : new DateTime($deadline->Date);
+                         $array[] = $d;
+                    }
+                }
+                $response[] = $array;
             }
         }
 
