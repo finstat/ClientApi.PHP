@@ -658,6 +658,26 @@ class FinstatApi
                 }
                 $response->Liquidation = $o;
             }
+			if (!empty($detail->OtherProceeding)) {
+                $o = new ProceedingResult();
+                $o->Source = (string) $detail->OtherProceeding->Source;
+                $o->StartDate = $this->parseDate($detail->OtherProceeding->StartDate);
+                $o->EnterDate = $this->parseDate($detail->OtherProceeding->EnterDate);
+                $o->EnterReason = (string) $detail->OtherProceeding->EnterReason;
+                $o->ExitDate = $this->parseDate($detail->OtherProceeding->ExitDate);
+                $o->ExitReason = (string) $detail->OtherProceeding->ExitReason;
+                $o->Officer = $this->pasrePerson($detail->OtherProceeding->Officer);
+                $o->Status = (string) $detail->OtherProceeding->Status;
+                if (!empty($detail->OtherProceeding->Deadlines)) {
+                    foreach ($detail->OtherProceeding->Deadlines->Deadline as $deadline) {
+                        $od = new DeadlineResult();
+                        $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
+                        $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
+                        $o->Deadlines[] = $od;
+                    }
+                }
+                $response->OtherProceeding = $o;
+            }
         }
 
         return $response;

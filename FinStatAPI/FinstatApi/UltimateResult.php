@@ -61,7 +61,7 @@ class LiquidationResult
     ;
 }
 
-class BankruptResult extends LiquidationResult
+class ProceedingResult extends LiquidationResult
 {
     public
         $StartDate,
@@ -70,7 +70,11 @@ class BankruptResult extends LiquidationResult
     ;
 }
 
-class RestructuringResult extends BankruptResult
+class BankruptResult extends ProceedingResult
+{
+}
+
+class RestructuringResult extends ProceedingResult
 {
 }
 
@@ -99,7 +103,8 @@ class UltimateResult extends ExtendedResult
         $Bankrupt,
         $Restructuring,
         $Liquidation,
-        $ORCancelled
+        $ORCancelled,
+		$OtherProceeding
     ;
 }
 ?>
