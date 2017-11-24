@@ -439,32 +439,7 @@ class FinstatApi
 
 
         if($response->SelfEmployed && !empty($detail->StructuredName)) {
-            $o = new NamePartsResult();
-            if(!empty($detail->StructuredName->Prefix)) {
-                $o->Prefix = array();
-                foreach ($detail->StructuredName->Prefix->string as $s) {
-                    $o->Prefix[] = (string)$s;
-                }
-            }
-            if(!empty($detail->StructuredName->Name)) {
-                $o->Name = array();
-                foreach ($detail->StructuredName->Name->string as $s) {
-                   $o->Name[] = (string)$s;
-                }
-            }
-            if(!empty($detail->StructuredName->Suffix)) {
-                $o->Suffix = array();
-                foreach ($detail->StructuredName->Suffix->string as $s) {
-                   $o->Suffix[] = (string)$s;
-                }
-            }
-            if(!empty($detail->StructuredName->After)) {
-                $o->After = array();
-                foreach ($detail->StructuredName->After->string as $s) {
-                   $o->After[] = (string)$s;
-                }
-            }
-            $response->StructuredName = $o;
+            $response->StructuredName = $this->parseStructuredName($detail->StructuredName);
         }
 
         if (!empty($detail->ContactSources)) {
@@ -513,7 +488,37 @@ class FinstatApi
         return $response;
     }
 
-    private function pasrePerson($person)
+    private function parseStructuredName($element)
+    {
+        $o = new NamePartsResult();
+        if(!empty($element->Prefix)) {
+            $o->Prefix = array();
+            foreach ($element->Prefix->string as $s) {
+                $o->Prefix[] = (string)$s;
+            }
+        }
+        if(!empty($element->Name)) {
+            $o->Name = array();
+            foreach ($element->Name->string as $s) {
+               $o->Name[] = (string)$s;
+            }
+        }
+        if(!empty($element->Suffix)) {
+            $o->Suffix = array();
+            foreach ($element->Suffix->string as $s) {
+               $o->Suffix[] = (string)$s;
+            }
+        }
+        if(!empty($element->After)) {
+            $o->After = array();
+            foreach ($element->After->string as $s) {
+               $o->After[] = (string)$s;
+            }
+        }
+        return $o;
+    }
+
+    private function parsePerson($person)
     {
         $o = new PersonResult();
         $o = $this->parseAddress($person, $o);
@@ -529,6 +534,9 @@ class FinstatApi
                 $of->From = $this->parseDate($function->From);
                 $o->Functions[] = $of;
             }
+        }
+        if(!empty($person->StructuredName)) {
+            $o->StructuredName = $this->parseStructuredName($person->StructuredName);
         }
 
         return $o;
@@ -549,7 +557,7 @@ class FinstatApi
             $response->Persons = array();
             if (!empty($detail->Persons)) {
                 foreach ($detail->Persons->Person as $person) {
-                    $o = $this->pasrePerson($person);
+                    $o = $this->parsePerson($person);
                     $o->DepositAmount  = (!empty($person->DepositAmount)) ? (float)$person->DepositAmount : null;
                     $o->PaybackRange  = (!empty($person->PaybackRange)) ? (float)$person->PaybackRange : null;
                     $response->Persons[] = $o;
@@ -558,7 +566,7 @@ class FinstatApi
             $response->RpvsPersons = array();
             if (!empty($detail->RpvsPersons)) {
                 foreach ($detail->RpvsPersons->RpvsPerson as $rpvsPerson) {
-                    $o = $this->pasrePerson($rpvsPerson);
+                    $o = $this->parsePerson($rpvsPerson);
                     $o->BirthDate = (!empty($rpvsPerson->BirthDate)) ? $this->parseDate($rpvsPerson->BirthDate) : null;
                     $o->Ico = (!empty($rpvsPerson->Ico)) ? (string)$rpvsPerson->Ico : null;
                     $response->RpvsPersons[] = $o;
@@ -609,7 +617,7 @@ class FinstatApi
                 $o->EnterReason = (string) $detail->Bankrupt->EnterReason;
                 $o->ExitDate = $this->parseDate($detail->Bankrupt->ExitDate);
                 $o->ExitReason = (string) $detail->Bankrupt->ExitReason;
-                $o->Officer = $this->pasrePerson($detail->Bankrupt->Officer);
+                $o->Officer = $this->parsePerson($detail->Bankrupt->Officer);
                 $o->Status = (string) $detail->Bankrupt->Status;
                 if (!empty($detail->Bankrupt->Deadlines)) {
                     foreach ($detail->Bankrupt->Deadlines->Deadline as $deadline) {
@@ -629,7 +637,7 @@ class FinstatApi
                 $o->EnterReason = (string) $detail->Restructuring->EnterReason;
                 $o->ExitDate = $this->parseDate($detail->Restructuring->ExitDate);
                 $o->ExitReason = (string) $detail->Restructuring->ExitReason;
-                $o->Officer = $this->pasrePerson($detail->Restructuring->Officer);
+                $o->Officer = $this->parsePerson($detail->Restructuring->Officer);
                 $o->Status = (string) $detail->Restructurin->Status;
                 if (!empty($detail->Deadlines)) {
                     foreach ($detail->Deadlines->Deadline as $deadline) {
@@ -647,7 +655,7 @@ class FinstatApi
                 $o->EnterDate = $this->parseDate($detail->Liquidation->EnterDate);
                 $o->EnterReason = (string) $detail->Liquidation->EnterReason;
                 $o->ExitDate = $this->parseDate($detail->Liquidation->ExitDate);
-                $o->Officer = $this->pasrePerson($detail->Liquidation->Officer);
+                $o->Officer = $this->parsePerson($detail->Liquidation->Officer);
                 if (!empty($detail->Deadlines)) {
                     foreach ($detail->Deadlines->Deadline as $deadline) {
                         $od = new DeadlineResult();
@@ -666,7 +674,7 @@ class FinstatApi
                 $o->EnterReason = (string) $detail->OtherProceeding->EnterReason;
                 $o->ExitDate = $this->parseDate($detail->OtherProceeding->ExitDate);
                 $o->ExitReason = (string) $detail->OtherProceeding->ExitReason;
-                $o->Officer = $this->pasrePerson($detail->OtherProceeding->Officer);
+                $o->Officer = $this->parsePerson($detail->OtherProceeding->Officer);
                 $o->Status = (string) $detail->OtherProceeding->Status;
                 if (!empty($detail->OtherProceeding->Deadlines)) {
                     foreach ($detail->OtherProceeding->Deadlines->Deadline as $deadline) {

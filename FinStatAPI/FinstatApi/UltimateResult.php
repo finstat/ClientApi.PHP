@@ -18,7 +18,8 @@ class PersonResult extends AddressResult
         $DetectedTo,
         $Functions = array(),
         $DepositAmount,
-        $PaybackRange
+        $PaybackRange,
+        $StructuredName
     ;
 }
 
