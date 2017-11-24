@@ -19,6 +19,21 @@ function echoDate($date, $json = false)
     return '';
 }
 
+function echoStructuredName($data)
+{
+    $result ="";
+    if($data && !empty($data))
+    {
+        $result = '<b>Štrukturovane meno: </b><br />' .
+        ((!empty($data->Prefix))   ? "Prefix: " .   implode(" ", $data->Prefix) . "<br />": "") .
+        ((!empty($data->Name))     ? "Name: " .     implode(" ", $data->Name) . "<br />": "" ).
+        ((!empty($data->Suffix))   ? "Suffix: " .   implode(" ", $data->Suffix) . "<br />": "" ).
+        ((!empty($data->After))    ? "After: " .    implode(" ", $data->After) . "<br />": "" );
+    }
+    return $result;
+}
+
+
 function echoBase($response, $json = false)
 {
     echo "<pre>";
@@ -272,12 +287,7 @@ function echoBase($response, $json = false)
             echo "</table><br />";
         }
         if ($response->SelfEmployed && !empty($response->StructuredName)) {
-            echo '<b>Štrukturovane meno: </b><br />';
-            echo (!empty($response->StructuredName->Prefix))   ? "Prefix: " . implode(" ", $response->StructuredName->Prefix) . "<br />": "";
-            echo (!empty($response->StructuredName->Name))     ? "Name: " . implode(" ", $response->StructuredName->Name) . "<br />": "";
-            echo (!empty($response->StructuredName->Suffix))   ? "Suffix: " . implode(" ", $response->StructuredName->Suffix) . "<br />": "";
-            echo (!empty($response->StructuredName->After))    ? "After: " . implode(" ", $response->StructuredName->After) . "<br />": "";
-            echo "<br />";
+            echo echoStructuredName($response->StructuredName). "<br />";
         }
         echo '<br />';
     }
@@ -310,7 +320,7 @@ function echoBase($response, $json = false)
                     }
                 }
                 echo
-                    "<tr><td>" . $person->FullName .
+                    "<tr><td>" . $person->FullName . "<br /> ". echoStructuredName($person->StructuredName) .
                     "</td><td>" . $person->Street ." " . $person->StreetNumber. ", " . $person->ZipCode . ", " . $person->City .  ", " . $person->District .  ", " . $person->Region .  ", " . $person->Country .
                     "</td><td>" . (($person->DetectedFrom) ? echoDate($person->DetectedFrom, $json) : '') .
                     "</td><td>" . (($person->DetectedTo) ? echoDate($person->DetectedTo, $json) : '') .
@@ -405,7 +415,7 @@ function echoBase($response, $json = false)
                     (($response->Bankrupt->StartDate) ? echoDate($response->Bankrupt->StartDate, $json) : '') ."</td><td>".
                     (($response->Bankrupt->ExitDate) ? echoDate($response->Bankrupt->ExitDate, $json) : '') ."</td><td>".
                     $response->Bankrupt->ExitReason."</td><td>".
-                    (($response->Bankrupt->Officer) ? $response->Bankrupt->Officer->FullName : '')."</td><td>".
+                    (($response->Bankrupt->Officer) ? $response->Bankrupt->Officer->FullName . "<br />" . echoStructuredName($response->Bankrupt->Officer->StructuredName) : ''). "</td><td>".
                      $response->Bankrupt->Source."</td><td>".
                      $response->Bankrupt->Status."</td><td>".
                     "</td></tr>";
@@ -426,7 +436,7 @@ function echoBase($response, $json = false)
                     (($response->Restructuring->StartDate) ? echoDate($response->Restructuring->StartDate, $json) : '') ."</td><td>".
                     (($response->Restructuring->ExitDate) ? echoDate($response->Restructuring->ExitDate, $json) : '') ."</td><td>".
                     $response->Restructuring->ExitReason."</td><td>".
-                    (($response->Restructuring->Officer) ? $response->Restructuring->Officer->FullName : '')."</td><td>".
+                    (($response->Restructuring->Officer) ? $response->Restructuring->Officer->FullName . "<br />" . echoStructuredName($response->Restructuring->Officer->StructuredName) : '')."</td><td>".
                     $response->Restructuring->Source."</td><td>".
                     $response->Restructuring->Status."</td><td>".
                     "</td></tr>";
@@ -447,7 +457,7 @@ function echoBase($response, $json = false)
                     "</td><td>".
                     (($response->Liquidation->ExitDate) ? echoDate($response->Liquidation->ExitDate, $json) : '') ."</td><td>".
                     "</td><td>".
-                    (($response->Liquidation->Officer) ? $response->Liquidation->Officer->FullName : '')."</td><td>".
+                    (($response->Liquidation->Officer) ? $response->Liquidation->Officer->FullName . "<br />" . echoStructuredName($response->Liquidation->Officer->StructuredName): '')."</td><td>".
                     $response->Bankrupt->Source."</td><td>".
                     "</td><td>".
                     "</td></tr>";
@@ -468,7 +478,7 @@ function echoBase($response, $json = false)
                     (($response->OtherProceeding->StartDate) ? echoDate($response->OtherProceeding->StartDate, $json) : '') ."</td><td>".
                     (($response->OtherProceeding->ExitDate) ? echoDate($response->OtherProceeding->ExitDate, $json) : '') ."</td><td>".
                     $response->OtherProceeding->ExitReason."</td><td>".
-                    (($response->OtherProceeding->Officer) ? $response->OtherProceeding->Officer->FullName : '')."</td><td>".
+                    (($response->OtherProceeding->Officer) ? $response->OtherProceeding->Officer->FullName . "<br />" . echoStructuredName($response->OtherProceeding->Officer->StructuredName) : '')."</td><td>".
                     $response->OtherProceeding->Source."</td><td>".
                     $response->OtherProceeding->Status."</td><td>".
                     "</td></tr>";
@@ -573,7 +583,9 @@ $api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $
 // priklad dopytu na detail firmy, ktora ma ICO 35757442
 $ico = (isset($_GET['ico']) && !empty($_GET['ico'])) ? $_GET['ico'] : '35757442';
 ?>
+header('Content-Type: text/html; charset=utf-8');
 <h1>Detail test:</h1>
+// priklad vypisu ziskanych udajov z Finstatu
 <?php
 try
 {
@@ -581,18 +593,15 @@ try
     if (!empty($ico)) {
         $response = $api->Request($ico, "detail", $json);
     }
+    echoBase($response, $json);
+    echoLimits($api->GetAPILimits());
 }
 catch (Exception $e)
 {
-    echoLimits($api->GetAPILimits());
     echoException($e);
+    echoLimits($api->GetAPILimits());
 }
 
-// priklad vypisu ziskanych udajov z Finstatu
-header('Content-Type: text/html; charset=utf-8');
-echoBase($response, $json);
-
-echoLimits($api->GetAPILimits());
 echo '<hr />';
 ?>
 <h1>Extended test:</h1>
