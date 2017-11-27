@@ -10,28 +10,30 @@ class FunctionResult
     ;
 }
 
-class PersonResult extends AddressResult
+class AbstractPersonResult extends AddressResult
 {
     public
         $FullName,
+        $StructuredName,
         $DetectedFrom,
         $DetectedTo,
-        $Functions = array(),
-        $DepositAmount,
-        $PaybackRange,
-        $StructuredName
+        $Functions = array()
     ;
 }
 
-class RpvsPersonResult extends AddressResult
+class PersonResult extends AbstractPersonResult
 {
     public
-    $FullName,
-    $BirthDate,
-    $Ico,
-    $DetectedFrom,
-    $DetectedTo,
-    $Functions = array()
+        $DepositAmount,
+        $PaybackRange
+    ;
+}
+
+class RpvsPersonResult extends AbstractPersonResult
+{
+    public
+        $BirthDate,
+        $Ico
     ;
 }
 

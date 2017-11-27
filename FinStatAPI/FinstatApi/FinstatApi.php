@@ -518,9 +518,9 @@ class FinstatApi
         return $o;
     }
 
-    private function parsePerson($person)
+    private function parsePerson($person, $o = null)
     {
-        $o = new PersonResult();
+        $o = ($o == null) ? new PersonResult() : $o;
         $o = $this->parseAddress($person, $o);
         $o->FullName = (string)$person->FullName;
         $o->DetectedFrom = $this->parseDate($person->DetectedFrom);
@@ -566,7 +566,7 @@ class FinstatApi
             $response->RpvsPersons = array();
             if (!empty($detail->RpvsPersons)) {
                 foreach ($detail->RpvsPersons->RpvsPerson as $rpvsPerson) {
-                    $o = $this->parsePerson($rpvsPerson);
+                    $o = $this->parsePerson($rpvsPerson, new RpvsPersonResult());
                     $o->BirthDate = (!empty($rpvsPerson->BirthDate)) ? $this->parseDate($rpvsPerson->BirthDate) : null;
                     $o->Ico = (!empty($rpvsPerson->Ico)) ? (string)$rpvsPerson->Ico : null;
                     $response->RpvsPersons[] = $o;

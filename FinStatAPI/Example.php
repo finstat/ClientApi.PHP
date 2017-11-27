@@ -355,7 +355,7 @@ function echoBase($response, $json = false)
                     }
                 }
                 echo
-                "<tr><td>" . $person->FullName .
+                "<tr><td>" . $person->FullName . "<br /> ". echoStructuredName($person->StructuredName) .
                 "</td><td>" . (($person->BirthDate) ? echoDate($person->BirthDate, $json) : '') .
                 "</td><td>" . $person->Ico .
                 "</td><td>" . $person->Street ." " . $person->StreetNumber. ", " . $person->ZipCode . ", " . $person->City .  ", " . $person->District .  ", " . $person->Region .  ", " . $person->Country .
