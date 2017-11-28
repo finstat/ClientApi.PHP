@@ -582,10 +582,10 @@ $api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $
 
 // priklad dopytu na detail firmy, ktora ma ICO 35757442
 $ico = (isset($_GET['ico']) && !empty($_GET['ico'])) ? $_GET['ico'] : '35757442';
-?>
 header('Content-Type: text/html; charset=utf-8');
-<h1>Detail test:</h1>
 // priklad vypisu ziskanych udajov z Finstatu
+?>
+<h1>Detail test:</h1>
 <?php
 try
 {
