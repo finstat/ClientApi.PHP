@@ -25,8 +25,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Example.php" />
+    <Compile Include="FinstatApi\KeyValue.php" />
     <Compile Include="FinstatApi\DailyDiff.php" />
     <Compile Include="FinstatApi\DailyDiffList.php" />
+    <Compile Include="FinstatApi\FinstatDailyUltimateDiffApi.php" />
+    <Compile Include="FinstatApi\FinstatDailyStatementDiffApi.php" />
     <Compile Include="FinstatApi\FinstatDailyDiffApi.php" />
     <Compile Include="FinstatApi\Requests.php" />
     <Compile Include="FinstatApi\Requests\Auth.php" />

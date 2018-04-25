@@ -3,10 +3,8 @@
 require_once('Requests.php');
 require_once('DailyDiff.php');
 require_once('DailyDiffList.php');
-require_once('KeyValue.php');
 
-
-class FinstatDailyDiffApi
+class FinstatDailyStatementDiffApi
 {
     private
         $apiUrl,
@@ -95,7 +93,7 @@ class FinstatDailyDiffApi
         return $detail;
     }
 
-    public function RequestListOfDailyDiffs($json = false)
+    public function RequestListOfDailyStatementDiffs($json = false)
     {
         if(!class_exists('Requests'))
         {
@@ -118,7 +116,7 @@ class FinstatDailyDiffApi
             'StationName' => $this->stationName
         );
 
-        $url = $this->apiUrl. "/GetListOfDiffs";
+        $url = $this->apiUrl. "/GetListOfStatementDiffs";
 
         try
         {
@@ -172,7 +170,7 @@ class FinstatDailyDiffApi
         return null;
     }
 
-    public function DownloadDailyDiffFile($fileName, $exportPath)
+    public function DownloadDailyStatementDiffFile($fileName, $exportPath)
     {
         if(!class_exists('Requests'))
         {
@@ -195,7 +193,7 @@ class FinstatDailyDiffApi
             'StationId' => $this->stationId,
             'StationName' => $this->stationName
         );
-        $url = $this->apiUrl. "/GetFile";
+        $url = $this->apiUrl. "/GetStatementFile";
 
         try
         {
@@ -209,6 +207,69 @@ class FinstatDailyDiffApi
         $this->parseResponseRaw($response, $url, $fileName);
 
         return file_put_contents($exportPath, $response->body);
+    }
+
+
+    public function RequestStatementLegend($lang = "sk", $json = false)
+    {
+        if(!class_exists('Requests'))
+        {
+            trigger_error("Unable to load Requests class", E_USER_WARNING);
+            return false;
+        }
+
+        Requests::register_autoloader();
+
+        $options = array(
+            'timeout' => $this->timeout,
+            'follow_redirects' => false,
+            'auth' => false
+        );
+
+        $data = array(
+            'apiKey' => $this->apiKey,
+            'lang' => $lang,
+            'Hash' => $this->ComputeVerificationHash($lang),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        );
+
+        $url = $this->apiUrl. "/GetStatementLegend";
+
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+            $response = Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+
+
+        $detail = $this->parseResponse($response, $url, null, $json);
+        if($detail != false)
+        {
+            if(!$json)
+            {
+                $result = array();
+                foreach ($detail->KeyValue as $element) {
+                    $o = new KeyValue();
+                    $o->Key = (string)$element->Key;
+                    $o->Value = (string)$element->Value;
+                    $result[] = $o;
+                }
+
+                return $result;
+            } else {
+                return $detail;
+            }
+        }
+
+        return null;
     }
 
     public function GetAPILimits()

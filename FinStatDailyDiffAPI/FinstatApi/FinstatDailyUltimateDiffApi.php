@@ -3,10 +3,8 @@
 require_once('Requests.php');
 require_once('DailyDiff.php');
 require_once('DailyDiffList.php');
-require_once('KeyValue.php');
 
-
-class FinstatDailyDiffApi
+class FinstatDailyUltimateDiffApi
 {
     private
         $apiUrl,
@@ -95,7 +93,7 @@ class FinstatDailyDiffApi
         return $detail;
     }
 
-    public function RequestListOfDailyDiffs($json = false)
+    public function RequestListOfDailyUltimateDiffs($json = false)
     {
         if(!class_exists('Requests'))
         {
@@ -118,7 +116,7 @@ class FinstatDailyDiffApi
             'StationName' => $this->stationName
         );
 
-        $url = $this->apiUrl. "/GetListOfDiffs";
+        $url = $this->apiUrl. "/GetListOfUltimateDiffs";
 
         try
         {
@@ -172,7 +170,7 @@ class FinstatDailyDiffApi
         return null;
     }
 
-    public function DownloadDailyDiffFile($fileName, $exportPath)
+    public function DownloadDailyUltimateDiffFile($fileName, $exportPath)
     {
         if(!class_exists('Requests'))
         {
@@ -195,7 +193,7 @@ class FinstatDailyDiffApi
             'StationId' => $this->stationId,
             'StationName' => $this->stationName
         );
-        $url = $this->apiUrl. "/GetFile";
+        $url = $this->apiUrl. "/GetUltimateFile";
 
         try
         {
