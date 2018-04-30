@@ -1,0 +1,69 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2043
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStat.ViewModel", "FinStat.ViewModel\FinStat.ViewModel.phpproj", "{52B481CB-A8C6-45D9-A15A-F515D79AF8EA}"
+EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStatApi", "FinStatApi\FinStatApi.phpproj", "{69BE925A-9D68-4EA8-BF50-95384A018487}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tester", "Tester", "{507E48DF-41E8-4258-854A-1969114E1DE0}"
+EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStat.Client", "FinStat.Client\FinStat.Client.phpproj", "{B609F2B6-8BD3-4EE7-B490-7953ED404434}"
+EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStatCZ.ViewModel", "FinStatCZ.ViewModel\FinStatCZ.ViewModel.phpproj", "{0C3B7D70-99E9-4AC8-8C1A-9FBA7E556031}"
+EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStatApiCZ", "FinStatApiCZ\FinStatApiCZ.phpproj", "{9F2816FE-3B1D-4BFF-97D9-11D7F941A1FF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SK", "SK", "{B090BB50-38A1-4851-BD8B-07264DF8B85E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CZ", "CZ", "{AA8CA9C0-4B27-4318-AD8D-5C5343ED1C37}"
+EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStatDailyDiff", "FinStatDailyDiff\FinStatDailyDiff.phpproj", "{25CA97EC-8AD6-4FFC-9FFA-EECA8B626599}"
+EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStatMonitoring", "FinStatMonitoring\FinStatMonitoring.phpproj", "{49BF212F-B6FF-4D23-A302-6AD37160EC23}"
+EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStat", "FinStat\FinStat.phpproj", "{625FEE24-A3F0-4738-AF6E-2732213E90A6}"
+EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "FinStatCZ", "FinStatCZ\FinStatCZ.phpproj", "{5F1C0A8C-CEA3-45B1-9F6C-AF67FEA421E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52B481CB-A8C6-45D9-A15A-F515D79AF8EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52B481CB-A8C6-45D9-A15A-F515D79AF8EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69BE925A-9D68-4EA8-BF50-95384A018487}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69BE925A-9D68-4EA8-BF50-95384A018487}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B609F2B6-8BD3-4EE7-B490-7953ED404434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B609F2B6-8BD3-4EE7-B490-7953ED404434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C3B7D70-99E9-4AC8-8C1A-9FBA7E556031}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C3B7D70-99E9-4AC8-8C1A-9FBA7E556031}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F2816FE-3B1D-4BFF-97D9-11D7F941A1FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F2816FE-3B1D-4BFF-97D9-11D7F941A1FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25CA97EC-8AD6-4FFC-9FFA-EECA8B626599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25CA97EC-8AD6-4FFC-9FFA-EECA8B626599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49BF212F-B6FF-4D23-A302-6AD37160EC23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49BF212F-B6FF-4D23-A302-6AD37160EC23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{625FEE24-A3F0-4738-AF6E-2732213E90A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{625FEE24-A3F0-4738-AF6E-2732213E90A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F1C0A8C-CEA3-45B1-9F6C-AF67FEA421E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F1C0A8C-CEA3-45B1-9F6C-AF67FEA421E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B090BB50-38A1-4851-BD8B-07264DF8B85E} = {507E48DF-41E8-4258-854A-1969114E1DE0}
+		{AA8CA9C0-4B27-4318-AD8D-5C5343ED1C37} = {507E48DF-41E8-4258-854A-1969114E1DE0}
+		{25CA97EC-8AD6-4FFC-9FFA-EECA8B626599} = {B090BB50-38A1-4851-BD8B-07264DF8B85E}
+		{49BF212F-B6FF-4D23-A302-6AD37160EC23} = {B090BB50-38A1-4851-BD8B-07264DF8B85E}
+		{625FEE24-A3F0-4738-AF6E-2732213E90A6} = {B090BB50-38A1-4851-BD8B-07264DF8B85E}
+		{5F1C0A8C-CEA3-45B1-9F6C-AF67FEA421E4} = {AA8CA9C0-4B27-4318-AD8D-5C5343ED1C37}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D6A8E64-C94C-4CF8-9E27-5274E3961A3C}
+	EndGlobalSection
+EndGlobal
