@@ -1,6 +1,6 @@
 <?php
 require_once('../FinStat.Client/ViewModel/AddressResult.php');
-require_once('../FinStat.Client/ViewModel/AbstractBaseResult.php');
+require_once('../FinStat.Client/ViewModel/Detail/AbstractBaseResult.php');
 
 class DetailResult extends AbstractBaseResult
 {
