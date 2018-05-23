@@ -1,7 +1,7 @@
 <?php
-require_once('../FinStatApiCZ/FinstatApi.php');
-require_once('../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once('../FinStatCZ.ViewModel/Detail/DetailResult.php');
+require_once(__DIR__ . '/../FinStatApiCZ/FinstatApi.php');
+require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/DetailResult.php');
 
 function echoDate($date, $json = false)
 {

@@ -1,5 +1,5 @@
 <?php
-require_once('ExtendedResult.php');
+require_once(__DIR__ . '/ExtendedResult.php');
 
 class FunctionResult
 {

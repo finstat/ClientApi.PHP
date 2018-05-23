@@ -1,71 +1,26 @@
 <?php
-require_once('Requests.php');
-require_once('AbstractFinstatApi.php');
-require_once('ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/Requests.php');
+require_once(__DIR__ . '/AbstractFinstatApi.php');
+require_once(__DIR__ . '/ViewModel/AutoCompleteResult.php');
 
 class BaseFinstatApi extends AbstractFinstatApi
 {
     public function RequestAutoLogin($redirecturl, $email = null, $json = false)
     {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'url' => $redirecturl,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash("autologin"),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
+        $data = array('url' => $redirecturl);
         if (!empty($email)) {
             $data['email'] = $email;
         }
 
-        $url = $this->apiUrl . "autologin";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
+        $detail = $this->DoRequest("autologin", $data, "autologin", $json);
 
-        $detail = $this->parseResponse($response, $url, "autologin", $json);
         return (string)$detail;
     }
 
     public function RequestAutoComplete($query, $json = false)
     {
-        $options = $this->InitRequests();
+        $detail = $this->DoRequest("autocomplete", array('query' => $query), $query, $json);
 
-        $data = array(
-            'query' => $query,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash($query),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "autocomplete";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, $query, $json);
         if(!$json) {
             return $this->parseAutoComplete($detail);
         } else

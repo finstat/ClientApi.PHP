@@ -1,70 +1,14 @@
 <?php
-require_once('../FinStat.Client/Requests.php');
-require_once('../FinStat.Client/AbstractFinstatApi.php');
-require_once('../FinStat.Client/ViewModel/Monitoring/MonitoringReportResult.php');
-require_once('../FinStat.ViewModel/Monitoring/ProceedingResult.php');
+require_once(__DIR__ . '/../FinStat.Client/Requests.php');
+require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
+require_once(__DIR__ . '/../FinStat.Client/ViewModel/Monitoring/MonitoringReportResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Monitoring/ProceedingResult.php');
 
 class FinstatMonitoringApi extends AbstractFinstatApi
 {
     public function AddToMonitoring($ico, $json = false)
     {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'ico' => $ico,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash($ico),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "AddToMonitoring";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, $ico, $json);
-
-        $parse = (string)$detail;
-        return ($json) ? $detail : ($parse == 'true');
-    }
-
-    public function AddDateToMonitoring($date, $json = false)
-    {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'date' => $date,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash($date),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "AddDateToMonitoring";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, $date, $json);
+        $detail = $this->DoRequest("AddToMonitoring", array('ico' => $ico), $ico, $json);
 
         $parse = (string)$detail;
         return ($json) ? $detail : ($parse == 'true');
@@ -72,238 +16,67 @@ class FinstatMonitoringApi extends AbstractFinstatApi
 
     public function RemoveFromMonitoring($ico, $json = false)
     {
-        $options = $this->InitRequests();
+        $detail = $this->DoRequest("RemoveFromMonitoring", array('ico' => $ico), $ico, $json);
 
-        $data = array(
-            'ico' => $ico,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash($ico),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "RemoveFromMonitoring";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, $ico, $json);
         $parse = (string)$detail;
-
-         return ($json) ? $detail : ($parse == 'true');
-    }
-
-    public function RemoveDateFromMonitoring($date, $json = false)
-    {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'date' => $date,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash($date),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "RemoveDateFromMonitoring";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, $date, $json);
-        $parse = (string)$detail;
-
-         return ($json) ? $detail : ($parse == 'true');
+        return ($json) ? $detail : ($parse == 'true');
     }
 
     public function MonitoringList($json = false)
     {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash('list'),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "MonitoringList";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-        $detail = $this->parseResponse($response, $url, null, $json);
-
-        return ($json) ? $detail : $this->parseMonitoringList($detail);
-    }
-
-    public function MonitoringDateList($json = false)
-    {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash('datelist'),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "MonitoringDateList";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-        $detail = $this->parseResponse($response, $url, null, $json);
+        $detail = $this->DoRequest("MonitoringList", array(), "list", $json);
 
         return ($json) ? $detail : $this->parseMonitoringList($detail);
     }
 
     public function MonitoringReport($json = false)
     {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash('report'),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "MonitoringReport";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, null, $json);
+        $detail = $this->DoRequest("MonitoringReport", array(), "report", $json);
 
         return ($json) ? $detail : $this->parseMonitoringReport($detail);
     }
 
-    public function MonitoringDateReport($json = false)
-    {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash('datereport'),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "MonitoringDateReport";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, null, $json);
-        return ($json) ? $detail : $this->parseMonitoringDateReport($detail);
-    }
-
     public function MonitoringProceedings($json = false)
     {
-        $options = $this->InitRequests();
+        $detail = $this->DoRequest("MonitoringProceedings", array(), "proceedings", $json);
 
-        $data = array(
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash('proceedings'),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "MonitoringProceedings";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-        $detail = $this->parseResponse($response, $url, null, $json);
         return ($json) ? $detail : $this->parseMonitoringProceedings($detail);
+    }
+
+    public function AddDateToMonitoring($date, $json = false)
+    {
+        $detail = $this->DoRequest("AddDateToMonitoring", array('date' => $date), $date, $json);
+
+        $parse = (string)$detail;
+        return ($json) ? $detail : ($parse == 'true');
+    }
+
+    public function RemoveDateFromMonitoring($date, $json = false)
+    {
+        $detail = $this->DoRequest("RemoveDateFromMonitoring", array('date' => $date), $date, $json);
+
+        $parse = (string)$detail;
+        return ($json) ? $detail : ($parse == 'true');
+    }
+
+    public function MonitoringDateList($json = false)
+    {
+        $detail = $this->DoRequest("MonitoringDateList", array(), "datelist", $json);
+
+        return ($json) ? $detail : $this->parseMonitoringList($detail);
+    }
+
+    public function MonitoringDateReport($json = false)
+    {
+        $detail = $this->DoRequest("MonitoringDateReport", array(), "datereport", $json);
+
+        return ($json) ? $detail : $this->parseMonitoringDateReport($detail);
     }
 
     public function MonitoringDateProceedings($json = false)
     {
-        $options = $this->InitRequests();
+        $detail = $this->DoRequest("MonitoringDateProceedings", array(), "dateproceedings", $json);
 
-        $data = array(
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash('dateproceedings'),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "MonitoringDateProceedings";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-        $detail = $this->parseResponse($response, $url, null, $json);
         return ($json) ? $detail : $this->parseMonitoringProceedings($detail);
     }
 

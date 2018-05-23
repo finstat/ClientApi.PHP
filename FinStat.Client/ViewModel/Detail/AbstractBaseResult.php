@@ -1,5 +1,5 @@
 <?php
-require_once('../AddressResult.php');
+require_once(__DIR__ . '/../AddressResult.php');
 
 class AbstractBaseResult extends AddressResult
 {

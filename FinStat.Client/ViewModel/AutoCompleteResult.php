@@ -1,6 +1,6 @@
 <?php
 
-class CompanyResult 
+class CompanyResult
 {
     public
         $Ico,
@@ -9,6 +9,7 @@ class CompanyResult
         $Cancelled
     ;
 }
+
 class AutoCompleteResult
 {
     public

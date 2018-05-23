@@ -1,10 +1,10 @@
 <?php
 
-require_once('../FinStat.Client/Requests.php');
-require_once('../FinStat.Client/AbstractFinstatApi.php');
-require_once('../FinStat.Client/BaseFinstatApi.php');
-require_once('../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once('../FinStatCZ.ViewModel/Detail/DetailResult.php');
+require_once(__DIR__ . '/../FinStat.Client/Requests.php');
+require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
+require_once(__DIR__ . '/../FinStat.Client/BaseFinstatApi.php');
+require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/DetailResult.php');
 
 class FinstatApi extends BaseFinstatApi
 {
@@ -19,32 +19,8 @@ class FinstatApi extends BaseFinstatApi
     // Returns: details or FALSE
     public function Request($ico, $type="detail", $json = false)
     {
-        $options = $this->InitRequests();
+        $detail = $this->DoRequest($type, array('ico' => $ico), $ico, $json);
 
-        $data = array(
-            'ico' => $ico,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash($ico),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl. $type;
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, $ico, $json);
         if(!$json) {
             switch($type) {
                 case 'detail':

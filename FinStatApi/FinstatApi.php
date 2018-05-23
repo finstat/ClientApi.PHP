@@ -1,85 +1,16 @@
 <?php
 
-require_once('../FinStat.Client/Requests.php');
-require_once('../FinStat.Client/AbstractFinstatApi.php');
-require_once('../FinStat.Client/BaseFinstatApi.php');
-require_once('../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once('../FinStat.ViewModel/Detail/BaseResult.php');
-require_once('../FinStat.ViewModel/Detail/DetailResult.php');
-require_once('../FinStat.ViewModel/Detail/ExtendedResult.php');
-require_once('../FinStat.ViewModel/Detail/UltimateResult.php');
+require_once(__DIR__ . '/../FinStat.Client/Requests.php');
+require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
+require_once(__DIR__ . '/../FinStat.Client/BaseFinstatApi.php');
+require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BaseResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/DetailResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/ExtendedResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/UltimateResult.php');
 
 class FinstatApi extends BaseFinstatApi
 {
-    public function RequestAutoLogin($redirecturl, $email = null, $json = false)
-    {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'url' => $redirecturl,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash("autologin"),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        if (!empty($email)) {
-            $data['email'] = $email;
-        }
-
-        $url = $this->apiUrl . "autologin";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, "autologin", $json);
-        return (string)$detail;
-    }
-
-    public function RequestAutoComplete($query, $json = false)
-    {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'query' => $query,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash($query),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl . "autocomplete";
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-
-        $detail = $this->parseResponse($response, $url, $query, $json);
-        if(!$json) {
-            return $this->parseAutoComplete($detail);
-        } else
-        {
-            return $detail;
-        }
-    }
-
     public function RequestDetail($ico, $json = false)
     {
         return $this->Request($ico, 'detail', $json);
@@ -100,30 +31,7 @@ class FinstatApi extends BaseFinstatApi
     // Returns: details or FALSE
     public function Request($ico, $type="detail", $json = false)
     {
-        $options = $this->InitRequests();
-
-        $data = array(
-            'ico' => $ico,
-            'apiKey' => $this->apiKey,
-            'Hash' => $this->ComputeVerificationHash($ico),
-            'StationId' => $this->stationId,
-            'StationName' => $this->stationName
-        );
-
-        $url = $this->apiUrl. $type;
-        try
-        {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-            $response = Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
-            throw $e;
-        }
-        $detail = $this->parseResponse($response, $url, $ico, $json);
+        $detail = $this->DoRequest($type, array('ico' => $ico), $ico, $json);
         if(!$json) {
             switch($type) {
                 case 'ultimate':

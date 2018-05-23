@@ -22,9 +22,6 @@
     <Compile Include="Detail\UltimateResult.php" />
     <Compile Include="Diff\DailyDiff.php" />
     <Compile Include="Diff\DailyDiffList.php" />
-    <Compile Include="Diff\FinstatDailyDiffApi.php" />
-    <Compile Include="Diff\FinstatDailyStatementDiffApi.php" />
-    <Compile Include="Diff\FinstatDailyUltimateDiffApi.php" />
     <Compile Include="KeyValue.php" />
     <Compile Include="Monitoring\ProceedingResult.php" />
   </ItemGroup>

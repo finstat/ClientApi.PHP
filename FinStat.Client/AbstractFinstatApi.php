@@ -1,6 +1,6 @@
 <?php
-require_once('Requests.php');
-require_once('ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/Requests.php');
+require_once(__DIR__ . '/ViewModel/AutoCompleteResult.php');
 
 class AbstractFinstatApi
 {
@@ -52,6 +52,47 @@ class AbstractFinstatApi
         );
 
         return $options;
+    }
+
+    public function DoBaseRequest($requestUrl, $requestData, $parameter = null, $json = false) {
+        $options = $this->InitRequests();
+
+        $data = array_merge(array(
+            'apiKey' => $this->apiKey,
+            'Hash' => $this->ComputeVerificationHash($parameter),
+            'StationId' => $this->stationId,
+            'StationName' => $this->stationName
+        ), $requestData);
+
+        $url = $this->apiUrl. $requestUrl;
+        try
+        {
+            $headers = null;
+            if ($json) {
+                $url = $url . ".json";
+            }
+
+
+            return Requests::post($url, $headers, $data, $options);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
+    }
+
+    public function DoRequest($requestUrl, $requestData, $parameter = null, $json = false)
+    {
+        try
+        {
+            $url = $this->apiUrl. $requestUrl;
+            $response = $this->DoBaseRequest($requestUrl, $requestData, $parameter, $json);
+            return $this->parseResponse($response, $url, $parameter, $json);
+        }
+        catch(Requests_Exception $e)
+        {
+            throw $e;
+        }
     }
 
     //

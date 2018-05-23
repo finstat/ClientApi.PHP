@@ -1,8 +1,8 @@
 
 <?php
-require_once('../FinStatApi/FinstatDailyDiffApi.php');
-require_once('../FinStat.ViewModel/Diff/DailyDiff.php');
-require_once('../FinStat.ViewModel/Diff/DailyDiffList.php');
+require_once(__DIR__ . '/../FinStatApi/FinstatDailyDiffApi.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Diff/DailyDiff.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Diff/DailyDiffList.php');
 
 function echoDate($date, $json = false)
 {

@@ -1,10 +1,10 @@
 <?php
-require_once('../FinStatApi/FinstatApi.php');
-require_once('../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once('../FinStat.ViewModel/Detail/BaseResult.php');
-require_once('../FinStat.ViewModel/Detail/DetailResult.php');
-require_once('../FinStat.ViewModel/Detail/ExtendedResult.php');
-require_once('../FinStat.ViewModel/Detail/UltimateResult.php');
+require_once(__DIR__ . '/../FinStatApi/FinstatApi.php');
+require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BaseResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/DetailResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/ExtendedResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/UltimateResult.php');
 
 function echoDate($date, $json = false)
 {

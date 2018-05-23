@@ -1,6 +1,6 @@
 <?php
-require_once('../FinStat.Client/ViewModel/AddressResult.php');
-require_once('../FinStat.Client/ViewModel/Detail/AbstractBaseResult.php');
+require_once(__DIR__ . '/../../FinStat.Client/ViewModel/AddressResult.php');
+require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/AbstractBaseResult.php');
 
 class JudgementIndicatorResult
 {

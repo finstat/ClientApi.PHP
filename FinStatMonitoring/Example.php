@@ -1,6 +1,6 @@
 <?php
-require_once('../FinStatApi/FinstatMonitoringApi.php');
-require_once('../FinStat.Client/ViewModel/Monitoring/MonitoringReportResult.php');
+require_once(__DIR__ . '/../FinStatApi/FinstatMonitoringApi.php');
+require_once(__DIR__ . '/../FinStat.Client/ViewModel/Monitoring/MonitoringReportResult.php');
 
 function echoDate($date, $json = false)
 {
