@@ -129,32 +129,36 @@ class FinstatApi extends BaseFinstatApi
         $response->HasDebt              = "{$detail->HasDebt}"  == 'true';
         $response->HasDisposal          = "{$detail->HasDisposal}"  == 'true';
         $response->SelfEmployed         = "{$detail->SelfEmployed}"  == 'true';
+
         $response->Phones = array();
         if (!empty($detail->Phones)) {
             foreach ($detail->Phones->string as $s) {
                 $response->Phones[] = (string)$s;
             }
         }
+
         $response->Emails = array();
         if (!empty($detail->Emails)) {
             foreach ($detail->Emails->string as $s) {
                 $response->Emails[] = (string)$s;
             }
         }
-        $response->Debts = array();
 
+        $response->Debts = array();
         if (!empty($detail->Debts)) {
             foreach ($detail->Debts->Debt as $debt) {
-                $o = new DebtResult();
-                $o->Source  = $debt->Source;
-                $o->Value   = (double)$debt->Value;
-                $o->ValidFrom  = $this->parseDate($detail->ValidFrom);
-                $response->Debts[] = $o;
+                $response->Debts[] = $this->parseDebtResult($debt);
+            }
+        }
+
+        $response->StateReceivables = array();
+        if (!empty($detail->StateReceivables)) {
+            foreach ($detail->StateReceivables->ReceivableDebt as $debt) {
+                $response->StateReceivables[] = $this->ParseReceivableDebtResult($debt);
             }
         }
 
         $response->PaymentOrders = array();
-
         if (!empty($detail->PaymentOrders)) {
             foreach ($detail->PaymentOrders->PaymentOrder as $paymentOrder) {
                 $o = new PaymentOrderResult();
@@ -237,6 +241,7 @@ class FinstatApi extends BaseFinstatApi
                 $response->JudgementCounts[] = $o;
             }
         }
+
         $response->JudgementLastPublishedDate = $this->parseDate($detail->JudgementLastPublishedDate);
 
         return $response;
@@ -263,6 +268,7 @@ class FinstatApi extends BaseFinstatApi
                     $response->Persons[] = $o;
                 }
             }
+
             $response->RpvsPersons = array();
             if (!empty($detail->RpvsPersons)) {
                 foreach ($detail->RpvsPersons->RpvsPerson as $rpvsPerson) {
@@ -272,6 +278,7 @@ class FinstatApi extends BaseFinstatApi
                     $response->RpvsPersons[] = $o;
                 }
             }
+
             if (!empty($detail->RegistrationCourt)) {
                 $o = new PersonResult();
                 $o = $this->parseAddress($detail->RegistrationCourt, $o);
@@ -310,84 +317,78 @@ class FinstatApi extends BaseFinstatApi
             }
 
             if (!empty($detail->Bankrupt)) {
-                $o = new BankruptResult();
-                $o->Source = (string) $detail->Bankrupt->Source;
-                $o->StartDate = $this->parseDate($detail->Bankrupt->StartDate);
-                $o->EnterDate = $this->parseDate($detail->Bankrupt->EnterDate);
-                $o->EnterReason = (string) $detail->Bankrupt->EnterReason;
-                $o->ExitDate = $this->parseDate($detail->Bankrupt->ExitDate);
-                $o->ExitReason = (string) $detail->Bankrupt->ExitReason;
-                $o->Officer = $this->parsePerson($detail->Bankrupt->Officer);
-                $o->Status = (string) $detail->Bankrupt->Status;
-                if (!empty($detail->Bankrupt->Deadlines)) {
-                    foreach ($detail->Bankrupt->Deadlines->Deadline as $deadline) {
-                        $od = new DeadlineResult();
-                        $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
-                        $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
-                        $o->Deadlines[] = $od;
-                    }
-                }
-                $response->Bankrupt = $o;
+                $response->Bankrupt = $this->ParseProceeding($detail->Bankrupt, new BankruptResult());
             }
+
             if (!empty($detail->Restructuring)) {
-                $o = new RestructuringResult();
-                $o->Source = (string) $detail->Restructuring->Source;
-                $o->StartDate = $this->parseDate($detail->Restructuring->StartDate);
-                $o->EnterDate = $this->parseDate($detail->Restructuring->EnterDate);
-                $o->EnterReason = (string) $detail->Restructuring->EnterReason;
-                $o->ExitDate = $this->parseDate($detail->Restructuring->ExitDate);
-                $o->ExitReason = (string) $detail->Restructuring->ExitReason;
-                $o->Officer = $this->parsePerson($detail->Restructuring->Officer);
-                $o->Status = (string) $detail->Restructurin->Status;
-                if (!empty($detail->Deadlines)) {
-                    foreach ($detail->Deadlines->Deadline as $deadline) {
-                        $od = new DeadlineResult();
-                        $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
-                        $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
-                        $o->Deadlines[] = $od;
-                    }
-                }
-                $response->Restructuring = $o;
+                $response->Restructuring = $this->ParseProceeding($detail->Restructuring, new RestructuringResult());
             }
+
             if (!empty($detail->Liquidation)) {
-                $o = new LiquidationResult();
-                $o->Source = (string) $detail->Liquidation->Source;
-                $o->EnterDate = $this->parseDate($detail->Liquidation->EnterDate);
-                $o->EnterReason = (string) $detail->Liquidation->EnterReason;
-                $o->ExitDate = $this->parseDate($detail->Liquidation->ExitDate);
-                $o->Officer = $this->parsePerson($detail->Liquidation->Officer);
-                if (!empty($detail->Deadlines)) {
-                    foreach ($detail->Deadlines->Deadline as $deadline) {
-                        $od = new DeadlineResult();
-                        $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
-                        $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
-                        $o->Deadlines[] = $od;
-                    }
-                }
-                $response->Liquidation = $o;
+                $response->Liquidation = $this->arseLiquidationResult($detail->Liquidation);
             }
+
 			if (!empty($detail->OtherProceeding)) {
-                $o = new ProceedingResult();
-                $o->Source = (string) $detail->OtherProceeding->Source;
-                $o->StartDate = $this->parseDate($detail->OtherProceeding->StartDate);
-                $o->EnterDate = $this->parseDate($detail->OtherProceeding->EnterDate);
-                $o->EnterReason = (string) $detail->OtherProceeding->EnterReason;
-                $o->ExitDate = $this->parseDate($detail->OtherProceeding->ExitDate);
-                $o->ExitReason = (string) $detail->OtherProceeding->ExitReason;
-                $o->Officer = $this->parsePerson($detail->OtherProceeding->Officer);
-                $o->Status = (string) $detail->OtherProceeding->Status;
-                if (!empty($detail->OtherProceeding->Deadlines)) {
-                    foreach ($detail->OtherProceeding->Deadlines->Deadline as $deadline) {
-                        $od = new DeadlineResult();
-                        $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
-                        $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
-                        $o->Deadlines[] = $od;
-                    }
-                }
-                $response->OtherProceeding = $o;
+                $response->OtherProceeding = $this->ParseProceeding($detail->OtherProceeding, new ProceedingResult());
             }
         }
 
         return $response;
+    }
+
+    protected function ParseDebtResult($detail, $response = null) {
+        if(!empty($detail)) {
+            $o = (!empty($response)) ? $response : new DebtResult();
+            $o->Source  = $detail->Source;
+            $o->Value   = (double)$detail->Value;
+            $o->ValidFrom  = $this->parseDate($detail->ValidFrom);
+            return $o;
+        }
+        return null;
+    }
+
+    protected function ParseReceivableDebtResult($detail, $response = null) {
+        if(!empty($detail)) {
+            $o = (!empty($response)) ? $response : new ReceivableDebtResult();
+            return $this->ParseDebtResult($detail, $o);
+        }
+        return null;
+    }
+
+    protected function ParseLiquidationResult($detail, $response = null) {
+        if(!empty($detail)) {
+            $o = (!empty($response)) ? $response : new LiquidationResult();
+            $o->Source = (string) $detail->Source;
+            $o->EnterDate = $this->parseDate($detail->EnterDate);
+            $o->EnterReason = (string) $detail->EnterReason;
+            $o->ExitDate = $this->parseDate($detail->ExitDate);
+            $o->Officer = $this->parsePerson($detail->Officer);
+            if (!empty($detail->Deadlines)) {
+                foreach ($detail->Deadlines->Deadline as $deadline) {
+                    $od = new DeadlineResult();
+                    $od->Date  = (!empty($deadline->Date)) ? $this->parseDate($deadline->Date) : null;
+                    $od->Type  = (!empty($deadline->Type)) ? (string)$deadline->Type : null;
+                    $o->Deadlines[] = $od;
+                }
+            }
+            return $o;
+        }
+        return null;
+    }
+
+    protected function ParseProceeding($detail, $response = null) {
+        if(!empty($detail)) {
+            $o = (!empty($response)) ? $response : new ProceedingResult();
+            $o = $this->ParseLiquidationResult($detail, $response);
+            if(!empty($o)) {
+                $o->FileReference = (string) $detail->FileReference;
+                $o->CourtCode = (string) $detail->CourtCode;
+                $o->StartDate = $this->parseDate($detail->OtherProceeding->StartDate);
+                $o->ExitReason = (string) $detail->OtherProceeding->ExitReason;
+                $o->Status = (string) $detail->OtherProceeding->Status;
+            }
+            return $o;
+        }
+        return null;
     }
 }

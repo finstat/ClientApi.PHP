@@ -67,6 +67,8 @@ class LiquidationResult
 class ProceedingResult extends LiquidationResult
 {
     public
+        $FileReference,
+        $CourtCode,
         $StartDate,
         $ExitReason,
         $Status

@@ -10,6 +10,10 @@ class DebtResult
     ;
 }
 
+class ReceivableDebtResult extends DebtResult
+{
+}
+
 class PaymentOrderResult
 {
     public
@@ -120,6 +124,7 @@ class ExtendedResult extends BaseResult
         $HasDisposal,
         $JudgementCounts = array(),
         $JudgementLastPublishedDate,
-        $Ratios  = array()
+        $Ratios  = array(),
+        $StateReceivables = array()
         ;
     }

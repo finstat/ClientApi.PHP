@@ -234,6 +234,19 @@ function echoBase($response, $json = false)
             }
             echo "</table><br />";
         }
+        echo '<b>Pohľadávky štátu: </b><br />';
+        if(!empty($response->StateReceivables)) {
+            echo "<br /><table>";
+            echo
+                    "<tr><th>Zdroj" .
+                    "</th><th>Hodnota" .
+                    "</th><th>Platné od" .
+                    "</th></tr>";
+            foreach($response->StateReceivables as $debt) {
+                echo "<tr><td>" . $debt->Source. "</td><td>" . $debt->Value.  "</td><td>" . (($debt->ValidFrom) ? echoDate($debt->ValidFrom, $json) : '') .'</td></tr>';
+            }
+            echo "</table><br />";
+        }
         echo '<b>Platobné rozkazy: </b><br />';
         if(!empty($response->PaymentOrders)) {
             echo "<br /><table>";
@@ -398,7 +411,9 @@ function echoBase($response, $json = false)
             echo "<br /><table><tr>";
             echo "<tr>";
             echo
-                "</th><th>" .
+                "</th><th>".
+                "</th><th>Spisovná značka".
+                "</th><th>Kód súdu".
                 "</th><th>Dátum vstupu" .
                 "</th><th>" .
                 "</th><th>Dátum začiatku" .
@@ -410,6 +425,8 @@ function echoBase($response, $json = false)
                 "</th></tr>";
             if(!empty($response->Bankrupt)) {
                 echo "<tr><th>Konkurz</th></td><td>".
+                    (($response->Bankrupt->FileReference) ? echoDate($response->Bankrupt->FileReference, $json) : '') ."</td><td>".
+                    (($response->Bankrupt->CourtCode) ? echoDate($response->Bankrupt->CourtCode, $json) : '') ."</td><td>".
                     (($response->Bankrupt->EnterDate) ? echoDate($response->Bankrupt->EnterDate, $json) : '') ."</td><td>".
                     $response->Bankrupt->EnterReason."</td><td>".
                     (($response->Bankrupt->StartDate) ? echoDate($response->Bankrupt->StartDate, $json) : '') ."</td><td>".
@@ -431,6 +448,8 @@ function echoBase($response, $json = false)
             }
             if(!empty($response->Restructuring)) {
                 echo "<tr><th>Reštrukturalizácia</th></td><td>".
+                    (($response->Restructuring->FileReference) ? echoDate($response->Restructuring->FileReference, $json) : '') ."</td><td>".
+                    (($response->Restructuring->CourtCode) ? echoDate($response->Restructuring->CourtCode, $json) : '') ."</td><td>".
                     (($response->Restructuring->EnterDate) ? echoDate($response->Restructuring->EnterDate, $json) : '') ."</td><td>".
                     $response->Restructuring->EnterReason."</td><td>".
                     (($response->Restructuring->StartDate) ? echoDate($response->Restructuring->StartDate, $json) : '') ."</td><td>".
@@ -452,6 +471,8 @@ function echoBase($response, $json = false)
             }
             if(!empty($response->Liquidation)) {
                 echo "<tr><th>Likvidácia</th></td><td>".
+                    "</td><td>".
+                    "</td><td>".
                     (($response->Liquidation->EnterDate) ? echoDate($response->Liquidation->EnterDate, $json) : '') ."</td><td>".
                     $response->Liquidation->EnterReason."</td><td>".
                     "</td><td>".
@@ -473,6 +494,8 @@ function echoBase($response, $json = false)
             }
 			if(!empty($response->OtherProceeding)) {
                 echo "<tr><th>Iné Konanie</th></td><td>".
+                    (($response->OtherProceeding->FileReference) ? echoDate($response->OtherProceeding->FileReference, $json) : '') ."</td><td>".
+                    (($response->OtherProceeding->CourtCode) ? echoDate($response->OtherProceeding->CourtCode, $json) : '') ."</td><td>".
                     (($response->OtherProceeding->EnterDate) ? echoDate($response->OtherProceeding->EnterDate, $json) : '') ."</td><td>".
                     $response->OtherProceeding->EnterReason."</td><td>".
                     (($response->OtherProceeding->StartDate) ? echoDate($response->OtherProceeding->StartDate, $json) : '') ."</td><td>".
