@@ -24,10 +24,12 @@
     <Compile Include="Diff\DailyDiffList.php" />
     <Compile Include="KeyValue.php" />
     <Compile Include="Monitoring\ProceedingResult.php" />
+    <Compile Include="Statement\StatementResult.php" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Detail\" />
     <Folder Include="Diff\" />
     <Folder Include="Monitoring\" />
+    <Folder Include="Statement\" />
   </ItemGroup>
 </Project>
