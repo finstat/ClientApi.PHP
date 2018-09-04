@@ -19,7 +19,7 @@ class StatementValue
         $Previous
     ;
 }
-abstract class AbstractStatementResult
+class StatementResult
 {
     public
         $ICO,
@@ -32,19 +32,7 @@ abstract class AbstractStatementResult
         $OriginalFormat,
         $Source,
         $Assets,
-        $LiabilitiesAndEquity
-    ;
-}
-
-class StatementResult extends AbstractStatementResult
-{
-    public $Income;
-}
-
-class NonProfitStatementResult extends AbstractStatementResult
-{
-    public
-        $Expenses,
-        $Revenue
+        $LiabilitiesAndEquity,
+        $IncomeStatement
     ;
 }

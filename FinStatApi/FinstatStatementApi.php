@@ -53,8 +53,7 @@ class FinstatStatementApi extends AbstractFinstatApi
         {
             if(!$json)
             {
-                $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateNujPU");
-                $result = $isNonProfit ? new NonProfitStatementResult() : new StatementResult();
+                $result = new StatementResult();
 
                 $result->ICO = (string)$detail->ICO;
                 $result->Name = (string)$detail->Name;
@@ -66,14 +65,16 @@ class FinstatStatementApi extends AbstractFinstatApi
                 $result->OriginalFormat = (string)$detail->OriginalFormat;
                 $result->Source = (string)$detail->Source;
 
+                $result->Assets = array();
                 foreach ($detail->Assets as $element) {
                     $o = new StatementValue();
                     $o->Key    =  (string)$element->Key;
                     $o->Actual =  (float)$element->Actual;
                     $o->Previous    =  (float)$element->Previous;
-                    $result>Assets[] = $o;
+                    $result->Assets[] = $o;
                 }
 
+                $result->LiabilitiesAndEquity = array();
                 foreach ($detail->LiabilitiesAndEquity as $element) {
                     $o = new StatementValue();
                     $o->Key    =  (string)$element->Key;
@@ -82,30 +83,13 @@ class FinstatStatementApi extends AbstractFinstatApi
                     $result->LiabilitiesAndEquity[] = $o;
                 }
 
-                if($isNonProfit) {
-                    foreach ($detail->Expenses as $element) {
-                        $o = new StatementValue();
-                        $o->Key    =  (string)$element->Key;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
-                        $result->Expenses[] = $o;
-                    }
-
-                    foreach ($detail->Revenue as $element) {
-                        $o = new StatementValue();
-                        $o->Key    =  (string)$element->Key;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
-                        $result->Revenue[] = $o;
-                    }
-                } else {
-                    foreach ($detail->Income as $element) {
-                        $o = new StatementValue();
-                        $o->Key    =  (string)$element->Key;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
-                        $result->Income[] = $o;
-                    }
+                $result->IncomeStatement = array();
+                foreach ($detail->IncomeStatement as $element) {
+                    $o = new StatementValue();
+                    $o->Key    =  (string)$element->Key;
+                    $o->Actual =  (float)$element->Actual;
+                    $o->Previous    =  (float)$element->Previous;
+                    $result->IncomeStatement[] = $o;
                 }
 
                 return $result;
