@@ -1,5 +1,35 @@
 <?php
 
+abstract class AbstractStatementLegendResult
+{
+    public
+        $Assets,
+        $LiabilitiesAndEquity
+    ;
+}
+
+class StatementLegendResult extends AbstractStatementLegendResult
+{
+    public $IncomeStatement;
+}
+
+class NonProfitStatementLegendResult extends AbstractStatementLegendResult
+{
+    public
+        $Expenses,
+        $Revenue
+    ;
+}
+
+class StatementLegendValue
+{
+    public
+        $ReportRow,
+        $ReportSection,
+        $Name
+    ;
+}
+
 class StatementItem
 {
     public
@@ -14,12 +44,30 @@ class StatementItem
 class StatementValue
 {
     public
-        $Key,
+        $ReportRow,
+        $ReportSection,
         $Actual,
         $Previous
     ;
 }
-class StatementResult
+
+class AssetStatementValue extends StatementValue
+{
+    public
+        $ActualBrutto,
+        $ActualCorrection
+    ;
+}
+
+class NonProfitAssetStatementValue extends StatementValue
+{
+    public
+        $ActualMain,
+        $ActualCommercial
+    ;
+}
+
+abstract class AbstractStatementResult
 {
     public
         $ICO,
@@ -32,7 +80,19 @@ class StatementResult
         $OriginalFormat,
         $Source,
         $Assets,
-        $LiabilitiesAndEquity,
-        $IncomeStatement
+        $LiabilitiesAndEquity
+    ;
+}
+
+class StatementResult extends AbstractStatementResult
+{
+    public $IncomeStatement;
+}
+
+class NonProfitStatementResult extends AbstractStatementResult
+{
+    public
+        $Expenses,
+        $Revenue
     ;
 }

@@ -53,7 +53,8 @@ class FinstatStatementApi extends AbstractFinstatApi
         {
             if(!$json)
             {
-                $result = new StatementResult();
+                $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateNujPU");
+                $result = $isNonProfit ? new NonProfitStatementResult() : new StatementResult();
 
                 $result->ICO = (string)$detail->ICO;
                 $result->Name = (string)$detail->Name;
@@ -65,31 +66,70 @@ class FinstatStatementApi extends AbstractFinstatApi
                 $result->OriginalFormat = (string)$detail->OriginalFormat;
                 $result->Source = (string)$detail->Source;
 
-                $result->Assets = array();
-                foreach ($detail->Assets as $element) {
-                    $o = new StatementValue();
-                    $o->Key    =  (string)$element->Key;
-                    $o->Actual =  (float)$element->Actual;
-                    $o->Previous    =  (float)$element->Previous;
-                    $result->Assets[] = $o;
-                }
-
                 $result->LiabilitiesAndEquity = array();
                 foreach ($detail->LiabilitiesAndEquity as $element) {
                     $o = new StatementValue();
-                    $o->Key    =  (string)$element->Key;
+                    $o->Row    =  (string)$element->Row;
+                    $o->Section    =  (string)$element->Section;
                     $o->Actual =  (float)$element->Actual;
                     $o->Previous    =  (float)$element->Previous;
                     $result->LiabilitiesAndEquity[] = $o;
                 }
+                if ($isNonProfit) {
 
-                $result->IncomeStatement = array();
-                foreach ($detail->IncomeStatement as $element) {
-                    $o = new StatementValue();
-                    $o->Key    =  (string)$element->Key;
-                    $o->Actual =  (float)$element->Actual;
-                    $o->Previous    =  (float)$element->Previous;
-                    $result->IncomeStatement[] = $o;
+                    $result->Assets = array();
+                    foreach ($detail->Assets as $element) {
+                        $o = new NonProfitAssetStatementValue();
+                        $o->Row    =  (string)$element->Row;
+                        $o->Section    =  (string)$element->Section;
+                        $o->Actual =  (float)$element->Actual;
+                        $o->Previous    =  (float)$element->Previous;
+                        $o->ActualMain =  (float)$element->ActualMain;
+                        $o->ActualCommercial    =  (float)$element->ActualCommercial;
+                        $result->Assets[] = $o;
+                    }
+
+                    $result->Expenses = array();
+                    foreach ($detail->Expenses as $element) {
+                        $o = new StatementValue();
+                        $o->Row    =  (string)$element->Row;
+                        $o->Section    =  (string)$element->Section;
+                        $o->Actual =  (float)$element->Actual;
+                        $o->Previous    =  (float)$element->Previous;
+                        $result->Expenses[] = $o;
+                    }
+                    $result->Revenue = array();
+                    foreach ($detail->Revenue as $element) {
+                        $o = new StatementValue();
+                        $o->Row    =  (string)$element->Row;
+                        $o->Section    =  (string)$element->Section;
+                        $o->Actual =  (float)$element->Actual;
+                        $o->Previous    =  (float)$element->Previous;
+                        $result->Revenue[] = $o;
+                    }
+                } else {
+
+                    $result->Assets = array();
+                    foreach ($detail->Assets as $element) {
+                        $o = new AssetStatementValue();
+                        $o->Row    =  (string)$element->Row;
+                        $o->Section    =  (string)$element->Section;
+                        $o->Actual =  (float)$element->Actual;
+                        $o->Previous    =  (float)$element->Previous;
+                        $o->ActualBrutto =  (float)$element->ActualBrutto;
+                        $o->ActualCorrection    =  (float)$element->ActualCorrection;
+                        $result->Assets[] = $o;
+                    }
+
+                    $result->IncomeStatement = array();
+                    foreach ($detail->IncomeStatement as $element) {
+                        $o = new StatementValue();
+                        $o->Row    =  (string)$element->Row;
+                        $o->Section    =  (string)$element->Section;
+                        $o->Actual =  (float)$element->Actual;
+                        $o->Previous    =  (float)$element->Previous;
+                        $result->IncomeStatement[] = $o;
+                    }
                 }
 
                 return $result;
@@ -103,7 +143,7 @@ class FinstatStatementApi extends AbstractFinstatApi
 
     public function RequestStatementLegend($template, $lang = "sk", $json = false)
     {
-        $detail = $this->DoRequest("GetStatementLegend", array(
+        $detail = $this->DoRequest("GetStatementTemplateLegend", array(
             'lang' => $lang,
             'template' => $template
         ), $lang, $json);
@@ -112,12 +152,54 @@ class FinstatStatementApi extends AbstractFinstatApi
         {
             if(!$json)
             {
-                $result = array();
-                foreach ($detail->KeyValue as $element) {
-                    $o = new KeyValue();
-                    $o->Key = (string)$element->Key;
-                    $o->Value = (string)$element->Value;
-                    $result[] = $o;
+                $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateNujPU");
+                $result = $isNonProfit ? new NonProfitStatementLegendResult() : new StatementLegendResult();
+
+                $result->Assets = array();
+                foreach ($detail->Assets as $element) {
+                    $o = new StatementLegendValue();
+                    $o->ReportRow = (string)$element->Row;
+                    $o->ReportSection = (string)$element->Section;
+                    $o->Name = (string)$element->Name;
+                    $result->Assets[] = $o;
+                }
+
+                $result->LiabilitiesAndEquity = array();
+                foreach ($detail->LiabilitiesAndEquity as $element) {
+                    $o = new StatementLegendValue();
+                    $o->ReportRow = (string)$element->Row;
+                    $o->ReportSection = (string)$element->Section;
+                    $o->Name = (string)$element->Name;
+                    $result->LiabilitiesAndEquity[] = $o;
+                }
+
+                if ($isNonProfit) {
+                    $result->Expenses = array();
+                    foreach ($detail->Expenses as $element) {
+                        $o = new StatementLegendValue();
+                        $o->ReportRow = (string)$element->Row;
+                        $o->ReportSection = (string)$element->Section;
+                        $o->Name = (string)$element->Name;
+                        $result->Expenses[] = $o;
+                    }
+
+                    $result->Revenue = array();
+                    foreach ($detail->Revenue as $element) {
+                        $o = new StatementLegendValue();
+                        $o->ReportRow = (string)$element->Row;
+                        $o->ReportSection = (string)$element->Section;
+                        $o->Name = (string)$element->Name;
+                        $result->Revenue[] = $o;
+                    }
+                } else {
+                    $result->IncomeStatement = array();
+                    foreach ($detail->IncomeStatement as $element) {
+                        $o = new StatementLegendValue();
+                        $o->ReportRow = (string)$element->Row;
+                        $o->ReportSection = (string)$element->Section;
+                        $o->Name = (string)$element->Name;
+                        $result->IncomeStatement[] = $o;
+                    }
                 }
 
                 return $result;
