@@ -59,7 +59,7 @@ class AssetStatementValue extends StatementValue
     ;
 }
 
-class NonProfitAssetStatementValue extends StatementValue
+class FinanceStatementValue extends StatementValue
 {
     public
         $ActualMain,

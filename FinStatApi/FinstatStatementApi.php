@@ -76,39 +76,42 @@ class FinstatStatementApi extends AbstractFinstatApi
                     $result->LiabilitiesAndEquity[] = $o;
                 }
                 if ($isNonProfit) {
-
                     $result->Assets = array();
                     foreach ($detail->Assets as $element) {
-                        $o = new NonProfitAssetStatementValue();
+                        $o = new AssetStatementValue();
+                        $o->Row    =  (string)$element->Row;
+                        $o->Section    =  (string)$element->Section;
+                        $o->Actual =  (float)$element->Actual;
+                        $o->Previous    =  (float)$element->Previous;
+                        $o->ActualBrutto =  (float)$element->ActualBrutto;
+                        $o->ActualCorrection    =  (float)$element->ActualCorrection;
+                        $result->Assets[] = $o;
+                    }
+
+                    $result->Expenses = array();
+                    foreach ($detail->Expenses as $element) {
+                        $o = new FinanceStatementValue();
                         $o->Row    =  (string)$element->Row;
                         $o->Section    =  (string)$element->Section;
                         $o->Actual =  (float)$element->Actual;
                         $o->Previous    =  (float)$element->Previous;
                         $o->ActualMain =  (float)$element->ActualMain;
                         $o->ActualCommercial    =  (float)$element->ActualCommercial;
-                        $result->Assets[] = $o;
-                    }
-
-                    $result->Expenses = array();
-                    foreach ($detail->Expenses as $element) {
-                        $o = new StatementValue();
-                        $o->Row    =  (string)$element->Row;
-                        $o->Section    =  (string)$element->Section;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
                         $result->Expenses[] = $o;
                     }
+
                     $result->Revenue = array();
                     foreach ($detail->Revenue as $element) {
-                        $o = new StatementValue();
+                        $o = new FinanceStatementValue();
                         $o->Row    =  (string)$element->Row;
                         $o->Section    =  (string)$element->Section;
                         $o->Actual =  (float)$element->Actual;
                         $o->Previous    =  (float)$element->Previous;
+                        $o->ActualMain =  (float)$element->ActualMain;
+                        $o->ActualCommercial    =  (float)$element->ActualCommercial;
                         $result->Revenue[] = $o;
                     }
                 } else {
-
                     $result->Assets = array();
                     foreach ($detail->Assets as $element) {
                         $o = new AssetStatementValue();
