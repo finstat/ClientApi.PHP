@@ -66,6 +66,18 @@ class FinstatStatementApi extends AbstractFinstatApi
                 $result->OriginalFormat = (string)$detail->OriginalFormat;
                 $result->Source = (string)$detail->Source;
 
+                $result->Assets = array();
+                foreach ($detail->Assets as $element) {
+                    $o = new AssetStatementValue();
+                    $o->Row    =  (string)$element->Row;
+                    $o->Section    =  (string)$element->Section;
+                    $o->Actual =  (float)$element->Actual;
+                    $o->Previous    =  (float)$element->Previous;
+                    $o->ActualBrutto =  (float)$element->ActualBrutto;
+                    $o->ActualCorrection    =  (float)$element->ActualCorrection;
+                    $result->Assets[] = $o;
+                }
+
                 $result->LiabilitiesAndEquity = array();
                 foreach ($detail->LiabilitiesAndEquity as $element) {
                     $o = new StatementValue();
@@ -76,18 +88,6 @@ class FinstatStatementApi extends AbstractFinstatApi
                     $result->LiabilitiesAndEquity[] = $o;
                 }
                 if ($isNonProfit) {
-                    $result->Assets = array();
-                    foreach ($detail->Assets as $element) {
-                        $o = new AssetStatementValue();
-                        $o->Row    =  (string)$element->Row;
-                        $o->Section    =  (string)$element->Section;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
-                        $o->ActualBrutto =  (float)$element->ActualBrutto;
-                        $o->ActualCorrection    =  (float)$element->ActualCorrection;
-                        $result->Assets[] = $o;
-                    }
-
                     $result->Expenses = array();
                     foreach ($detail->Expenses as $element) {
                         $o = new FinancialStatementValue();
@@ -112,18 +112,6 @@ class FinstatStatementApi extends AbstractFinstatApi
                         $result->Revenue[] = $o;
                     }
                 } else {
-                    $result->Assets = array();
-                    foreach ($detail->Assets as $element) {
-                        $o = new AssetStatementValue();
-                        $o->Row    =  (string)$element->Row;
-                        $o->Section    =  (string)$element->Section;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
-                        $o->ActualBrutto =  (float)$element->ActualBrutto;
-                        $o->ActualCorrection    =  (float)$element->ActualCorrection;
-                        $result->Assets[] = $o;
-                    }
-
                     $result->IncomeStatement = array();
                     foreach ($detail->IncomeStatement as $element) {
                         $o = new StatementValue();
