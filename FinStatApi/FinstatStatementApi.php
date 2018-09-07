@@ -90,7 +90,7 @@ class FinstatStatementApi extends AbstractFinstatApi
 
                     $result->Expenses = array();
                     foreach ($detail->Expenses as $element) {
-                        $o = new FinanceStatementValue();
+                        $o = new FinancialStatementValue();
                         $o->Row    =  (string)$element->Row;
                         $o->Section    =  (string)$element->Section;
                         $o->Actual =  (float)$element->Actual;
@@ -102,7 +102,7 @@ class FinstatStatementApi extends AbstractFinstatApi
 
                     $result->Revenue = array();
                     foreach ($detail->Revenue as $element) {
-                        $o = new FinanceStatementValue();
+                        $o = new FinancialStatementValue();
                         $o->Row    =  (string)$element->Row;
                         $o->Section    =  (string)$element->Section;
                         $o->Actual =  (float)$element->Actual;
