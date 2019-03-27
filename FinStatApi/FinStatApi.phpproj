@@ -19,6 +19,7 @@
     <Compile Include="FinstatApi.php" />
     <Compile Include="AbstractFinstatDiffApi.php" />
     <Compile Include="FinstatDailyDiffApi.php" />
+    <Compile Include="FinstatDailyStatement2014DiffApi.php" />
     <Compile Include="FinstatStatementApi.php" />
     <Compile Include="FinstatDailyStatementDiffApi.php" />
     <Compile Include="FinstatDailyUltimateDiffApi.php" />
