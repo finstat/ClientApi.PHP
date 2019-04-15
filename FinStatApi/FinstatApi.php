@@ -362,6 +362,13 @@ class FinstatApi extends BaseFinstatApi
             $o->EnterDate = $this->parseDate($detail->EnterDate);
             $o->EnterReason = (string) $detail->EnterReason;
             $o->ExitDate = $this->parseDate($detail->ExitDate);
+			if (!empty($detail->Officers)) {
+				  foreach ($detail->Officers->Officer as $officer) {
+					$of = $this->parsePerson($officer);
+					$of->Source  = (string)$officer->Source;
+					$o->Officers[] = $of;
+				}
+			}
             $o->Officer = $this->parsePerson($detail->Officer);
             if (!empty($detail->Deadlines)) {
                 foreach ($detail->Deadlines->Deadline as $deadline) {

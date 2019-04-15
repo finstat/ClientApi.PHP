@@ -29,6 +29,13 @@ class PersonResult extends AbstractPersonResult
     ;
 }
 
+class OfficerResult extends AbstractPersonResult
+{
+    public
+        $Source
+    ;
+}
+
 class RpvsPersonResult extends AbstractPersonResult
 {
     public
@@ -58,7 +65,7 @@ class LiquidationResult
         $EnterDate,
         $EnterReason,
         $ExitDate,
-        $Officer,
+        $Officers = array(),
         $Source,
         $Deadlines = array()
     ;
