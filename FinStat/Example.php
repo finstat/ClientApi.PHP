@@ -319,6 +319,7 @@ function echoBase($response, $json = false)
                 "</th><th>Detekovane do" .
                 "</th><th>Funckcia" .
                 "</th><th>Podiel / Vyska splatenia" .
+                "</th><th>Percento podielu" .
                 "</th></tr>";
             foreach ($response->Persons as $person) {
                 $functions = "";
@@ -339,6 +340,7 @@ function echoBase($response, $json = false)
                     "</td><td>" . (($person->DetectedTo) ? echoDate($person->DetectedTo, $json) : '') .
                     "</td><td>" . $functions .
                     "</td><td>" . $person->DepositAmount . "/" . $person->PaybackRange .
+                    "</td><td>" . $person->PartnersSharePercentage . "%" .
                     "</td></tr>";
             }
             echo "</table><br />";

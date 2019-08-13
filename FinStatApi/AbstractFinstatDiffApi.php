@@ -51,6 +51,7 @@ class AbstractFinstatDailyDiffApi extends AbstractFinstatApi
             $result->FileName = (string) $detail->FileName;
             $result->FileSize = (int) $detail->FileSize;
             $result->GeneratedDate = $this->parseDate($detail->GeneratedDate);
+            $result->UploadDate = $this->parseDate($detail->UploadDate);
 
             return $result;
         }

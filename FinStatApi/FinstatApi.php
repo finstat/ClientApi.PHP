@@ -264,6 +264,7 @@ class FinstatApi extends BaseFinstatApi
                 foreach ($detail->Persons->Person as $person) {
                     $o = $this->parsePerson($person);
                     $o->DepositAmount  = (!empty($person->DepositAmount)) ? (float)$person->DepositAmount : null;
+                    $o->PartnersSharePercentage  = (!empty($person->PartnersSharePercentage)) ? (float)$person->PartnersSharePercentage : null;
                     $o->PaybackRange  = (!empty($person->PaybackRange)) ? (float)$person->PaybackRange : null;
                     $response->Persons[] = $o;
                 }

@@ -25,7 +25,8 @@ class PersonResult extends AbstractPersonResult
 {
     public
         $DepositAmount,
-        $PaybackRange
+        $PaybackRange,
+        $PartnersSharePercentage
     ;
 }
 

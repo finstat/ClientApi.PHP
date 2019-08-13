@@ -55,6 +55,7 @@ class Requests_Transport_cURL implements Requests_Transport {
 		$curl = curl_version();
 		$this->version = $curl['version'];
 		$this->fp = curl_init();
+        //curl_setopt($this->fp, CURLOPT_PROXY, '127.0.0.1:8888');
 
 		curl_setopt($this->fp, CURLOPT_HEADER, false);
 		curl_setopt($this->fp, CURLOPT_RETURNTRANSFER, 1);
@@ -87,7 +88,13 @@ class Requests_Transport_cURL implements Requests_Transport {
 		switch ($options['type']) {
 			case Requests::POST:
 				curl_setopt($this->fp, CURLOPT_POST, true);
-				curl_setopt($this->fp, CURLOPT_POSTFIELDS, $data);
+                if (empty($headers['Content-Type']) || $headers['Content-Type'] == 'application/x-www-form-urlencoded') {
+					curl_setopt($this->fp, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+				    curl_setopt($this->fp, CURLOPT_POSTFIELDS, http_build_query($data, null, '&'));
+				} else {
+                    curl_setopt($this->fp, CURLOPT_HTTPHEADER, 'Content-Type: ' . $headers['Content-Type']);
+				    curl_setopt($this->fp, CURLOPT_POSTFIELDS, $data);
+                }
 				break;
 			case Requests::HEAD:
 				curl_setopt($this->fp, CURLOPT_NOBODY, true);
@@ -100,6 +107,8 @@ class Requests_Transport_cURL implements Requests_Transport {
 		curl_setopt($this->fp, CURLOPT_REFERER, $url);
 		curl_setopt($this->fp, CURLOPT_USERAGENT, $options['useragent']);
 		curl_setopt($this->fp, CURLOPT_HTTPHEADER, $headers);
+
+
 
 		if (true === $options['blocking']) {
 			curl_setopt($this->fp, CURLOPT_HEADERFUNCTION, array(&$this, 'stream_headers'));

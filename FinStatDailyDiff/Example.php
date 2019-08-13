@@ -52,9 +52,15 @@ if($list != null) {
                 "<tr><th>Nazov" .
                 "</th><th>Generovane" .
                 "</th><th>Velkost" .
+                "</th><th>Nahrane" .
                 "</th></tr>";
         foreach($list->Files as $file) {
-            echo "<tr><td><a href=\"?file=".$file->FileName. "\">" . $file->FileName. "</a></td><td>" . (($file->GeneratedDate) ? echoDate($file->GeneratedDate, $json) : '').  "</td><td>" . $file->FileSize .' bytov</td></tr>';
+            echo "<tr>".
+                    "<td><a href=\"?file=".$file->FileName. "\">" . $file->FileName. "</a></td>".
+                    "<td>" . (($file->GeneratedDate) ? echoDate($file->GeneratedDate, $json) : '').  "</td>".
+                    "<td>" . $file->FileSize ." bytov</td>".
+                    "<td>" . (($file->UploadDate) ? echoDate($file->UploadDate, $json) : '').  "</td>".
+                    "</tr>";
         }
         echo "</table><br />";
     }

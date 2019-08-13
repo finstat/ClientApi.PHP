@@ -5,6 +5,7 @@ class DailyDiff
     public
         $FileName,
         $GeneratedDate,
-        $FileSize
+        $FileSize,
+        $UploadDate
     ;
 }

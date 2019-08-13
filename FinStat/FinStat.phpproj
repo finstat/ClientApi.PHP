@@ -9,6 +9,10 @@
     <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
     <RuntimeVersion>7.1</RuntimeVersion>
     <Runtime>PHP</Runtime>
+    <SaveServerSettingsInUserFile>false</SaveServerSettingsInUserFile>
+    <EnvName>PHPDev</EnvName>
+    <PHPDevHostName>localhost</PHPDevHostName>
+    <PHPDevAutoPort>true</PHPDevAutoPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <IncludeDebugInformation>true</IncludeDebugInformation>
