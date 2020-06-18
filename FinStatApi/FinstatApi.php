@@ -326,7 +326,7 @@ class FinstatApi extends BaseFinstatApi
             }
 
             if (!empty($detail->Liquidation)) {
-                $response->Liquidation = $this->arseLiquidationResult($detail->Liquidation);
+                $response->Liquidation = $this->ParseLiquidationResult($detail->Liquidation);
             }
 
 			if (!empty($detail->OtherProceeding)) {
