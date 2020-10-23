@@ -144,6 +144,13 @@ class FinstatMonitoringApi extends AbstractFinstatApi
         return $response;
     }
 
+    public function parseAdministratorAddress($address)
+    {
+        $element = $this->parsePersonAddress($address, new AdministratorAddress());
+        $element->Id =  (string)$address->Id;
+        return $element;
+    }
+
     private function parseMonitoringProceedings($detail)
     {
         if  ($detail === FALSE) {
@@ -170,8 +177,8 @@ class FinstatMonitoringApi extends AbstractFinstatApi
                 }
                 if(!empty($element->AdministratorsAddress)) {
                     $array = array();
-                    foreach ($element->AdministratorsAddress->PersonAddress as $address) {
-                         $array[] = $this->parsePersonAddress($address);
+                    foreach ($element->AdministratorsAddress->AdministratorAddress as $address) {
+                         $array[] = $this->parseAdministratorAddress($address);
                     }
                     $o->AdministratorsAddress = $array;
                 }

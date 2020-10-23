@@ -40,6 +40,12 @@ class PersonAddress extends Address
         $Ico;
 }
 
+class AdministratorAddress extends PersonAddress
+{
+    public
+        $Id;
+}
+
 class IssuedPerson
 {
     public

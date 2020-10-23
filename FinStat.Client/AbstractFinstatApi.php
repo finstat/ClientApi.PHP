@@ -189,14 +189,15 @@ class AbstractFinstatApi
     protected function parseFullAddress($element, $object = null)
     {
         $o = ($object != null) ? $object : new Address();
-        $o= $this->parseAddress($element, $o);
+        $o = $this->parseAddress($element, $o);
         $o->Name            = (string)$element->Name;
         return $o;
     }
 
-    protected function parsePersonAddress($element)
+    protected function parsePersonAddress($element, $object = null)
     {
-        $o = $this->parseFullAddress($element, new PersonAddress());
+        $o = ($object != null) ? $object : new PersonAddress();
+        $o = $this->parseFullAddress($element, $o);
         $o->Ico         = (string)$element->Ico;
         $o->BirthDate   = (string)$element->BirthDate;
         return $o;
