@@ -116,15 +116,12 @@ class ExtendedResult extends BaseResult
         $Subjects,
         $StructuredName,
         $ContactSources,
-        $KaRUrl,
-        $DebtUrl,
         $DisposalUrl,
-        $HasKaR,
-        $HasDebt,
         $HasDisposal,
         $JudgementCounts = array(),
         $JudgementLastPublishedDate,
         $Ratios  = array(),
-        $StateReceivables = array()
+        $StateReceivables = array(),
+        $CommercialReceivables = array()
         ;
     }

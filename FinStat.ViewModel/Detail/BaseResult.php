@@ -33,7 +33,11 @@ class BaseResult extends AbstractBaseResult
         $SalesCategory,
         $IcDphAdditional,
         $JudgementIndicators  = array(),
-        $JudgementFinstatLink
+        $JudgementFinstatLink,
+        $HasKaR,
+        $HasDebt,
+        $KaRUrl,
+        $DebtUrl
     ;
 }
 ?>

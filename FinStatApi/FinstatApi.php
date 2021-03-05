@@ -88,6 +88,11 @@ class FinstatApi extends BaseFinstatApi
         }
         $response->JudgementFinstatLink =  (string)$detail->JudgementFinstatLink;
 
+        $response->KaRUrl               = (string)$detail->KaRUrl;
+        $response->DebtUrl              = (string)$detail->DebtUrl;
+        $response->HasKaR               = "{$detail->HasKaR}"  == 'true';
+        $response->HasDebt              = "{$detail->HasDebt}"  == 'true';
+
         return $response;
     }
 
@@ -122,11 +127,7 @@ class FinstatApi extends BaseFinstatApi
         $response->ROA                  = empty($detail->ROA) ? null : (double)"{$detail->ROA}";
         $response->WarningKaR           = $this->parseDate($detail->WarningKaR);
         $response->WarningLiquidation   = $this->parseDate($detail->WarningLiquidation);
-        $response->KaRUrl               = (string)$detail->KaRUrl;
-        $response->DebtUrl              = (string)$detail->DebtUrl;
         $response->DisposalUrl          = (string)$detail->DisposalUrl;
-        $response->HasKaR               = "{$detail->HasKaR}"  == 'true';
-        $response->HasDebt              = "{$detail->HasDebt}"  == 'true';
         $response->HasDisposal          = "{$detail->HasDisposal}"  == 'true';
         $response->SelfEmployed         = "{$detail->SelfEmployed}"  == 'true';
 
@@ -155,6 +156,13 @@ class FinstatApi extends BaseFinstatApi
         if (!empty($detail->StateReceivables)) {
             foreach ($detail->StateReceivables->ReceivableDebt as $debt) {
                 $response->StateReceivables[] = $this->ParseReceivableDebtResult($debt);
+            }
+        }
+
+        $response->CommercialReceivables = array();
+        if (!empty($detail->CommercialReceivables)) {
+            foreach ($detail->CommercialReceivables->ReceivableDebt as $debt) {
+                $response->CommercialReceivables[] = $this->ParseReceivableDebtResult($debt);
             }
         }
 

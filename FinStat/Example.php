@@ -128,12 +128,12 @@ function echoBase($response, $json = false)
     echo '<b>Url: </b>'.            $response->Url.'<br />';
     echo '<b>Príznak, či sa daná firma nachádza v zoznamoch dlžníkov, konkurzov alebo likvidácií: </b>';
     if($response->Warning) echo 'Áno (<a href="'.$response->WarningUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
+    echo '<b>Príznak, či sa daná firma má evidované konkurzy: </b>';
+    if($response->HasKaR) echo 'Áno (<a href="'.$response->KaRUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
+    echo '<b>Príznak, či sa daná firma má evidované dlhy: </b>';
+    if($response->HasDebt) echo 'Áno (<a href="'.$response->DebtUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
     if($response instanceof ExtendedResult|| isset($response->ActualYear))
     {
-        echo '<b>Príznak, či sa daná firma má evidované konkurzy: </b>';
-        if($response->HasKaR) echo 'Áno (<a href="'.$response->KaRUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
-        echo '<b>Príznak, či sa daná firma má evidované dlhy: </b>';
-        if($response->HasDebt) echo 'Áno (<a href="'.$response->DebtUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
         echo '<b>Príznak, či sa daná firma má evidované likvidácie: </b>';
         if($response->HasDisposal) echo 'Áno (<a href="'.$response->DisposalUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
     }
@@ -247,6 +247,20 @@ function echoBase($response, $json = false)
             }
             echo "</table><br />";
         }
+        echo '<b>Komerčné pohľadávky</b><br />';
+        if(!empty($response->CommercialReceivables)) {
+            echo "<br /><table>";
+            echo
+                    "<tr><th>Zdroj" .
+                    "</th><th>Hodnota" .
+                    "</th><th>Platné od" .
+                    "</th></tr>";
+            foreach($response->CommercialReceivables as $debt) {
+                echo "<tr><td>" . $debt->Source. "</td><td>" . $debt->Value.  "</td><td>" . (($debt->ValidFrom) ? echoDate($debt->ValidFrom, $json) : '') .'</td></tr>';
+            }
+            echo "</table><br />";
+        }
+
         echo '<b>Platobné rozkazy: </b><br />';
         if(!empty($response->PaymentOrders)) {
             echo "<br /><table>";
