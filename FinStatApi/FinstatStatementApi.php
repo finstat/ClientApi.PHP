@@ -123,6 +123,9 @@ class FinstatStatementApi extends AbstractFinstatApi
                     }
                 }
 
+                $result->PreviousAccountingPeriodFrom = $this->parseDate($detail->PreviousAccountingPeriodFrom);
+                $result->PreviousAccountingPeriodTo = $this->parseDate($detail->PreviousAccountingPeriodTo);
+
                 return $result;
             } else {
                 return $detail;

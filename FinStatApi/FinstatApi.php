@@ -288,6 +288,34 @@ class FinstatApi extends BaseFinstatApi
                 }
             }
 
+            $response->RPOPersons = array();
+            if (!empty($detail->RPOPersons)) {
+                foreach ($detail->RPOPersons->RPOPerson as $rpoPerson) {
+                    $o = new RPOPersonResult();
+                    $o->BirthDate = (!empty($rpoPerson->BirthDate)) ? $this->parseDate($rpoPerson->BirthDate) : null;
+                    $o->Citizenship = (!empty($rpoPerson->Citizenship)) ? (string)$rpoPerson->Citizenship : null;
+                    $o->FullName = (string)$rpoPerson->FullName;
+                    $o->Country = (string)$rpoPerson->Country;
+                    $o->DetectedFrom = $this->parseDate($rpoPerson->DetectedFrom);
+                    $o->DetectedTo  = $this->parseDate($rpoPerson->DetectedTo);
+                    $o->Functions = array();
+                    if (!empty($rpoPerson->Functions) && !empty($rpoPerson->Functions->FunctionAssigment)) {
+                        foreach($rpoPerson->Functions->FunctionAssigment as $function) {
+                            $of = new FunctionResult();
+                            $of->Type = (string)$function->Type;
+                            $of->Description = (string)$function->Description;
+                            $of->From = $this->parseDate($function->From);
+                            $o->Functions[] = $of;
+                        }
+                    }
+                    if(!empty($rpoPerson->StructuredName)) {
+                        $o->StructuredName = $this->parseStructuredName($rpoPerson->StructuredName);
+                    }
+                  
+                    $response->RPOPersons[] = $o;
+                }
+            }
+
             if (!empty($detail->RegistrationCourt)) {
                 $o = new PersonResult();
                 $o = $this->parseAddress($detail->RegistrationCourt, $o);

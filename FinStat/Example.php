@@ -395,6 +395,40 @@ function echoBase($response, $json = false)
             }
             echo "</table><br />";
         }
+        if (!empty($response->RPOPersons)) {
+            echo '<b>RPO osoby: </b><br />';
+            echo "<br /><table>";
+            echo
+            "<tr><th>Meno" .
+            "</th><th>Datum nar." .
+            "</th><th>Adresa" .
+            "</th><th>Detekovane od" .
+            "</th><th>Detekovane do" .
+            "</th><th>Funckcia" .
+            "</th></tr>";
+            foreach ($response->RpvsPersons as $person) {
+                $functions = "";
+                if (!empty($person->Functions)) {
+                    foreach ($person->Functions as $function) {
+                        $functions .= $function->Type . " - ";
+                        $functions .= $function->Description;
+                        if ($function->From) {
+                            $functions .= " (" . echoDate($function->From, $json) . ")";
+                        }
+                        $functions .="<br />";
+                    }
+                }
+                echo
+                "<tr><td>" . $person->FullName . "<br /> ". echoStructuredName($person->StructuredName) .
+                "</td><td>" . (($person->BirthDate) ? echoDate($person->BirthDate, $json) : '') .
+                "</td><td>" .  $person->City .  ", " . $person->Citizenship .
+                "</td><td>" . (($person->DetectedFrom) ? echoDate($person->DetectedFrom, $json) : '') .
+                "</td><td>" . (($person->DetectedTo) ? echoDate($person->DetectedTo, $json) : '') .
+                "</td><td>" . $functions .
+                "</td></tr>";
+            }
+            echo "</table><br />";
+        }
         if (!empty($response->ProcurationAction)) {
             echo '<b>Konanie prokúry: </b>' .                   $response->ProcurationAction.'<br />';
         }

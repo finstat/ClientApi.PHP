@@ -45,6 +45,20 @@ class RpvsPersonResult extends AbstractPersonResult
     ;
 }
 
+class RPOPersonResult
+{
+    public
+        $BirthDate,
+        $Citizenship,
+        $FullName,
+        $Country,
+        $DetectedFrom,
+        $DetectedTo,
+        $StructuredName,
+        $Functions = array()
+    ;
+}
+
 class CourtResult extends AddressResult
 {
     public
@@ -117,7 +131,8 @@ class UltimateResult extends ExtendedResult
         $Restructuring,
         $Liquidation,
         $ORCancelled,
-		$OtherProceeding
+		$OtherProceeding,
+        $RPOPersons
     ;
 }
 ?>

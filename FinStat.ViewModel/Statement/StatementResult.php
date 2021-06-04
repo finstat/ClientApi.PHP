@@ -80,7 +80,9 @@ abstract class AbstractStatementResult
         $OriginalFormat,
         $Source,
         $Assets,
-        $LiabilitiesAndEquity
+        $LiabilitiesAndEquity,
+        $PreviousAccountingPeriodFrom,
+        $PreviousAccountingPeriodTo
     ;
 }
 
