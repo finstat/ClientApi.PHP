@@ -25,4 +25,7 @@
     <Compile Include="FinstatDailyUltimateDiffApi.php" />
     <Compile Include="FinstatMonitoringApi.php" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 </Project>
