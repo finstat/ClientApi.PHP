@@ -112,24 +112,26 @@ class FinstatApi extends BaseFinstatApi
         $response = ($response == null)? new ExtendedResult() : $response;
         $response = $this->parseBase($detail, $response);
 
-        $response->EmployeeCode         = (string)$detail->EmployeeCode;
-        $response->EmployeeText         = (string)$detail->EmployeeText;
-        $response->OwnershipTypeCode    = (string)$detail->OwnershipTypeCode;
-        $response->OwnershipTypeText    = (string)$detail->OwnershipTypeText;
-        $response->ActualYear           = (int)"{$detail->ActualYear}";
-        $response->CreditScoreValue     = (float)$detail->CreditScoreValue;
-        $response->CreditScoreState     = (string)$detail->CreditScoreState;
-        $response->BasicCapital         = (!empty($detail->BasicCapital)) ? (float)$detail->BasicCapital : null;
-        $response->RevenuePrev          = empty($detail->RevenuePrev) ? null :(double)"{$detail->RevenuePrev}";
-        $response->ProfitPrev           = empty($detail->ProfitPrev) ? null :(double)"{$detail->ProfitPrev}";
-        $response->ForeignResources     = empty($detail->ForeignResources) ? null :(double)"{$detail->ForeignResources}";
-        $response->GrossMargin          = empty($detail->GrossMargin) ? null :(double)"{$detail->GrossMargin}";
-        $response->ROA                  = empty($detail->ROA) ? null : (double)"{$detail->ROA}";
-        $response->WarningKaR           = $this->parseDate($detail->WarningKaR);
-        $response->WarningLiquidation   = $this->parseDate($detail->WarningLiquidation);
-        $response->DisposalUrl          = (string)$detail->DisposalUrl;
-        $response->HasDisposal          = "{$detail->HasDisposal}"  == 'true';
-        $response->SelfEmployed         = "{$detail->SelfEmployed}"  == 'true';
+        $response->EmployeeCode             = (string)$detail->EmployeeCode;
+        $response->EmployeeText             = (string)$detail->EmployeeText;
+        $response->OwnershipTypeCode        = (string)$detail->OwnershipTypeCode;
+        $response->OwnershipTypeText        = (string)$detail->OwnershipTypeText;
+        $response->ActualYear               = (int)"{$detail->ActualYear}";
+        $response->CreditScoreValue         = (float)$detail->CreditScoreValue;
+        $response->CreditScoreState         = (string)$detail->CreditScoreState;
+        $response->BasicCapital             = (!empty($detail->BasicCapital)) ? (float)$detail->BasicCapital : null;
+        $response->RevenuePrev              = empty($detail->RevenuePrev) ? null :(double)"{$detail->RevenuePrev}";
+        $response->ProfitPrev               = empty($detail->ProfitPrev) ? null :(double)"{$detail->ProfitPrev}";
+        $response->ForeignResources         = empty($detail->ForeignResources) ? null :(double)"{$detail->ForeignResources}";
+        $response->GrossMargin              = empty($detail->GrossMargin) ? null :(double)"{$detail->GrossMargin}";
+        $response->ROA                      = empty($detail->ROA) ? null : (double)"{$detail->ROA}";
+        $response->WarningKaR               = $this->parseDate($detail->WarningKaR);
+        $response->WarningLiquidation       = $this->parseDate($detail->WarningLiquidation);
+        $response->DisposalUrl              = (string)$detail->DisposalUrl;
+        $response->HasDisposal              = "{$detail->HasDisposal}"  == 'true';
+        $response->SelfEmployed             = "{$detail->SelfEmployed}"  == 'true';
+        $response->CreditScoreValueIndex05  = (float)$detail->CreditScoreValueIndex05;
+        $response->CreditScoreStateIndex05  = (string)$detail->CreditScoreStateIndex05;
 
         $response->Phones = array();
         if (!empty($detail->Phones)) {
@@ -252,6 +254,12 @@ class FinstatApi extends BaseFinstatApi
 
         $response->JudgementLastPublishedDate = $this->parseDate($detail->JudgementLastPublishedDate);
 
+        if (!empty($detail->DistraintsAuthorization)) {
+            $response->DistraintsAuthorization = new DistraintsAuthorizationInfoResult();
+            $response->DistraintsAuthorization->LastPublishDate = $this->parseDate($detail->DistraintsAuthorization->LastPublishDate);
+            $response->DistraintsAuthorization->Count = (int)$detail->DistraintsAuthorization->Count;
+        }
+
         return $response;
     }
 
@@ -261,6 +269,7 @@ class FinstatApi extends BaseFinstatApi
             return $detail;
         }
 
+        
         $response = $this->parseExtended($detail, new UltimateResult());
         if ($response !== FALSE) {
             $response->EmployeesNumber = (!empty($detail->EmployeesNumber)) ? (int)$detail->EmployeesNumber : null;
@@ -368,6 +377,30 @@ class FinstatApi extends BaseFinstatApi
 			if (!empty($detail->OtherProceeding)) {
                 $response->OtherProceeding = $this->ParseProceeding($detail->OtherProceeding, new ProceedingResult());
             }
+
+            if (!empty($detail->DistraintsAuthorizations)) {
+            $response->DistraintsAuthorizations = array();
+            foreach ($detail->DistraintsAuthorizations->DistraintsAuthorizationDetail as $dad) {
+                $o = new DistraintsAuthorizationDetailResult();
+                $o->ReferenceNumber = (string) $dad->ReferenceNumber;
+                if(!empty($dad->Authorized)) {
+                    $o->Authorized = [];
+                    foreach ($dad->Authorized->BaseInfo as $bi) {
+                        $obi = new BaseInfo();
+                        $obi->Name = (string)$bi->Name;
+                        $obi->Ico = (string)$bi->Ico; 
+                        $o->Authorized[] = $obi;
+                    }
+                }
+                $o->TypeOfClaim = (string) $dad->TypeOfClaim;
+                $o->Plaintiff = (string) $dad->Plaintiff;
+                $o->PublishDate = $this->parseDate($dad->PublishDate);
+                $o->Url = (string) $dad->Url;
+                $o->Court = (string) $dad->Court;
+                $o->IdentifierNumber = (string) $dad->IdentifierNumber;
+                $response->DistraintsAuthorizations[] = $o;
+            }
+        }
         }
 
         return $response;

@@ -101,7 +101,7 @@ function echoBase($response, $json = false)
     echo '<b>SK Nace kód: </b>'.            $response->SkNaceCode.'<br />';
     echo '<b>SK Nace popis: </b>'.          $response->SkNaceText.'<br />';
     echo '<b>SK Nace divízia: </b>'.        $response->SkNaceDivision.'<br />';
-    if($response instanceof ExtendedResult|| isset($response->ActualYear))
+    if($response instanceof ExtendedResult || isset($response->ActualYear))
     {
     echo '<b>Príznak, či sa daná firma je živnostník: </b>';
         if($response->SelfEmployed) echo 'Áno <br />'; else echo 'Nie<br />';
@@ -110,13 +110,15 @@ function echoBase($response, $json = false)
     echo '<b>Pozastavená(živnosť): </b>'.   (($response->SuspendedAsPerson)? "Ano": "Nie").'<br />';
     echo '<b>Zisk za aktuálny rok: </b>'.                       $response->ProfitActual.'<br />';
     echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response->RevenueActual.'<br />';
-    if($response instanceof ExtendedResult|| isset($response->ActualYear))
+    if($response instanceof ExtendedResult || isset($response->ActualYear))
     {
         echo '<b>Kód počtu zamestnancov: </b>'.                     $response->EmployeeCode.'<br />';
         echo '<b>Text počtu zamestnancov: </b>'.                    $response->EmployeeText.'<br />';
         echo '<b>Aktuálny rok: </b>'.                               $response->ActualYear.'<br />';
         echo '<b>Credit scoring: </b>'.                             $response->CreditScoreValue.'<br />';
         echo '<b>Credit scoring - text: </b>'.                      $response->CreditScoreState.'<br />';
+        echo '<b>Credit scoring Index05: </b>'.                     $response->CreditScoreValueIndex05.'<br />';
+        echo '<b>Credit scoring Index05 - text: </b>'.              $response->CreditScoreStateIndex05.'<br />';
         echo '<b>Zisk za predošlý rok: </b>'.                       $response->ProfitPrev.'<br />';
         echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response->RevenuePrev.'<br />';
         echo '<b>Pomer cudzích zdrojov za aktuálny rok : </b>'.     $response->ForeignResources.'<br />';
@@ -317,6 +319,11 @@ function echoBase($response, $json = false)
             echo echoStructuredName($response->StructuredName). "<br />";
         }
         echo '<br />';
+        if (!empty($response->DistraintsAuthorization)) {
+            echo '<b>Poverenia Exekucii: </b>';
+            echo "Počet: " . $response->DistraintsAuthorization->Count . " (Poslednné: " . echoDate($response->DistraintsAuthorization->LastPublishDate) .")";
+            echo '<br />';
+        }
     }
     if($response instanceof UltimateResult || isset($response->ORSection))
     {
@@ -566,6 +573,34 @@ function echoBase($response, $json = false)
                 }
             }
             echo "</table><br />";
+        }
+        if (!empty($response->DistraintsAuthorizations)) {
+            echo '<b>Poverenia Exekucii Detail: </b>';
+            echo "<br /><table><tr>";
+            echo
+                "</th><th>Ref.Číslo" .
+                "</th><th>Oprávnený" .
+                "</th><th>Typ" .
+                "</th><th>Exekútor" .
+                "</th><th>Dátum Zverejnenia" .
+                "</th><th>URL" .
+                "</th><th>Súd" .
+                "</th><th>Identif. čislo" .
+                "</th></tr>";
+            foreach ($response->DistraintsAuthorizations as $distraintsAuthorization) {
+                echo
+                    "<tr></td><td>" . $distraintsAuthorization->ReferenceNumber .
+                    "</td><td>" . ((!empty($distraintsAuthorization->Authorized)) ? implode(", ", array_map(function($i) { return $i->Name . ((!empty($i->Ico)) ? "(" . $i->Ico  . ")": "" );} , $distraintsAuthorization->Authorized)) : '') .
+                    "</td><td>" . $distraintsAuthorization->TypeOfClaim .
+                    "</td><td>" . $distraintsAuthorization->Plaintiff .
+                    "</td><td>" . echoDate($distraintsAuthorization->PublishDate) .
+                    "</td><td><a href=\"" . $distraintsAuthorization->Url ."\" >Link</a>".
+                    "</td><td>" . $distraintsAuthorization->Court .
+                    "</td><td>" . $distraintsAuthorization->IdentifierNumber .
+                    "</td></tr>";    
+            }
+            echo "</table><br />";
+            echo '<br />';
         }
     }
     echo "</pre>";

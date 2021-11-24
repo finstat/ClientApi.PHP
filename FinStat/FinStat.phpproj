@@ -23,4 +23,7 @@
   <ItemGroup>
     <Compile Include="Example.php" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
 </Project>

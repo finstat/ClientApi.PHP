@@ -113,6 +113,20 @@ class DeadlineResult
     ;
 }
 
+class DistraintsAuthorizationDetailResult
+{
+    public
+        $ReferenceNumber,
+        $Authorized,
+        $TypeOfClaim,
+        $Plaintiff,
+        $PublishDate,
+        $Url,
+        $Court,
+        $IdentifierNumber
+    ;   
+}
+
 class UltimateResult extends ExtendedResult
 {
     public
@@ -132,7 +146,8 @@ class UltimateResult extends ExtendedResult
         $Liquidation,
         $ORCancelled,
 		$OtherProceeding,
-        $RPOPersons
+        $RPOPersons,
+        $DistraintsAuthorizations
     ;
 }
 ?>

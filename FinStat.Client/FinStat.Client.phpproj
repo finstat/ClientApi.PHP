@@ -37,6 +37,7 @@
     <Compile Include="ViewModel\Monitoring\MonitoringReportResult.php" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Properties\" />
     <Folder Include="ViewModel\" />
     <Folder Include="Requests\" />
     <Folder Include="Requests\Auth\" />

@@ -1,4 +1,11 @@
 <?php
+class BaseInfo
+{
+    public
+        $Name,
+        $Ico 
+    ;
+}
 
 class AddressResult
 {

@@ -89,6 +89,13 @@ class RatioItemResult
     $Value;
 }
 
+class DistraintsAuthorizationInfoResult
+{
+    public
+    $LastPublishDate,
+    $Count;
+}
+
 class ExtendedResult extends BaseResult
 {
     public
@@ -122,6 +129,9 @@ class ExtendedResult extends BaseResult
         $JudgementLastPublishedDate,
         $Ratios  = array(),
         $StateReceivables = array(),
-        $CommercialReceivables = array()
+        $CommercialReceivables = array(),
+        $CreditScoreValueIndex05,
+        $CreditScoreStateIndex05,
+        $DistraintsAuthorization
         ;
     }

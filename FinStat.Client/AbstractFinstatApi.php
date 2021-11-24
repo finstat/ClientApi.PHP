@@ -63,7 +63,7 @@ class AbstractFinstatApi
             'StationId' => $this->stationId,
             'StationName' => $this->stationName
         ), $requestData);
-
+        
         $url = $this->apiUrl. $requestUrl;
         try
         {
