@@ -92,6 +92,16 @@ class FinstatApi extends BaseFinstatApi
         $response->DebtUrl              = (string)$detail->DebtUrl;
         $response->HasKaR               = "{$detail->HasKaR}"  == 'true';
         $response->HasDebt              = "{$detail->HasDebt}"  == 'true';
+        //$response->Gdpr                 = "{$detail->Gdpr}"  == 'true';
+        if (!empty($detail->BankAccounts)) {
+            $response->BankAccounts = array();
+            foreach ($detail->BankAccounts->BankAccount as $c) {
+                $o = new BankAccount();
+                $o->AccountNumber = (string)$c->AccountNumber;
+                $o->PublishedAt = $this->parseDate($c->PublishedAt);
+                $response->BankAccounts[] = $o;
+            }
+        }
 
         return $response;
     }
@@ -269,7 +279,7 @@ class FinstatApi extends BaseFinstatApi
             return $detail;
         }
 
-        
+
         $response = $this->parseExtended($detail, new UltimateResult());
         if ($response !== FALSE) {
             $response->EmployeesNumber = (!empty($detail->EmployeesNumber)) ? (int)$detail->EmployeesNumber : null;
@@ -320,7 +330,7 @@ class FinstatApi extends BaseFinstatApi
                     if(!empty($rpoPerson->StructuredName)) {
                         $o->StructuredName = $this->parseStructuredName($rpoPerson->StructuredName);
                     }
-                  
+
                     $response->RPOPersons[] = $o;
                 }
             }
@@ -388,7 +398,7 @@ class FinstatApi extends BaseFinstatApi
                     foreach ($dad->Authorized->BaseInfo as $bi) {
                         $obi = new BaseInfo();
                         $obi->Name = (string)$bi->Name;
-                        $obi->Ico = (string)$bi->Ico; 
+                        $obi->Ico = (string)$bi->Ico;
                         $o->Authorized[] = $obi;
                     }
                 }

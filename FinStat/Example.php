@@ -181,6 +181,24 @@ function echoBase($response, $json = false)
             echo "</table><br />";
         }
     }
+    //echo '<b>GDPR: </b>'.                  ($response->Gdpr ? "Áno" : "nie").'<br />';
+    if (!empty($response->BankAccounts))
+    {
+        echo '<b>Bankové účty: </b><br />';
+        if(!empty($response->BankAccounts)) {
+            echo "<br /><table>";
+            echo
+            "<tr><th>Čislo účtu" .
+            "</th><th>Dátum zverejnenia" .
+            "</th></tr>";
+            foreach($response->BankAccounts as $bac) {
+                echo "<tr><td>" . $bac->AccountNumber;
+                echo "</td><td>" . echoDate($bac->PublishedAt, $json);
+                echo "</td></tr>";
+            }
+            echo "</table><br />";
+        }
+    }
     if ($response instanceof ExtendedResult)
     {
         if(!empty($response->JudgementCounts)) {
@@ -321,7 +339,7 @@ function echoBase($response, $json = false)
         echo '<br />';
         if (!empty($response->DistraintsAuthorization)) {
             echo '<b>Poverenia Exekucii: </b>';
-            echo "Počet: " . $response->DistraintsAuthorization->Count . " (Poslednné: " . echoDate($response->DistraintsAuthorization->LastPublishDate) .")";
+            echo "Počet: " . $response->DistraintsAuthorization->Count . " (Poslednné: " . echoDate($response->DistraintsAuthorization->LastPublishDate, $json) .")";
             echo '<br />';
         }
     }
@@ -505,8 +523,8 @@ function echoBase($response, $json = false)
             }
             if(!empty($response->Restructuring)) {
                 echo "<tr><th>Reštrukturalizácia</th></td><td>".
-                    (($response->Restructuring->FileReference) ? echoDate($response->Restructuring->FileReference, $json) : '') ."</td><td>".
-                    (($response->Restructuring->CourtCode) ? echoDate($response->Restructuring->CourtCode, $json) : '') ."</td><td>".
+                    (($response->Restructuring->FileReference) ? $response->Restructuring->FileReference : '') ."</td><td>".
+                    (($response->Restructuring->CourtCode) ? $response->Restructuring->CourtCode : '') ."</td><td>".
                     (($response->Restructuring->EnterDate) ? echoDate($response->Restructuring->EnterDate, $json) : '') ."</td><td>".
                     $response->Restructuring->EnterReason."</td><td>".
                     (($response->Restructuring->StartDate) ? echoDate($response->Restructuring->StartDate, $json) : '') ."</td><td>".
@@ -593,11 +611,11 @@ function echoBase($response, $json = false)
                     "</td><td>" . ((!empty($distraintsAuthorization->Authorized)) ? implode(", ", array_map(function($i) { return $i->Name . ((!empty($i->Ico)) ? "(" . $i->Ico  . ")": "" );} , $distraintsAuthorization->Authorized)) : '') .
                     "</td><td>" . $distraintsAuthorization->TypeOfClaim .
                     "</td><td>" . $distraintsAuthorization->Plaintiff .
-                    "</td><td>" . echoDate($distraintsAuthorization->PublishDate) .
+                    "</td><td>" . echoDate($distraintsAuthorization->PublishDate, $json) .
                     "</td><td><a href=\"" . $distraintsAuthorization->Url ."\" >Link</a>".
                     "</td><td>" . $distraintsAuthorization->Court .
                     "</td><td>" . $distraintsAuthorization->IdentifierNumber .
-                    "</td></tr>";    
+                    "</td></tr>";
             }
             echo "</table><br />";
             echo '<br />';

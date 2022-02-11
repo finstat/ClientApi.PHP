@@ -5,8 +5,16 @@ require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/AbstractBaseResul
 class JudgementIndicatorResult
 {
     public
-    $Name,
-    $Value
+        $Name,
+        $Value
+    ;
+}
+
+class BankAccount
+{
+    public
+        $AccountNumber,
+        $PublishedAt
     ;
 }
 
@@ -37,7 +45,9 @@ class BaseResult extends AbstractBaseResult
         $HasKaR,
         $HasDebt,
         $KaRUrl,
-        $DebtUrl
+        $DebtUrl,
+        //$Gdpr,
+        $BankAccounts
     ;
 }
 ?>
