@@ -2,6 +2,9 @@
 require_once(__DIR__ . '/Requests.php');
 require_once(__DIR__ . '/AbstractFinstatApi.php');
 require_once(__DIR__ . '/ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/ViewModel/AddressResult.php');
+require_once(__DIR__ . '/ViewModel/Detail/AbstractResult.php');
+require_once(__DIR__ . '/ViewModel/Detail/CommonResult.php');
 
 class BaseFinstatApi extends AbstractFinstatApi
 {
@@ -57,19 +60,31 @@ class BaseFinstatApi extends AbstractFinstatApi
         return $response;
     }
 
-    protected function parseAbstractBase($detail , $response = null)
+    protected function parseAbstractResult($detail , $response = null)
     {
         if  ($detail === FALSE) {
             return $detail;
         }
-        $response = ($response == null)? new AbstractBaseResult() : $response;
+        $response = ($response == null)? new AbstractResult() : $response;
         $response = $this->parseFullAddress($detail, $response);
         $response->Ico                  = (string)$detail->Ico;
+        $response->Url                  = (string)$detail->Url;
+
+        return $response;
+    }
+
+    protected function parseCommonResult($detail , $response = null)
+    {
+        if  ($detail === FALSE) {
+            return $detail;
+        }
+        $response = ($response == null)? new CommonResult() : $response;
+        $response = $this->parseAbstractResult($detail, $response);
         $response->IcDPH                = (string)$detail->IcDPH;
+        $response->Dic                  = (string)$detail->Dic;
         $response->Activity             = (string)$detail->Activity;
         $response->Created              = $this->parseDate($detail->Created);
         $response->Cancelled            = $this->parseDate($detail->Cancelled);
-        $response->Url                  = (string)$detail->Url;
         $response->Warning              = "{$detail->Warning}"  == 'true' ;
         $response->WarningUrl           = (string)$detail->WarningUrl;
 

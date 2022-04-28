@@ -19,6 +19,7 @@
     <Folder Include="Detail\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Detail\BasicResult.php" />
     <Compile Include="Detail\DetailResult.php" />
   </ItemGroup>
 </Project>

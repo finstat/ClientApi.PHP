@@ -1,8 +1,8 @@
 <?php
 require_once('../FinStat.Client/ViewModel/AddressResult.php');
-require_once('../FinStat.Client/ViewModel/Detail/AbstractBaseResult.php');
+require_once('../FinStat.Client/ViewModel/Detail/CommonResult.php');
 
-class DetailResult extends AbstractBaseResult
+class DetailResult extends CommonResult
 {
     public
         $LegalForm,

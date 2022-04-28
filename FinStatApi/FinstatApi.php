@@ -5,12 +5,18 @@ require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
 require_once(__DIR__ . '/../FinStat.Client/BaseFinstatApi.php');
 require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BaseResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BasicResult.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Detail/DetailResult.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Detail/ExtendedResult.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Detail/UltimateResult.php');
 
 class FinstatApi extends BaseFinstatApi
 {
+    public function RequestBasic($ico, $json = false)
+    {
+        return $this->Request($ico, 'basic', $json);
+    }
+
     public function RequestDetail($ico, $json = false)
     {
         return $this->Request($ico, 'detail', $json);
@@ -41,8 +47,11 @@ class FinstatApi extends BaseFinstatApi
                     $detail = $this->parseExtended($detail);
                     break;
                 case 'detail':
+                     $detail = $this->parseDetail($detail);
+                     break;
+                case 'basic': 
                 default:
-                    $detail = $this->parseDetail($detail);
+                    $detail = $this->parseBasic($detail);
                     break;
             }
         }
@@ -53,9 +62,9 @@ class FinstatApi extends BaseFinstatApi
     protected function parseBase($detail , $response = null)
     {
         $response = ($response == null)? new BaseResult() : $response;
-        $response = $this->parseAbstractBase($detail, $response);
+        $response = $this->parseCommonResult($detail, $response);
         $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
-        $response->Dic                  = (string)$detail->Dic;
+
         $response->SuspendedAsPerson    = "{$detail->SuspendedAsPerson}"  == 'true' ;
         $response->PaymentOrderWarning  = "{$detail->PaymentOrderWarning}"  == 'true';
         $response->PaymentOrderUrl      = (string)$detail->PaymentOrderUrl;
@@ -102,6 +111,21 @@ class FinstatApi extends BaseFinstatApi
                 $response->BankAccounts[] = $o;
             }
         }
+
+        return $response;
+    }
+
+    private function parseBasic($detail)
+    {
+        if  ($detail === FALSE) {
+            return $detail;
+        }
+
+        $response = new BasicResult();
+        $response = $this->parseAbstractResult($detail, $response);
+
+        $response->Dic                  = (string)$detail->Dic;
+        $response->IcDPH                = (string)$detail->IcDPH;
 
         return $response;
     }

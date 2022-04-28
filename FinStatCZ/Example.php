@@ -28,9 +28,10 @@ function echoBase($response, $json = false)
     echo '<b>Okres: </b>'.                  $response->District.'<br />';
     echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
     echo '<b>Štát: </b>'.                   $response->Country.'<br />';
-    echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
-    if($response instanceof DetailResult || isset($response->Created))
+   
+    if($response instanceof DetailResult)
     {
+        echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
         echo '<b>CZ Nace Kod: </b>'.            $response->CzNaceCode.'<br />';
         echo '<b>CZ Nace Text: </b>'.           $response->CzNaceText.'<br />';
         echo '<b>CZ Nace Divizia: </b>'.        $response->CzNaceDivision.'<br />';
@@ -38,13 +39,16 @@ function echoBase($response, $json = false)
         echo '<b>Právna forma: </b>'.           $response->LegalForm.'<br />';
         echo '<b>Druh vlastníctva: </b>'.       $response->OwnershipType.'<br />';
         echo '<b>Počet zamestnancov: </b>'.     $response->EmployeeCount.'<br />';
+        echo '<b>Založená: </b>'.               (($response->Created) ? echoDate($response->Created, $json) : '').'<br />';
+        echo '<b>Zrušená: </b>'.                (($response->Cancelled) ?echoDate( $response->Cancelled, $json) : '') .'<br />';
     }
-    echo '<b>Založená: </b>'.               (($response->Created) ? echoDate($response->Created, $json) : '').'<br />';
-    echo '<b>Zrušená: </b>'.                (($response->Cancelled) ?echoDate( $response->Cancelled, $json) : '') .'<br />';
 
     echo '<b>Url: </b>'.            $response->Url.'<br />';
+    if($response instanceof DetailResult)
+    {
     echo '<b>Príznak, či sa daná firma nachádza insolvenčnom registry: </b>';
     if($response->Warning) echo 'Áno (<a href="'.$response->WarningUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
+    }
 
     echo "</pre>";
 }
@@ -134,12 +138,31 @@ $api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $
 
 // priklad dopytu na detail firmy, ktora ma ICO 48207349
 $ico = (isset($_GET['ico']) && !empty($_GET['ico'])) ? $_GET['ico'] : '48207349';
+// priklad vypisu ziskanych udajov z Finstatu
+header('Content-Type: text/html; charset=utf-8');
+?>
+<h1>Basic test:</h1>
+<?php
+try
+{
+    if (!empty($ico)) {
+        $response = $api->Request($ico, "basic", $json);
+    }
+}
+catch (Exception $e)
+{
+    echoLimits($api->GetAPILimits());
+    echoException($e);
+}
+echoBase($response, $json);
+echoLimits($api->GetAPILimits());
+echo '<hr />';
+
 ?>
 <h1>Detail test:</h1>
 <?php
 try
 {
-    // funkcia $api->RequestDetail(string) vracia naplneny objekt typu BaseResultCZ s udajmi o dopytovanej firme
     if (!empty($ico)) {
         $response = $api->Request($ico, "detail", $json);
     }
@@ -150,11 +173,7 @@ catch (Exception $e)
     echoException($e);
 }
 
-// priklad vypisu ziskanych udajov z Finstatu
-header('Content-Type: text/html; charset=utf-8');
-?>
-<h1>Detail test:</h1>
-<?php
+
 echoBase($response, $json);
 echoLimits($api->GetAPILimits());
 echo '<hr />';

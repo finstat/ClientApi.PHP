@@ -31,7 +31,8 @@
     <Compile Include="Requests\Transport.php" />
     <Compile Include="Requests\Transport\cURL.php" />
     <Compile Include="Requests\Transport\fsockopen.php" />
-    <Compile Include="ViewModel\Detail\AbstractBaseResult.php" />
+    <Compile Include="ViewModel\Detail\AbstractResult.php" />
+    <Compile Include="ViewModel\Detail\CommonResult.php" />
     <Compile Include="ViewModel\AddressResult.php" />
     <Compile Include="ViewModel\AutoCompleteResult.php" />
     <Compile Include="ViewModel\Monitoring\MonitoringReportResult.php" />

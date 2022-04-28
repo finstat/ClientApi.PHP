@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__ . '/../../FinStat.Client/ViewModel/AddressResult.php');
-require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/AbstractBaseResult.php');
+require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/CommonResult.php');
 
 class JudgementIndicatorResult
 {
@@ -18,11 +18,10 @@ class BankAccount
     ;
 }
 
-class BaseResult extends AbstractBaseResult
+class BaseResult extends CommonResult
 {
     public
         $RegisterNumberText,
-        $Dic,
         $SuspendedAsPerson,
         $OrChange,
         $OrChangeUrl,

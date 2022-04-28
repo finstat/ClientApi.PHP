@@ -1,15 +1,14 @@
 <?php
-require_once(__DIR__ . '/../AddressResult.php');
+require_once(__DIR__ . '/AbstractResult.php');
 
-class AbstractBaseResult extends AddressResult
+class CommonResult extends AbstractResult
 {
     public
-        $Ico,
+        $Dic,
         $IcDPH,
         $Activity,
         $Created,
         $Cancelled,
-        $Url,
         $Warning,
         $WarningUrl
     ;

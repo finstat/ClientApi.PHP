@@ -16,6 +16,7 @@
     <IncludeDebugInformation>false</IncludeDebugInformation>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Detail\BasicResult.php" />
     <Compile Include="Detail\BaseResult.php" />
     <Compile Include="Detail\DetailResult.php" />
     <Compile Include="Detail\ExtendedResult.php" />
