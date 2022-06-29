@@ -38,8 +38,8 @@ class FinstatApi extends BaseFinstatApi
     public function Request($ico, $type="detail", $json = false)
     {
         $detail = $this->DoRequest($type, array('ico' => $ico), $ico, $json);
-        if(!$json) {
-            switch($type) {
+        if (!$json) {
+            switch ($type) {
                 case 'ultimate':
                     $detail = $this->parseUltimate($detail);
                     break;
@@ -49,7 +49,7 @@ class FinstatApi extends BaseFinstatApi
                 case 'detail':
                      $detail = $this->parseDetail($detail);
                      break;
-                case 'basic': 
+                case 'basic':
                 default:
                     $detail = $this->parseBasic($detail);
                     break;
@@ -59,9 +59,9 @@ class FinstatApi extends BaseFinstatApi
         return $detail;
     }
 
-    protected function parseBase($detail , $response = null)
+    protected function parseBase($detail, $response = null)
     {
-        $response = ($response == null)? new BaseResult() : $response;
+        $response = ($response == null) ? new BaseResult() : $response;
         $response = $this->parseCommonResult($detail, $response);
         $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
 
@@ -79,8 +79,8 @@ class FinstatApi extends BaseFinstatApi
         $response->RpvsInsert           = (string)$detail->RpvsInsert;
         $response->RpvsUrl              = (string)$detail->RpvsUrl;
         $response->SalesCategory        = (string)$detail->SalesCategory;
-        $response->RevenueActual        = empty($detail->RevenueActual) ? null :(double)"{$detail->RevenueActual}";
-        $response->ProfitActual         = empty($detail->ProfitActual) ? null :(double)"{$detail->ProfitActual}";
+        $response->RevenueActual        = empty($detail->RevenueActual) ? null : (float)"{$detail->RevenueActual}";
+        $response->ProfitActual         = empty($detail->ProfitActual) ? null : (float)"{$detail->ProfitActual}";
 
         if (!empty($detail->IcDphAdditional)) {
             $response->IcDphAdditional = $this->parseIcDphAdditional($detail->IcDphAdditional);
@@ -101,7 +101,7 @@ class FinstatApi extends BaseFinstatApi
         $response->DebtUrl              = (string)$detail->DebtUrl;
         $response->HasKaR               = "{$detail->HasKaR}"  == 'true';
         $response->HasDebt              = "{$detail->HasDebt}"  == 'true';
-        //$response->Gdpr                 = "{$detail->Gdpr}"  == 'true';
+        $response->Anonymized           = "{$detail->Anonymized}"  == 'true';
         if (!empty($detail->BankAccounts)) {
             $response->BankAccounts = array();
             foreach ($detail->BankAccounts->BankAccount as $c) {
@@ -117,7 +117,7 @@ class FinstatApi extends BaseFinstatApi
 
     private function parseBasic($detail)
     {
-        if  ($detail === FALSE) {
+        if ($detail === false) {
             return $detail;
         }
 
@@ -126,13 +126,14 @@ class FinstatApi extends BaseFinstatApi
 
         $response->Dic                  = (string)$detail->Dic;
         $response->IcDPH                = (string)$detail->IcDPH;
+        $response->Anonymized           = "{$detail->Anonymized}"  == 'true';
 
         return $response;
     }
 
-    private function parseDetail($detail , $response = null)
+    private function parseDetail($detail, $response = null)
     {
-        $response = ($response == null)? new DetailResult() : $response;
+        $response = ($response == null) ? new DetailResult() : $response;
         $this->parseBase($detail, $response);
 
         $response->Revenue              = (string)$detail->Revenue;
@@ -143,7 +144,7 @@ class FinstatApi extends BaseFinstatApi
 
     private function parseExtended($detail, $response = null)
     {
-        $response = ($response == null)? new ExtendedResult() : $response;
+        $response = ($response == null) ? new ExtendedResult() : $response;
         $response = $this->parseBase($detail, $response);
 
         $response->EmployeeCode             = (string)$detail->EmployeeCode;
@@ -154,11 +155,11 @@ class FinstatApi extends BaseFinstatApi
         $response->CreditScoreValue         = (float)$detail->CreditScoreValue;
         $response->CreditScoreState         = (string)$detail->CreditScoreState;
         $response->BasicCapital             = (!empty($detail->BasicCapital)) ? (float)$detail->BasicCapital : null;
-        $response->RevenuePrev              = empty($detail->RevenuePrev) ? null :(double)"{$detail->RevenuePrev}";
-        $response->ProfitPrev               = empty($detail->ProfitPrev) ? null :(double)"{$detail->ProfitPrev}";
-        $response->ForeignResources         = empty($detail->ForeignResources) ? null :(double)"{$detail->ForeignResources}";
-        $response->GrossMargin              = empty($detail->GrossMargin) ? null :(double)"{$detail->GrossMargin}";
-        $response->ROA                      = empty($detail->ROA) ? null : (double)"{$detail->ROA}";
+        $response->RevenuePrev              = empty($detail->RevenuePrev) ? null : (float)"{$detail->RevenuePrev}";
+        $response->ProfitPrev               = empty($detail->ProfitPrev) ? null : (float)"{$detail->ProfitPrev}";
+        $response->ForeignResources         = empty($detail->ForeignResources) ? null : (float)"{$detail->ForeignResources}";
+        $response->GrossMargin              = empty($detail->GrossMargin) ? null : (float)"{$detail->GrossMargin}";
+        $response->ROA                      = empty($detail->ROA) ? null : (float)"{$detail->ROA}";
         $response->WarningKaR               = $this->parseDate($detail->WarningKaR);
         $response->WarningLiquidation       = $this->parseDate($detail->WarningLiquidation);
         $response->DisposalUrl              = (string)$detail->DisposalUrl;
@@ -207,7 +208,7 @@ class FinstatApi extends BaseFinstatApi
             foreach ($detail->PaymentOrders->PaymentOrder as $paymentOrder) {
                 $o = new PaymentOrderResult();
                 $o->PublishDate  = $this->parseDate($paymentOrder->PublishDate);
-                $o->Value   = (double)$paymentOrder->Value;
+                $o->Value   = (float)$paymentOrder->Value;
                 $response->PaymentOrders[] = $o;
             }
         }
@@ -218,9 +219,9 @@ class FinstatApi extends BaseFinstatApi
                 $o = new OfficeResult();
                 $o = $this->parseAddress($office, $o);
                 $o->Type = (string)$office->Type;
-                if(!empty($office->Subjects)) {
-                     $o->Subjects = array();
-                     foreach ($office->Subjects->string as $s) {
+                if (!empty($office->Subjects)) {
+                    $o->Subjects = array();
+                    foreach ($office->Subjects->string as $s) {
                         $o->Subjects[] = (string)$s;
                     }
                 }
@@ -236,26 +237,26 @@ class FinstatApi extends BaseFinstatApi
                 $o->ValidFrom = $this->parseDate($subject->ValidFrom);
                 $o->SuspendedFrom = $this->parseDate($subject->SuspendedFrom);
                 $response->Subjects[] = $o;
-           }
+            }
         }
 
 
-        if($response->SelfEmployed && !empty($detail->StructuredName)) {
+        if ($response->SelfEmployed && !empty($detail->StructuredName)) {
             $response->StructuredName = $this->parseStructuredName($detail->StructuredName);
         }
 
         if (!empty($detail->ContactSources)) {
             $response->ContactSources = array();
             foreach ($detail->ContactSources->ContactSource as $c) {
-               $o = new ContactSourceResult();
-               $o->Contact = (string) $c->Contact;
-               if(!empty($c->Sources)) {
-                   $o->Sources = array();
-                   foreach ($c->Sources->string as $s) {
-                      $o->Sources[] = (string)$s;
-                   }
-               }
-               $response->ContactSources[] = $o;
+                $o = new ContactSourceResult();
+                $o->Contact = (string) $c->Contact;
+                if (!empty($c->Sources)) {
+                    $o->Sources = array();
+                    foreach ($c->Sources->string as $s) {
+                        $o->Sources[] = (string)$s;
+                    }
+                }
+                $response->ContactSources[] = $o;
             }
         }
 
@@ -299,13 +300,13 @@ class FinstatApi extends BaseFinstatApi
 
     private function parseUltimate($detail)
     {
-        if ($detail === FALSE) {
+        if ($detail === false) {
             return $detail;
         }
 
 
         $response = $this->parseExtended($detail, new UltimateResult());
-        if ($response !== FALSE) {
+        if ($response !== false) {
             $response->EmployeesNumber = (!empty($detail->EmployeesNumber)) ? (int)$detail->EmployeesNumber : null;
             $response->ORSection = (string)$detail->ORSection;
             $response->ORInsertNo = (string)$detail->ORInsertNo;
@@ -343,7 +344,7 @@ class FinstatApi extends BaseFinstatApi
                     $o->DetectedTo  = $this->parseDate($rpoPerson->DetectedTo);
                     $o->Functions = array();
                     if (!empty($rpoPerson->Functions) && !empty($rpoPerson->Functions->FunctionAssigment)) {
-                        foreach($rpoPerson->Functions->FunctionAssigment as $function) {
+                        foreach ($rpoPerson->Functions->FunctionAssigment as $function) {
                             $of = new FunctionResult();
                             $of->Type = (string)$function->Type;
                             $of->Description = (string)$function->Description;
@@ -351,7 +352,7 @@ class FinstatApi extends BaseFinstatApi
                             $o->Functions[] = $of;
                         }
                     }
-                    if(!empty($rpoPerson->StructuredName)) {
+                    if (!empty($rpoPerson->StructuredName)) {
                         $o->StructuredName = $this->parseStructuredName($rpoPerson->StructuredName);
                     }
 
@@ -369,7 +370,7 @@ class FinstatApi extends BaseFinstatApi
             if (!empty($detail->WebPages)) {
                 $response->WebPages = array();
                 foreach ($detail->WebPages->string as $s) {
-                   $response->WebPages[] = (string)$s;
+                    $response->WebPages[] = (string)$s;
                 }
             }
 
@@ -408,71 +409,74 @@ class FinstatApi extends BaseFinstatApi
                 $response->Liquidation = $this->ParseLiquidationResult($detail->Liquidation);
             }
 
-			if (!empty($detail->OtherProceeding)) {
+            if (!empty($detail->OtherProceeding)) {
                 $response->OtherProceeding = $this->ParseProceeding($detail->OtherProceeding, new ProceedingResult());
             }
 
             if (!empty($detail->DistraintsAuthorizations)) {
-            $response->DistraintsAuthorizations = array();
-            foreach ($detail->DistraintsAuthorizations->DistraintsAuthorizationDetail as $dad) {
-                $o = new DistraintsAuthorizationDetailResult();
-                $o->ReferenceNumber = (string) $dad->ReferenceNumber;
-                if(!empty($dad->Authorized)) {
-                    $o->Authorized = [];
-                    foreach ($dad->Authorized->BaseInfo as $bi) {
-                        $obi = new BaseInfo();
-                        $obi->Name = (string)$bi->Name;
-                        $obi->Ico = (string)$bi->Ico;
-                        $o->Authorized[] = $obi;
+                $response->DistraintsAuthorizations = array();
+                foreach ($detail->DistraintsAuthorizations->DistraintsAuthorizationDetail as $dad) {
+                    $o = new DistraintsAuthorizationDetailResult();
+                    $o->ReferenceNumber = (string) $dad->ReferenceNumber;
+                    if (!empty($dad->Authorized)) {
+                        $o->Authorized = [];
+                        foreach ($dad->Authorized->BaseInfo as $bi) {
+                            $obi = new BaseInfo();
+                            $obi->Name = (string)$bi->Name;
+                            $obi->Ico = (string)$bi->Ico;
+                            $o->Authorized[] = $obi;
+                        }
                     }
+                    $o->TypeOfClaim = (string) $dad->TypeOfClaim;
+                    $o->Plaintiff = (string) $dad->Plaintiff;
+                    $o->PublishDate = $this->parseDate($dad->PublishDate);
+                    $o->Url = (string) $dad->Url;
+                    $o->Court = (string) $dad->Court;
+                    $o->IdentifierNumber = (string) $dad->IdentifierNumber;
+                    $response->DistraintsAuthorizations[] = $o;
                 }
-                $o->TypeOfClaim = (string) $dad->TypeOfClaim;
-                $o->Plaintiff = (string) $dad->Plaintiff;
-                $o->PublishDate = $this->parseDate($dad->PublishDate);
-                $o->Url = (string) $dad->Url;
-                $o->Court = (string) $dad->Court;
-                $o->IdentifierNumber = (string) $dad->IdentifierNumber;
-                $response->DistraintsAuthorizations[] = $o;
             }
-        }
         }
 
         return $response;
     }
 
-    protected function ParseDebtResult($detail, $response = null) {
-        if(!empty($detail)) {
+    protected function ParseDebtResult($detail, $response = null)
+    {
+        if (!empty($detail)) {
             $o = (!empty($response)) ? $response : new DebtResult();
             $o->Source  = $detail->Source;
-            $o->Value   = (double)$detail->Value;
+            $o->Value   = (float)$detail->Value;
             $o->ValidFrom  = $this->parseDate($detail->ValidFrom);
             return $o;
         }
         return null;
     }
 
-    protected function ParseReceivableDebtResult($detail, $response = null) {
-        if(!empty($detail)) {
+    protected function ParseReceivableDebtResult($detail, $response = null)
+    {
+        if (!empty($detail)) {
             $o = (!empty($response)) ? $response : new ReceivableDebtResult();
             return $this->ParseDebtResult($detail, $o);
         }
         return null;
     }
 
-    protected function ParseLiquidationResult($detail, $response = null) {
-        if(!empty($detail)) {
+    protected function ParseLiquidationResult($detail, $response = null)
+    {
+        if (!empty($detail)) {
             $o = (!empty($response)) ? $response : new LiquidationResult();
             $o->Source = (string) $detail->Source;
             $o->EnterDate = $this->parseDate($detail->EnterDate);
             $o->EnterReason = (string) $detail->EnterReason;
             $o->ExitDate = $this->parseDate($detail->ExitDate);
-			if (!empty($detail->Officers)) {
-				  foreach ($detail->Officers->Officer as $officer) {
-					$of = $this->parsePerson($officer);
-					$of->Source  = (string)$officer->Source;
-					$o->Officers[] = $of;
-				}
-			}
+            if (!empty($detail->Officers)) {
+                foreach ($detail->Officers->Officer as $officer) {
+                    $of = $this->parsePerson($officer);
+                    $of->Source  = (string)$officer->Source;
+                    $o->Officers[] = $of;
+                }
+            }
             $o->Officer = $this->parsePerson($detail->Officer);
             if (!empty($detail->Deadlines)) {
                 foreach ($detail->Deadlines->Deadline as $deadline) {
@@ -487,11 +491,12 @@ class FinstatApi extends BaseFinstatApi
         return null;
     }
 
-    protected function ParseProceeding($detail, $response = null) {
-        if(!empty($detail)) {
+    protected function ParseProceeding($detail, $response = null)
+    {
+        if (!empty($detail)) {
             $o = (!empty($response)) ? $response : new ProceedingResult();
             $o = $this->ParseLiquidationResult($detail, $response);
-            if(!empty($o)) {
+            if (!empty($o)) {
                 $o->FileReference = (string) $detail->FileReference;
                 $o->CourtCode = (string) $detail->CourtCode;
                 $o->StartDate = $this->parseDate($detail->OtherProceeding->StartDate);

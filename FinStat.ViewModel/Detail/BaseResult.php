@@ -45,7 +45,7 @@ class BaseResult extends CommonResult
         $HasDebt,
         $KaRUrl,
         $DebtUrl,
-        //$Gdpr,
+        $Anonymized,
         $BankAccounts
     ;
 }

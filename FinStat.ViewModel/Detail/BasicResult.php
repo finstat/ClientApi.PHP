@@ -6,7 +6,8 @@ class BasicResult extends AbstractResult
 {
     public
         $Dic,
-        $IcDPH
+        $IcDPH,
+        $Anonymized
     ;
 }
 ?>
