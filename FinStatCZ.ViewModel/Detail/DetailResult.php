@@ -1,8 +1,10 @@
 <?php
-require_once('../FinStat.Client/ViewModel/AddressResult.php');
-require_once('../FinStat.Client/ViewModel/Detail/CommonResult.php');
+namespace FinstatApiCz;
 
-class DetailResult extends CommonResult
+require_once(__DIR__ . '/../../FinStat.Client/ViewModel/AddressResult.php');
+require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/CommonResult.php');
+
+class DetailResult extends \CommonResult
 {
     public
         $LegalForm,
@@ -10,7 +12,7 @@ class DetailResult extends CommonResult
         $EmployeeCount,
         $CzNaceCode,
         $CzNaceText,
-        $CzNaceDicision,
+        $CzNaceDivision,
         $CzNaceGroup
     ;
 }

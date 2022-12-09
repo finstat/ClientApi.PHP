@@ -29,7 +29,7 @@ function echoBase($response, $json = false)
     echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
     echo '<b>Štát: </b>'.                   $response->Country.'<br />';
    
-    if($response instanceof DetailResult)
+    if($response instanceof FinstatApiCz\DetailResult)
     {
         echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
         echo '<b>CZ Nace Kod: </b>'.            $response->CzNaceCode.'<br />';
@@ -134,7 +134,7 @@ $timeout = 10;                            // Dĺžka čakania na odozvu zo serve
 $json =  false;                         // Flag ci ma API vraciat odpoved ako JSON
 
 // inicializacia klienta
-$api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+$api = new FinstatApiCz\FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
 
 // priklad dopytu na detail firmy, ktora ma ICO 48207349
 $ico = (isset($_GET['ico']) && !empty($_GET['ico'])) ? $_GET['ico'] : '48207349';
