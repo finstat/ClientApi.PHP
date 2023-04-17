@@ -8,13 +8,12 @@ require_once(__DIR__ . '/../FinStat.ViewModel/Diff/DailyDiffList.php');
 
 class AbstractFinstatDailyDiffApi extends AbstractFinstatApi
 {
-    protected function GetList($requestUrl, $json = false) {
+    protected function GetList($requestUrl, $json = false)
+    {
         $detail = $this->DoRequest($requestUrl, array(), null, $json);
 
-        if($detail != false)
-        {
-            if(!$json)
-            {
+        if($detail != false) {
+            if(!$json) {
                 $result = new DailyDiffList();
                 $result->Version = (string) $detail->Version;
                 $result->Files = array();
@@ -45,8 +44,7 @@ class AbstractFinstatDailyDiffApi extends AbstractFinstatApi
 
     protected function ParseDailyDiff($detail)
     {
-        if($detail != false)
-        {
+        if($detail != false) {
             $result = new DailyDiff();
             $result->FileName = (string) $detail->FileName;
             $result->FileSize = (int) $detail->FileSize;

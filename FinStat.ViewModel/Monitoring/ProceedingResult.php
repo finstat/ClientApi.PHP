@@ -2,61 +2,55 @@
 
 class ProceedingResult
 {
-    public
-        $DebtorsAddress,
-        $ProposersAddress,
-        $AdministratorsAddress,
-        $CourtsAddress,
-        $ReferenceFileNumber,
-        $Status,
-        $Character,
-        $EndReason,
-        $EndStatus,
-        $Url,
-        $Type,
-        $PublishDate,
-        $DatesInProceeding,
-        $FileIdentifierNumber,
-        $IssuedBy,
-        $PostedBy;
+    public $DebtorsAddress;
+    public $ProposersAddress;
+    public $AdministratorsAddress;
+    public $CourtsAddress;
+    public $ReferenceFileNumber;
+    public $Status;
+    public $Character;
+    public $EndReason;
+    public $EndStatus;
+    public $Url;
+    public $Type;
+    public $PublishDate;
+    public $DatesInProceeding;
+    public $FileIdentifierNumber;
+    public $IssuedBy;
+    public $PostedBy;
+    public $Deadline;
 }
 
 class Address
 {
-    public
-        $Name,
-        $Street,
-        $StreetNumber,
-        $ZipCode,
-        $City,
-        $Country,
-        $Region;
+    public $Name;
+    public $Street;
+    public $StreetNumber;
+    public $ZipCode;
+    public $City;
+    public $Country;
+    public $Region;
 }
 
 class PersonAddress extends Address
 {
-    public
-        $BirthDate,
-        $Ico;
+    public $BirthDate;
+    public $Ico;
 }
 
 class AdministratorAddress extends PersonAddress
 {
-    public
-        $Id;
+    public $Id;
 }
 
 class IssuedPerson
 {
-    public
-        $Name,
-        $Function;
+    public $Name;
+    public $Function;
 }
 
 class Deadline
 {
-    public
-        $Type,
-        $Date;
+    public $Type;
+    public $Date;
 }
-?>

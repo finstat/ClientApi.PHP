@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/Requests.php');
 require_once(__DIR__ . '/AbstractFinstatApi.php');
 require_once(__DIR__ . '/ViewModel/AutoCompleteResult.php');
@@ -26,15 +27,14 @@ class BaseFinstatApi extends AbstractFinstatApi
 
         if(!$json) {
             return $this->parseAutoComplete($detail);
-        } else
-        {
+        } else {
             return $detail;
         }
     }
 
     protected function parseAutoComplete($detail)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
 
@@ -60,12 +60,12 @@ class BaseFinstatApi extends AbstractFinstatApi
         return $response;
     }
 
-    protected function parseAbstractResult($detail , $response = null)
+    protected function parseAbstractResult($detail, $response = null)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
-        $response = ($response == null)? new AbstractResult() : $response;
+        $response = ($response == null) ? new AbstractResult() : $response;
         $response = $this->parseFullAddress($detail, $response);
         $response->Ico                  = (string)$detail->Ico;
         $response->Url                  = (string)$detail->Url;
@@ -73,12 +73,12 @@ class BaseFinstatApi extends AbstractFinstatApi
         return $response;
     }
 
-    protected function parseCommonResult($detail , $response = null)
+    protected function parseCommonResult($detail, $response = null)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
-        $response = ($response == null)? new CommonResult() : $response;
+        $response = ($response == null) ? new CommonResult() : $response;
         $response = $this->parseAbstractResult($detail, $response);
         $response->IcDPH                = (string)$detail->IcDPH;
         $response->Dic                  = (string)$detail->Dic;

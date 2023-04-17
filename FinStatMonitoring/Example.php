@@ -4,10 +4,8 @@ require_once(__DIR__ . '/../FinStat.Client/ViewModel/Monitoring/MonitoringReport
 
 function echoDate($date, $json = false)
 {
-    if($date && !empty($date))
-    {
-        if($json)
-        {
+    if($date && !empty($date)) {
+        if($json) {
             $date = new DateTime($date);
         }
         return $date->format('d.m.Y H:i:s');
@@ -33,7 +31,7 @@ function echoMonitoringReport($response, $json)
     if (!empty($response)) {
         $icodate = "";
         if($report[0] instanceof MonitoringDateReportResult) {
-             $icodate  = "Dátum";
+            $icodate  = "Dátum";
         } else {
             $icodate  = "Ičo";
         }
@@ -50,7 +48,7 @@ function echoMonitoringReport($response, $json)
         foreach($response as $report) {
             $icodate = "";
             if($report instanceof MonitoringDateReportResult) {
-                 $icodate  = $report->Date;
+                $icodate  = $report->Date;
             } else {
                 $icodate  = $report->Ico;
             }
@@ -83,7 +81,8 @@ function echoMonitoringList($response)
     echo "</pre>";
 }
 
-function echoLimits($limits) {
+function echoLimits($limits)
+{
     if(!empty($limits)) {
         echo '<h2>Limity</h2>';
         echo '<table>';
@@ -92,16 +91,16 @@ function echoLimits($limits) {
                 '<th>Aktuálny</th>'.
                 '<th>MAX</th>'.
              '</tr>';
-         echo '<tr>'.
-                '<th>Denný</th>'.
-                '<th>'. ((isset($limits['daily']) && isset($limits['daily']['current'])) ? $limits['daily']['current'] : "---") .'</th>'.
-                '<th>'. ((isset($limits['daily']) && isset($limits['daily']['max'])) ? $limits['daily']['max'] : "---") .'</th>'.
-             '</tr>';
-         echo '<tr>'.
-                '<th>Mesačný</th>'.
-                '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['current'])) ? $limits['monthly']['current'] : "---") .'</th>'.
-                '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['max'])) ? $limits['monthly']['max'] : "---") .'</th>'.
-             '</tr>';
+        echo '<tr>'.
+               '<th>Denný</th>'.
+               '<th>'. ((isset($limits['daily']) && isset($limits['daily']['current'])) ? $limits['daily']['current'] : "---") .'</th>'.
+               '<th>'. ((isset($limits['daily']) && isset($limits['daily']['max'])) ? $limits['daily']['max'] : "---") .'</th>'.
+            '</tr>';
+        echo '<tr>'.
+               '<th>Mesačný</th>'.
+               '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['current'])) ? $limits['monthly']['current'] : "---") .'</th>'.
+               '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['max'])) ? $limits['monthly']['max'] : "---") .'</th>'.
+            '</tr>';
         echo '</table>';
     }
 }
@@ -109,13 +108,13 @@ function echoLimits($limits) {
 // zakladne prihlasovacie udaje a nastavenia klienta
 $apiUrl = 'https://www.finstat.sk/api/';    // URL adresa Finstat API
 $apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-                                        // prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
+// prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
 $privateKey = 'PLEASE_FILL_IN_YOUR_PRIVATE_KEY';// PLEASE_FILL_IN_YOUR_PRIVATE_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-                                        // prosim poziadajte o svoj privatny kluc na info@finstat.sk.
+// prosim poziadajte o svoj privatny kluc na info@finstat.sk.
 $stationId = 'Api test';                // Identifikátor stanice, ktorá dopyt vygenerovala.
-                                        // Môže byť ľubovolný reťazec.
+// Môže byť ľubovolný reťazec.
 $stationName = 'Api test';                // Názov alebo opis stanice, ktorá dopyt vygenerovala.
-                                        // Môže byť ľubovolný reťazec.
+// Môže byť ľubovolný reťazec.
 $timeout = 10;                            // Dĺžka čakania na odozvu zo servera v sekundách.
 $json =  false;                         // Flag ci ma API vraciat odpoved ako JSON
 
@@ -128,8 +127,7 @@ $date = (isset($_GET['date']) && !empty($_GET['date'])) ? $_GET['date'] : "1.1.1
 ?>
 <h1>Add test:</h1>
 <?php
-try
-{
+try {
     // funkcia $api->AddToMonitoring(string) vracia stav úspechu operácie
     if (!empty($ico)) {
         $response = $api->AddToMonitoring($ico, $json);
@@ -138,10 +136,8 @@ try
     if (!empty($date)) {
         $response3 = $api->AddDateToMonitoring($date, $json);
     }
-}
-catch (Exception $e)
-{
-      echoException($e);
+} catch (Exception $e) {
+    echoException($e);
 }
 
 // priklad vypisu ziskanych udajov z Finstatu
@@ -155,8 +151,7 @@ echo '<hr />';
 ?>
 <h1>MonitoringList test:</h1>
 <?php
-try
-{
+try {
     // funkcia $api->MonitoringList() vracia zoznam monitorovanych ICO
     if (!empty($ico)) {
         $response = $api->MonitoringList($json);
@@ -165,10 +160,8 @@ try
         $response2 = $api->MonitoringDateList($json);
 
     }
-}
-catch (Exception $e)
-{
-     echoException($e);
+} catch (Exception $e) {
+    echoException($e);
 }
 
 // priklad vypisu ziskanych udajov z Finstatu
@@ -179,8 +172,7 @@ echo '<hr />';
 
 <h1>Remove test:</h1>
 <?php
-try
-{
+try {
     // funkcia $api->RemoveFromMonitoring(string) vracia stav úspechu operácie
     if (!empty($ico)) {
         $response = $api->RemoveFromMonitoring($ico, $json);
@@ -188,10 +180,8 @@ try
     if (!empty($date)) {
         $response2 = $api->RemoveDateFromMonitoring($date, $json);
     }
-}
-catch (Exception $e)
-{
-     echoException($e);
+} catch (Exception $e) {
+    echoException($e);
 }
 
 // priklad vypisu ziskanych udajov z Finstatu
@@ -204,8 +194,7 @@ echo '<hr />';
 
 <h1>MonitoringReport test:</h1>
 <?php
-try
-{
+try {
     // funkcia $api->MonitoringReport() vracia zoznam MonitoringReportResult objektov
     if (!empty($ico)) {
         $response = $api->MonitoringReport($json);
@@ -213,11 +202,9 @@ try
     if (!empty($date)) {
         $response2 = $api->MonitoringDateReport($json);
     }
-}
-catch (Exception $e)
-{
-     echoLimits($api->GetAPILimits());
-     echoException($e);
+} catch (Exception $e) {
+    echoLimits($api->GetAPILimits());
+    echoException($e);
 }
 
 echoMonitoringReport($response, $json);

@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/../FinStat.Client/Requests.php');
 require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/KeyValue.php');
@@ -6,17 +7,14 @@ require_once(__DIR__ . '/../FinStat.ViewModel/Statement/StatementResult.php');
 
 class FinstatStatementApi extends AbstractFinstatApi
 {
-
     public function RequestStatements($ico, $json = false)
     {
         $detail = $this->DoRequest("GetStatements", array(
             'ico' => $ico,
         ), $ico, $json);
 
-        if($detail != false)
-        {
-            if(!$json)
-            {
+        if($detail != false) {
+            if(!$json) {
                 $result = array();
                 foreach ($detail->StatementItem as $element) {
                     $o = new StatementItem();
@@ -49,10 +47,8 @@ class FinstatStatementApi extends AbstractFinstatApi
             'template' => $template,
         ), $ico . "|" . $year, $json);
 
-        if($detail != false)
-        {
-            if(!$json)
-            {
+        if($detail != false) {
+            if(!$json) {
                 $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateNujPU");
                 $result = $isNonProfit ? new NonProfitStatementResult() : new StatementResult();
 
@@ -142,10 +138,8 @@ class FinstatStatementApi extends AbstractFinstatApi
             'template' => $template
         ), $lang, $json);
 
-        if($detail != false)
-        {
-            if(!$json)
-            {
+        if($detail != false) {
+            if(!$json) {
                 $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateNujPU");
                 $result = $isNonProfit ? new NonProfitStatementLegendResult() : new StatementLegendResult();
 

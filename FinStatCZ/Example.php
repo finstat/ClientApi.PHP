@@ -5,10 +5,8 @@ require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/DetailResult.php');
 
 function echoDate($date, $json = false)
 {
-    if($date && !empty($date))
-    {
-        if($json)
-        {
+    if($date && !empty($date)) {
+        if($json) {
             $date = new DateTime($date);
         }
         return $date->format('d.m.Y');
@@ -28,9 +26,8 @@ function echoBase($response, $json = false)
     echo '<b>Okres: </b>'.                  $response->District.'<br />';
     echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
     echo '<b>Štát: </b>'.                   $response->Country.'<br />';
-   
-    if($response instanceof DetailResult)
-    {
+
+    if($response instanceof DetailResult) {
         echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
         echo '<b>CZ Nace Kod: </b>'.            $response->CzNaceCode.'<br />';
         echo '<b>CZ Nace Text: </b>'.           $response->CzNaceText.'<br />';
@@ -40,14 +37,17 @@ function echoBase($response, $json = false)
         echo '<b>Druh vlastníctva: </b>'.       $response->OwnershipType.'<br />';
         echo '<b>Počet zamestnancov: </b>'.     $response->EmployeeCount.'<br />';
         echo '<b>Založená: </b>'.               (($response->Created) ? echoDate($response->Created, $json) : '').'<br />';
-        echo '<b>Zrušená: </b>'.                (($response->Cancelled) ?echoDate( $response->Cancelled, $json) : '') .'<br />';
+        echo '<b>Zrušená: </b>'.                (($response->Cancelled) ? echoDate($response->Cancelled, $json) : '') .'<br />';
     }
 
     echo '<b>Url: </b>'.            $response->Url.'<br />';
-    if($response instanceof DetailResult)
-    {
-    echo '<b>Príznak, či sa daná firma nachádza insolvenčnom registry: </b>';
-    if($response->Warning) echo 'Áno (<a href="'.$response->WarningUrl.'">viac info</a>)<br />'; else echo 'Nie<br />';
+    if($response instanceof DetailResult) {
+        echo '<b>Príznak, či sa daná firma nachádza insolvenčnom registry: </b>';
+        if($response->Warning) {
+            echo 'Áno (<a href="'.$response->WarningUrl.'">viac info</a>)<br />';
+        } else {
+            echo 'Nie<br />';
+        }
     }
 
     echo "</pre>";
@@ -97,7 +97,8 @@ function echoAutoComplete($response)
     echo "</pre>";
 }
 
-function echoLimits($limits) {
+function echoLimits($limits)
+{
     if(!empty($limits)) {
         echo '<h2>Limity</h2>';
         echo '<table>';
@@ -106,16 +107,16 @@ function echoLimits($limits) {
                 '<th>Aktuálny</th>'.
                 '<th>MAX</th>'.
              '</tr>';
-         echo '<tr>'.
-                '<th>Denný</th>'.
-                '<th>'. ((isset($limits['daily']) && isset($limits['daily']['current'])) ? $limits['daily']['current'] : "---") .'</th>'.
-                '<th>'. ((isset($limits['daily']) && isset($limits['daily']['max'])) ? $limits['daily']['max'] : "---") .'</th>'.
-             '</tr>';
-         echo '<tr>'.
-                '<th>Mesačný</th>'.
-                '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['current'])) ? $limits['monthly']['current'] : "---") .'</th>'.
-                '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['max'])) ? $limits['monthly']['max'] : "---") .'</th>'.
-             '</tr>';
+        echo '<tr>'.
+               '<th>Denný</th>'.
+               '<th>'. ((isset($limits['daily']) && isset($limits['daily']['current'])) ? $limits['daily']['current'] : "---") .'</th>'.
+               '<th>'. ((isset($limits['daily']) && isset($limits['daily']['max'])) ? $limits['daily']['max'] : "---") .'</th>'.
+            '</tr>';
+        echo '<tr>'.
+               '<th>Mesačný</th>'.
+               '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['current'])) ? $limits['monthly']['current'] : "---") .'</th>'.
+               '<th>'. ((isset($limits['monthly']) && isset($limits['monthly']['max'])) ? $limits['monthly']['max'] : "---") .'</th>'.
+            '</tr>';
         echo '</table>';
     }
 }
@@ -123,13 +124,13 @@ function echoLimits($limits) {
 // zakladne prihlasovacie udaje a nastavenia klienta
 $apiUrl = 'https://cz.finstat.sk/api/';    // URL adresa Finstat API
 $apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-                                        // prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
+// prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
 $privateKey = 'PLEASE_FILL_IN_YOUR_PRIVATE_KEY';// PLEASE_FILL_IN_YOUR_PRIVATE_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-                                        // prosim poziadajte o svoj privatny kluc na info@finstat.sk.
+// prosim poziadajte o svoj privatny kluc na info@finstat.sk.
 $stationId = 'Api test';                // Identifikátor stanice, ktorá dopyt vygenerovala.
-                                        // Môže byť ľubovolný reťazec.
+// Môže byť ľubovolný reťazec.
 $stationName = 'Api test';                // Názov alebo opis stanice, ktorá dopyt vygenerovala.
-                                        // Môže byť ľubovolný reťazec.
+// Môže byť ľubovolný reťazec.
 $timeout = 10;                            // Dĺžka čakania na odozvu zo servera v sekundách.
 $json =  false;                         // Flag ci ma API vraciat odpoved ako JSON
 
@@ -143,14 +144,11 @@ header('Content-Type: text/html; charset=utf-8');
 ?>
 <h1>Basic test:</h1>
 <?php
-try
-{
+try {
     if (!empty($ico)) {
         $response = $api->Request($ico, "basic", $json);
     }
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
     echoLimits($api->GetAPILimits());
     echoException($e);
 }
@@ -161,14 +159,11 @@ echo '<hr />';
 ?>
 <h1>Detail test:</h1>
 <?php
-try
-{
+try {
     if (!empty($ico)) {
         $response = $api->Request($ico, "detail", $json);
     }
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
     echoLimits($api->GetAPILimits());
     echoException($e);
 }
@@ -181,12 +176,9 @@ echo '<hr />';
 
 <h1>AutoComplete test "volkswagen":</h1>
 <?php
-try
-{
+try {
     $response2 = $api->RequestAutoComplete('volkswagen', $json);
-}
-catch (Exception $e)
-{
+} catch (Exception $e) {
     // popis a kod chyby, ktora nastala
     echoException($e);
 }

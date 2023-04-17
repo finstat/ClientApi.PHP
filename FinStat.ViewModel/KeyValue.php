@@ -2,8 +2,6 @@
 
 class KeyValue
 {
-    public
-        $Key,
-        $Value
-    ;
+    public $Key;
+    public $Value;
 }

@@ -1,15 +1,14 @@
 <?php
+
 require_once(__DIR__ . '/AbstractResult.php');
 
 class CommonResult extends AbstractResult
 {
-    public
-        $Dic,
-        $IcDPH,
-        $Activity,
-        $Created,
-        $Cancelled,
-        $Warning,
-        $WarningUrl
-    ;
+    public $Dic;
+    public $IcDPH;
+    public $Activity;
+    public $Created;
+    public $Cancelled;
+    public $Warning;
+    public $WarningUrl;
 }

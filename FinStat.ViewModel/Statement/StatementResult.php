@@ -2,10 +2,8 @@
 
 abstract class AbstractStatementLegendResult
 {
-    public
-        $Assets,
-        $LiabilitiesAndEquity
-    ;
+    public $Assets;
+    public $LiabilitiesAndEquity;
 }
 
 class StatementLegendResult extends AbstractStatementLegendResult
@@ -15,75 +13,61 @@ class StatementLegendResult extends AbstractStatementLegendResult
 
 class NonProfitStatementLegendResult extends AbstractStatementLegendResult
 {
-    public
-        $Expenses,
-        $Revenue
-    ;
+    public $Expenses;
+    public $Revenue;
 }
 
 class StatementLegendValue
 {
-    public
-        $ReportRow,
-        $ReportSection,
-        $Name
-    ;
+    public $ReportRow;
+    public $ReportSection;
+    public $Name;
 }
 
 class StatementItem
 {
-    public
-        $Year,
-        $DateFrom,
-        $DateTo,
-        $DatePublished,
-        $Templates
-    ;
+    public $Year;
+    public $DateFrom;
+    public $DateTo;
+    public $DatePublished;
+    public $Templates;
 }
 
 class StatementValue
 {
-    public
-        $ReportRow,
-        $ReportSection,
-        $Actual,
-        $Previous
-    ;
+    public $ReportRow;
+    public $ReportSection;
+    public $Actual;
+    public $Previous;
 }
 
 class AssetStatementValue extends StatementValue
 {
-    public
-        $ActualBrutto,
-        $ActualCorrection
-    ;
+    public $ActualBrutto;
+    public $ActualCorrection;
 }
 
 class FinancialStatementValue extends StatementValue
 {
-    public
-        $ActualMain,
-        $ActualCommercial
-    ;
+    public $ActualMain;
+    public $ActualCommercial;
 }
 
 abstract class AbstractStatementResult
 {
-    public
-        $ICO,
-        $Name,
-        $Year,
-        $DateFrom,
-        $DateTo,
-        $DatePublished,
-        $Format,
-        $OriginalFormat,
-        $Source,
-        $Assets,
-        $LiabilitiesAndEquity,
-        $PreviousAccountingPeriodFrom,
-        $PreviousAccountingPeriodTo
-    ;
+    public $ICO;
+    public $Name;
+    public $Year;
+    public $DateFrom;
+    public $DateTo;
+    public $DatePublished;
+    public $Format;
+    public $OriginalFormat;
+    public $Source;
+    public $Assets;
+    public $LiabilitiesAndEquity;
+    public $PreviousAccountingPeriodFrom;
+    public $PreviousAccountingPeriodTo;
 }
 
 class StatementResult extends AbstractStatementResult
@@ -93,8 +77,6 @@ class StatementResult extends AbstractStatementResult
 
 class NonProfitStatementResult extends AbstractStatementResult
 {
-    public
-        $Expenses,
-        $Revenue
-    ;
+    public $Expenses;
+    public $Revenue;
 }

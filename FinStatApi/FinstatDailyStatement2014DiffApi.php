@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/../FinStat.Client/Requests.php');
 require_once(__DIR__ . '/AbstractFinstatDiffApi.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/KeyValue.php');
@@ -22,10 +23,8 @@ class FinstatDailyStatement2014DiffApi extends AbstractFinstatDailyDiffApi
             'lang' => $lang,
         ), $lang, $json);
 
-        if($detail != false)
-        {
-            if(!$json)
-            {
+        if($detail != false) {
+            if(!$json) {
                 $result =  new StatementLegendResult();
 
                 $result->Assets = array();

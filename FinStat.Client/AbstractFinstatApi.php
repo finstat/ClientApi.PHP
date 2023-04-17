@@ -1,17 +1,17 @@
 <?php
+
 require_once(__DIR__ . '/Requests.php');
 require_once(__DIR__ . '/ViewModel/AutoCompleteResult.php');
 
 class AbstractFinstatApi
 {
-    protected
-        $apiUrl,
-        $apiKey,
-        $privateKey,
-        $stationId,
-        $stationName,
-        $timeout,
-        $limits;
+    protected $apiUrl;
+    protected $apiKey;
+    protected $privateKey;
+    protected $stationId;
+    protected $stationName;
+    protected $timeout;
+    protected $limits;
 
     //
     // Constructor
@@ -37,8 +37,7 @@ class AbstractFinstatApi
 
     public function InitRequests()
     {
-        if(!class_exists('Requests'))
-        {
+        if(!class_exists('Requests')) {
             trigger_error("Unable to load Requests class", E_USER_WARNING);
             return false;
         }
@@ -54,7 +53,8 @@ class AbstractFinstatApi
         return $options;
     }
 
-    public function DoBaseRequest($requestUrl, $requestData, $parameter = null, $json = false) {
+    public function DoBaseRequest($requestUrl, $requestData, $parameter = null, $json = false)
+    {
         $options = $this->InitRequests();
 
         $data = array_merge(array(
@@ -63,10 +63,9 @@ class AbstractFinstatApi
             'StationId' => $this->stationId,
             'StationName' => $this->stationName
         ), $requestData);
-        
+
         $url = $this->apiUrl. $requestUrl;
-        try
-        {
+        try {
             $headers = null;
             if ($json) {
                 $url = $url . ".json";
@@ -74,23 +73,18 @@ class AbstractFinstatApi
 
 
             return Requests::post($url, $headers, $data, $options);
-        }
-        catch(Requests_Exception $e)
-        {
+        } catch(Requests_Exception $e) {
             throw $e;
         }
     }
 
     public function DoRequest($requestUrl, $requestData, $parameter = null, $json = false)
     {
-        try
-        {
+        try {
             $url = $this->apiUrl. $requestUrl;
             $response = $this->DoBaseRequest($requestUrl, $requestData, $parameter, $json);
             return $this->parseResponse($response, $url, $parameter, $json);
-        }
-        catch(Requests_Exception $e)
-        {
+        } catch(Requests_Exception $e) {
             throw $e;
         }
     }
@@ -119,12 +113,10 @@ class AbstractFinstatApi
             ),
         );
 
-        if(!$response->success)
-        {
+        if(!$response->success) {
             $dom = new DOMDocument();
             $dom->loadHTML($response->body);
-            switch($response->status_code)
-            {
+            switch($response->status_code) {
                 case 404:
                     if(isset($parameter) && !empty($parameter)) {
                         throw new Requests_Exception("Invalid URL: '{$url}' or specified parameter: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
@@ -132,6 +124,7 @@ class AbstractFinstatApi
                         throw new Requests_Exception("Invalid URL: '{$url}'!", 'FinstatApi', $dom->textContent, $response->status_code);
                     }
 
+                    // no break
                 case 402:
                     throw new Requests_Exception('Limit reached!', 'FinstatApi', $dom->textContent, $response->status_code);
 
@@ -148,25 +141,22 @@ class AbstractFinstatApi
     {
         $this->parseResponseRaw($response, $url, $parameter, $json);
         $detail = false;
-        if($json)
-        {
+        if($json) {
             $detail = json_decode($response->body);
-        }
-        else
-        {
+        } else {
             $detail = simplexml_load_string($response->body);
         }
 
-        if($detail === FALSE)
+        if($detail === false) {
             throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
+        }
 
         return $detail;
     }
 
     public function GetAPILimits()
     {
-        if(empty($this->limits))
-        {
+        if(empty($this->limits)) {
             throw new  Exception('Limits are available after API call');
         }
 
@@ -215,19 +205,19 @@ class AbstractFinstatApi
         if(!empty($element->Name)) {
             $o->Name = array();
             foreach ($element->Name->string as $s) {
-               $o->Name[] = (string)$s;
+                $o->Name[] = (string)$s;
             }
         }
         if(!empty($element->Suffix)) {
             $o->Suffix = array();
             foreach ($element->Suffix->string as $s) {
-               $o->Suffix[] = (string)$s;
+                $o->Suffix[] = (string)$s;
             }
         }
         if(!empty($element->After)) {
             $o->After = array();
             foreach ($element->After->string as $s) {
-               $o->After[] = (string)$s;
+                $o->After[] = (string)$s;
             }
         }
         return $o;
@@ -263,16 +253,18 @@ class AbstractFinstatApi
      * @param SimpleXMLElement $date
      * @return DateTime|null
      */
-    protected function parseDate(SimpleXMLElement $date = null) {
+    protected function parseDate(SimpleXMLElement $date = null)
+    {
 
         if (empty($date) || !((string) $date)) {
-          return null;
+            return null;
         }
 
         return new DateTime($date);
     }
 
-    protected function parseIcDphAdditional(SimpleXMLElement $icDphAdditional) {
+    protected function parseIcDphAdditional(SimpleXMLElement $icDphAdditional)
+    {
         $result = new IcDphAdditionalResult();
         $result->IcDph = (string) $icDphAdditional->IcDph;
         $result->Paragraph = (string) $icDphAdditional->Paragraph;

@@ -4,7 +4,6 @@ require_once(__DIR__ . '/AbstractFinstatDiffApi.php');
 
 class FinstatDailyUltimateDiffApi extends AbstractFinstatDailyDiffApi
 {
-
     public function RequestListOfDailyUltimateDiffs($json = false)
     {
         return $this->GetList("GetListOfUltimateDiffs", $json);

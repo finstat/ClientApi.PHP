@@ -2,19 +2,14 @@
 
 class CompanyResult
 {
-    public
-        $Ico,
-        $Name,
-        $City,
-        $Cancelled
-    ;
+    public $Ico;
+    public $Name;
+    public $City;
+    public $Cancelled;
 }
 
 class AutoCompleteResult
 {
-    public
-        $Results = array(),
-        $Suggestions = array()
-    ;
+    public $Results = array();
+    public $Suggestions = array();
 }
-?>

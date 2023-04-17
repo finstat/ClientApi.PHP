@@ -36,7 +36,7 @@ class FinstatApi extends BaseFinstatApi
 
     private function parseBasic($detail)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
 
@@ -48,7 +48,7 @@ class FinstatApi extends BaseFinstatApi
 
     private function parseDetail($detail)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
 

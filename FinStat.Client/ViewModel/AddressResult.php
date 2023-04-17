@@ -1,22 +1,19 @@
 <?php
+
 class BaseInfo
 {
-    public
-        $Name,
-        $Ico 
-    ;
+    public $Name;
+    public $Ico;
 }
 
 class AddressResult
 {
-    public
-        $Name,
-        $Street,
-        $StreetNumber,
-        $ZipCode,
-        $City,
-        $District,
-        $Region,
-        $Country
-    ;
+    public $Name;
+    public $Street;
+    public $StreetNumber;
+    public $ZipCode;
+    public $City;
+    public $District;
+    public $Region;
+    public $Country;
 }

@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/AbstractFinstatDiffApi.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/KeyValue.php');
 
@@ -14,17 +15,14 @@ class FinstatDailyStatementDiffApi extends AbstractFinstatDailyDiffApi
         return $this->DownloadFile("GetStatementFile", $fileName, $exportPath);
     }
 
-
     public function RequestStatementLegend($lang = "sk", $json = false)
     {
         $detail = $this->DoRequest("GetStatementLegend", array(
             'lang' => $lang,
         ), $lang, $json);
 
-        if($detail != false)
-        {
-            if(!$json)
-            {
+        if($detail != false) {
+            if(!$json) {
                 $result = array();
                 foreach ($detail->KeyValue as $element) {
                     $o = new KeyValue();
