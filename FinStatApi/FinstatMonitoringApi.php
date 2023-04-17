@@ -1,4 +1,5 @@
 <?php
+
 require_once(__DIR__ . '/../FinStat.Client/Requests.php');
 require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
 require_once(__DIR__ . '/../FinStat.Client/ViewModel/Monitoring/MonitoringReportResult.php');
@@ -6,32 +7,32 @@ require_once(__DIR__ . '/../FinStat.ViewModel/Monitoring/ProceedingResult.php');
 
 class FinstatMonitoringApi extends AbstractFinstatApi
 {
-    public function AddToMonitoring($ico, $json = false)
+    public function AddToMonitoring($ico, $category = null, $json = false)
     {
-        $detail = $this->DoRequest("AddToMonitoring", array('ico' => $ico), $ico, $json);
+        $detail = $this->DoRequest("AddToMonitoring", array('ico' => $ico, 'category' => $category), $ico, $json);
 
         $parse = (string)$detail;
         return ($json) ? $detail : ($parse == 'true');
     }
 
-    public function RemoveFromMonitoring($ico, $json = false)
+    public function RemoveFromMonitoring($ico, $category = null, $json = false)
     {
-        $detail = $this->DoRequest("RemoveFromMonitoring", array('ico' => $ico), $ico, $json);
+        $detail = $this->DoRequest("RemoveFromMonitoring", array('ico' => $ico, 'category' => $category), $ico, $json);
 
         $parse = (string)$detail;
         return ($json) ? $detail : ($parse == 'true');
     }
 
-    public function MonitoringList($json = false)
+    public function MonitoringList($category = null, $json = false)
     {
-        $detail = $this->DoRequest("MonitoringList", array(), "list", $json);
+        $detail = $this->DoRequest("MonitoringList", array('category' => $category), "list", $json);
 
         return ($json) ? $detail : $this->parseMonitoringList($detail);
     }
 
-    public function MonitoringReport($json = false)
+    public function MonitoringReport($category = null, $json = false)
     {
-        $detail = $this->DoRequest("MonitoringReport", array(), "report", $json);
+        $detail = $this->DoRequest("MonitoringReport", array('category' => $category), "report", $json);
 
         return ($json) ? $detail : $this->parseMonitoringReport($detail);
     }
@@ -43,32 +44,32 @@ class FinstatMonitoringApi extends AbstractFinstatApi
         return ($json) ? $detail : $this->parseMonitoringProceedings($detail);
     }
 
-    public function AddDateToMonitoring($date, $json = false)
+    public function AddDateToMonitoring($date, $category = null, $json = false)
     {
-        $detail = $this->DoRequest("AddDateToMonitoring", array('date' => $date), $date, $json);
+        $detail = $this->DoRequest("AddDateToMonitoring", array('date' => $date, 'category' => $category), $date, $json);
 
         $parse = (string)$detail;
         return ($json) ? $detail : ($parse == 'true');
     }
 
-    public function RemoveDateFromMonitoring($date, $json = false)
+    public function RemoveDateFromMonitoring($date, $category = null, $json = false)
     {
-        $detail = $this->DoRequest("RemoveDateFromMonitoring", array('date' => $date), $date, $json);
+        $detail = $this->DoRequest("RemoveDateFromMonitoring", array('date' => $date, 'category' => $category), $date, $json);
 
         $parse = (string)$detail;
         return ($json) ? $detail : ($parse == 'true');
     }
 
-    public function MonitoringDateList($json = false)
+    public function MonitoringDateList($category = null, $json = false)
     {
-        $detail = $this->DoRequest("MonitoringDateList", array(), "datelist", $json);
+        $detail = $this->DoRequest("MonitoringDateList", array('category' => $category), "datelist", $json);
 
         return ($json) ? $detail : $this->parseMonitoringList($detail);
     }
 
-    public function MonitoringDateReport($json = false)
+    public function MonitoringDateReport($category = null, $json = false)
     {
-        $detail = $this->DoRequest("MonitoringDateReport", array(), "datereport", $json);
+        $detail = $this->DoRequest("MonitoringDateReport", array('category' => $category), "datereport", $json);
 
         return ($json) ? $detail : $this->parseMonitoringDateReport($detail);
     }
@@ -82,7 +83,7 @@ class FinstatMonitoringApi extends AbstractFinstatApi
 
     private function parseMonitoringList($detail)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
 
@@ -98,7 +99,7 @@ class FinstatMonitoringApi extends AbstractFinstatApi
 
     private function parseMonitoringReport($detail)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
 
@@ -112,7 +113,11 @@ class FinstatMonitoringApi extends AbstractFinstatApi
                 $o->PublishDate  = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
                 $o->Type         = (string)$element->Type;
                 $o->Description  = (string)$element->Description;
-                $o->Url          = (string)$element->Url;
+                $o->Categories   = [];
+
+                foreach ($element->Categories->string as $category) {
+                    $o->Categories[] = $category;
+                }
                 $response[] = $o;
             }
         }
@@ -122,7 +127,7 @@ class FinstatMonitoringApi extends AbstractFinstatApi
 
     private function parseMonitoringDateReport($detail)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
 
@@ -153,7 +158,7 @@ class FinstatMonitoringApi extends AbstractFinstatApi
 
     private function parseMonitoringProceedings($detail)
     {
-        if  ($detail === FALSE) {
+        if  ($detail === false) {
             return $detail;
         }
 
@@ -178,7 +183,7 @@ class FinstatMonitoringApi extends AbstractFinstatApi
                 if(!empty($element->AdministratorsAddress)) {
                     $array = array();
                     foreach ($element->AdministratorsAddress->AdministratorAddress as $address) {
-                         $array[] = $this->parseAdministratorAddress($address);
+                        $array[] = $this->parseAdministratorAddress($address);
                     }
                     $o->AdministratorsAddress = $array;
                 }
@@ -214,10 +219,10 @@ class FinstatMonitoringApi extends AbstractFinstatApi
                 if(!empty($element->DatesInProceeding)) {
                     $array  = array();
                     foreach ($element->DatesInProceeding->Deadline as $deadline) {
-                         $d = new Deadline();
-                         $d->Type        = (string)$deadline->Type;
-                         $d->Date        = empty($deadline->Date) ? null : new DateTime($deadline->Date);
-                         $array[] = $d;
+                        $d = new Deadline();
+                        $d->Type        = (string)$deadline->Type;
+                        $d->Date        = empty($deadline->Date) ? null : new DateTime($deadline->Date);
+                        $array[] = $d;
                     }
                 }
                 $response[] = $array;
@@ -227,4 +232,3 @@ class FinstatMonitoringApi extends AbstractFinstatApi
         return $response;
     }
 }
-?>

@@ -2,26 +2,27 @@
 
 class AbstractMonitoringReportResult
 {
-    public
-        $Ident,
-        $Name,
-        $PublishDate,
-        $Type,
-        $Description,
-        $Url;
+    public $Ident;
+    public $Name;
+    public $PublishDate;
+    public $Type;
+    public $Description;
+    public $Url;
+    public $Categories;
 }
 
 class MonitoringReportResult extends AbstractMonitoringReportResult
 {
-    public
-        $Ico
-    ;
+    public $Ico;
 }
 
 class MonitoringDateReportResult extends AbstractMonitoringReportResult
 {
-    public
-        $Date
-    ;
+    public $Date;
 }
-?>
+
+class MonitoringCategory
+{
+    public $Category;
+    public $Name;
+}
