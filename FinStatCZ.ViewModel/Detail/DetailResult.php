@@ -2,8 +2,9 @@
 
 namespace FinstatApiCz;
 
-require_once('../FinStat.Client/ViewModel/AddressResult.php');
-require_once('../FinStat.Client/ViewModel/Detail/CommonResult.php');
+require_once(__DIR__ . '/../../FinStat.Client/ViewModel/AddressResult.php');
+require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/AbstractResult.php');
+
 class DetailResult extends \CommonResult
 {
     public $LegalForm;
