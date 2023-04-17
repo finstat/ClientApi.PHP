@@ -1,4 +1,5 @@
 <?php
+namespace FinstatApiCz;
 
 require_once(__DIR__ . '/../FinStat.Client/Requests.php');
 require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
@@ -7,7 +8,7 @@ require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
 require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/BasicResult.php');
 require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/DetailResult.php');
 
-class FinstatApi extends BaseFinstatApi
+class FinstatApi extends \BaseFinstatApi
 {
     public function RequestDetail($ico, $json = false)
     {

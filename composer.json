@@ -1,0 +1,7 @@
+{
+    "name": "finstat/client-api",
+    "type": "library",
+    "autoload": {
+        "classmap": [""]
+    }
+}
