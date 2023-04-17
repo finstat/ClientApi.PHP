@@ -47,8 +47,8 @@ class FinstatApi extends BaseFinstatApi
                     $detail = $this->parseExtended($detail);
                     break;
                 case 'detail':
-                     $detail = $this->parseDetail($detail);
-                     break;
+                    $detail = $this->parseDetail($detail);
+                    break;
                 case 'basic':
                 default:
                     $detail = $this->parseBasic($detail);
@@ -147,26 +147,28 @@ class FinstatApi extends BaseFinstatApi
         $response = ($response == null) ? new ExtendedResult() : $response;
         $response = $this->parseBase($detail, $response);
 
-        $response->EmployeeCode             = (string)$detail->EmployeeCode;
-        $response->EmployeeText             = (string)$detail->EmployeeText;
-        $response->OwnershipTypeCode        = (string)$detail->OwnershipTypeCode;
-        $response->OwnershipTypeText        = (string)$detail->OwnershipTypeText;
-        $response->ActualYear               = (int)"{$detail->ActualYear}";
-        $response->CreditScoreValue         = (float)$detail->CreditScoreValue;
-        $response->CreditScoreState         = (string)$detail->CreditScoreState;
-        $response->BasicCapital             = (!empty($detail->BasicCapital)) ? (float)$detail->BasicCapital : null;
-        $response->RevenuePrev              = empty($detail->RevenuePrev) ? null : (float)"{$detail->RevenuePrev}";
-        $response->ProfitPrev               = empty($detail->ProfitPrev) ? null : (float)"{$detail->ProfitPrev}";
-        $response->ForeignResources         = empty($detail->ForeignResources) ? null : (float)"{$detail->ForeignResources}";
-        $response->GrossMargin              = empty($detail->GrossMargin) ? null : (float)"{$detail->GrossMargin}";
-        $response->ROA                      = empty($detail->ROA) ? null : (float)"{$detail->ROA}";
-        $response->WarningKaR               = $this->parseDate($detail->WarningKaR);
-        $response->WarningLiquidation       = $this->parseDate($detail->WarningLiquidation);
-        $response->DisposalUrl              = (string)$detail->DisposalUrl;
-        $response->HasDisposal              = "{$detail->HasDisposal}"  == 'true';
-        $response->SelfEmployed             = "{$detail->SelfEmployed}"  == 'true';
-        $response->CreditScoreValueIndex05  = (float)$detail->CreditScoreValueIndex05;
-        $response->CreditScoreStateIndex05  = (string)$detail->CreditScoreStateIndex05;
+        $response->EmployeeCode                 = (string)$detail->EmployeeCode;
+        $response->EmployeeText                 = (string)$detail->EmployeeText;
+        $response->OwnershipTypeCode            = (string)$detail->OwnershipTypeCode;
+        $response->OwnershipTypeText            = (string)$detail->OwnershipTypeText;
+        $response->ActualYear                   = (int)"{$detail->ActualYear}";
+        $response->CreditScoreValue             = (float)$detail->CreditScoreValue;
+        $response->CreditScoreState             = (string)$detail->CreditScoreState;
+        $response->BasicCapital                 = (!empty($detail->BasicCapital)) ? (float)$detail->BasicCapital : null;
+        $response->RevenuePrev                  = empty($detail->RevenuePrev) ? null : (float)"{$detail->RevenuePrev}";
+        $response->ProfitPrev                   = empty($detail->ProfitPrev) ? null : (float)"{$detail->ProfitPrev}";
+        $response->ForeignResources             = empty($detail->ForeignResources) ? null : (float)"{$detail->ForeignResources}";
+        $response->GrossMargin                  = empty($detail->GrossMargin) ? null : (float)"{$detail->GrossMargin}";
+        $response->ROA                          = empty($detail->ROA) ? null : (float)"{$detail->ROA}";
+        $response->WarningKaR                   = $this->parseDate($detail->WarningKaR);
+        $response->WarningLiquidation           = $this->parseDate($detail->WarningLiquidation);
+        $response->DisposalUrl                  = (string)$detail->DisposalUrl;
+        $response->HasDisposal                  = "{$detail->HasDisposal}"  == 'true';
+        $response->SelfEmployed                 = "{$detail->SelfEmployed}"  == 'true';
+        $response->CreditScoreValueIndex05      = (float)$detail->CreditScoreValueIndex05;
+        $response->CreditScoreStateIndex05      = (string)$detail->CreditScoreStateIndex05;
+        $response->CreditScoreValueFinStatScore = (float)$detail->CreditScoreValueFinStatScore;
+        $response->CreditScoreStateFinStatScore = (string)$detail->CreditScoreStateFinStatScore;
 
         $response->Phones = array();
         if (!empty($detail->Phones)) {

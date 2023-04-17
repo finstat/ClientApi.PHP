@@ -117,6 +117,8 @@ function echoBase($response, $json = false)
             echo '<b>Credit scoring - text: </b>'.                      $response->CreditScoreState.'<br />';
             echo '<b>Credit scoring Index05: </b>'.                     $response->CreditScoreValueIndex05.'<br />';
             echo '<b>Credit scoring Index05 - text: </b>'.              $response->CreditScoreStateIndex05.'<br />';
+            echo '<b>Credit scoring FinStat Score: </b>'.               $response->CreditScoreValueFinStatScore.'<br />';
+            echo '<b>Credit scoring FinStat Score - text: </b>'.        $response->CreditScoreStateFinStatScore.'<br />';
             echo '<b>Zisk za predošlý rok: </b>'.                       $response->ProfitPrev.'<br />';
             echo '<b>Suma celkových výnosov za predošlý rok: </b>'.     $response->RevenuePrev.'<br />';
             echo '<b>Pomer cudzích zdrojov za aktuálny rok : </b>'.     $response->ForeignResources.'<br />';
@@ -169,17 +171,24 @@ function echoBase($response, $json = false)
         if ($response instanceof DetailResult || isset($response->Profit)) {
             echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
             switch ($response->Revenue) {
-                case 'Unknown': echo 'Neznámy'; break;
-                case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
-                case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
+                case 'Unknown': echo 'Neznámy';
+                break;
+                case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)';
+                break;
+                case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)';
+                break;
             }
             echo '<br />';
             echo '<b>Príznak nárastu/poklesu zisku firmy medzi posledným a predposledným rokom v databáze: </b>';
             switch ($response->Profit) {
-                case 'Unknown': echo 'Neznámy'; break;
-                case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)'; break;
-                case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)'; break;
-                case 'Loss': echo 'Firma bola posledný rok v strate (<a href="'.$response->Url.'">viac info</a>)'; break;
+                case 'Unknown': echo 'Neznámy';
+                break;
+                case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)';
+                break;
+                case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)';
+                break;
+                case 'Loss': echo 'Firma bola posledný rok v strate (<a href="'.$response->Url.'">viac info</a>)';
+                break;
             }
             echo '<br />';
         }
@@ -711,13 +720,13 @@ function echoLimits($limits)
 // zakladne prihlasovacie udaje a nastavenia klienta
 $apiUrl = 'https://www.finstat.sk/api/';    // URL adresa Finstat API
 $apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-                                        // prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
+// prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
 $privateKey = 'PLEASE_FILL_IN_YOUR_PRIVATE_KEY';// PLEASE_FILL_IN_YOUR_PRIVATE_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-                                        // prosim poziadajte o svoj privatny kluc na info@finstat.sk.
+// prosim poziadajte o svoj privatny kluc na info@finstat.sk.
 $stationId = 'Api test';                // Identifikátor stanice, ktorá dopyt vygenerovala.
-                                        // Môže byť ľubovolný reťazec.
+// Môže byť ľubovolný reťazec.
 $stationName = 'Api test';                // Názov alebo opis stanice, ktorá dopyt vygenerovala.
-                                        // Môže byť ľubovolný reťazec.
+// Môže byť ľubovolný reťazec.
 $timeout = 10;                            // Dĺžka čakania na odozvu zo servera v sekundách.
 $json =  false;                         // Flag ci ma API vraciat odpoved ako JSON
 // inicializacia klienta

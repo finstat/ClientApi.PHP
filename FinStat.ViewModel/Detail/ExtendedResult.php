@@ -1,13 +1,12 @@
 <?php
+
 require_once(__DIR__ . '/BaseResult.php');
 
 class DebtResult
 {
-    public
-        $Source,
-        $Value,
-        $ValidFrom
-    ;
+    public $Source;
+    public $Value;
+    public $ValidFrom;
 }
 
 class ReceivableDebtResult extends DebtResult
@@ -16,122 +15,104 @@ class ReceivableDebtResult extends DebtResult
 
 class PaymentOrderResult
 {
-    public
-        $PublishDate,
-        $Value
-    ;
+    public $PublishDate;
+    public $Value;
 }
 
 class IcDphAdditionalResult
 {
-    public
-        $IcDph,
-        $Paragraph,
-        $CancelListDetectedDate,
-        $RemoveListDetectedDate
-    ;
+    public $IcDph;
+    public $Paragraph;
+    public $CancelListDetectedDate;
+    public $RemoveListDetectedDate;
 }
 
 class OfficeResult extends AddressResult
 {
-    public
-        $Subjects,
-        $Type
-        ;
+    public $Subjects;
+    public $Type;
 }
 
 class SubjectResult
 {
-    public
-        $Title,
-        $ValidFrom,
-        $SuspendedFrom
-    ;
+    public $Title;
+    public $ValidFrom;
+    public $SuspendedFrom;
 }
 
 class NamePartsResult
 {
-    public
-        $Prefix,
-        $Name,
-        $Suffix,
-        $After
-    ;
+    public $Prefix;
+    public $Name;
+    public $Suffix;
+    public $After;
 }
 
 class ContactSourceResult
 {
-    public
-        $Contact,
-        $Sources
-    ;
+    public $Contact;
+    public $Sources;
 }
 class JudgementCountResult
 {
-    public
-        $Name,
-        $Value
-    ;
+    public $Name;
+    public $Value;
 }
 
 class RatioResult
 {
-    public
-    $Name,
-    $Values
-    ;
+    public $Name;
+    public $Values;
 }
 
 class RatioItemResult
 {
-    public
-    $Year,
-    $Value;
+    public $Year;
+    public $Value;
 }
 
 class DistraintsAuthorizationInfoResult
 {
-    public
-    $LastPublishDate,
-    $Count;
+    public $LastPublishDate;
+    public $Count;
 }
 
 class ExtendedResult extends BaseResult
 {
-    public
-        $Phones = array(),
-        $Emails = array(),
-        $EmployeeCode,
-        $EmployeeText,
-        $OwnershipTypeCode,
-        $OwnershipTypeText,
-        $ActualYear,
-        $CreditScoreValue,
-        $CreditScoreState,
-        $BasicCapital,
-        $ProfitPrev,
-        $RevenuePrev,
-        $ForeignResources,
-        $GrossMargin,
-        $ROA,
-        $Debts = array(),
-        $PaymentOrders = array(),
-        $WarningKaR,
-        $WarningLiquidation,
-        $SelfEmployed,
-        $Offices,
-        $Subjects,
-        $StructuredName,
-        $ContactSources,
-        $DisposalUrl,
-        $HasDisposal,
-        $JudgementCounts = array(),
-        $JudgementLastPublishedDate,
-        $Ratios  = array(),
-        $StateReceivables = array(),
-        $CommercialReceivables = array(),
-        $CreditScoreValueIndex05,
-        $CreditScoreStateIndex05,
-        $DistraintsAuthorization
-        ;
-    }
+    public $Phones = array();
+    public $Emails = array();
+    public $EmployeeCode;
+    public $EmployeeText;
+    public $OwnershipTypeCode;
+    public $OwnershipTypeText;
+    public $ActualYear;
+    public $CreditScoreValue;
+    public $CreditScoreState;
+    public $BasicCapital;
+    public $ProfitPrev;
+    public $RevenuePrev;
+    public $ForeignResources;
+    public $GrossMargin;
+    public $ROA;
+    public $Debts = array();
+    public $PaymentOrders = array();
+    public $WarningKaR;
+    public $WarningLiquidation;
+    public $SelfEmployed;
+    public $Offices;
+    public $Subjects;
+    public $StructuredName;
+    public $ContactSources;
+    public $DisposalUrl;
+    public $HasDisposal;
+    public $JudgementCounts = array();
+    public $JudgementLastPublishedDate;
+    public $Ratios  = array();
+    public $StateReceivables = array();
+    public $CommercialReceivables = array();
+    public $CreditScoreValueIndex05;
+    public $CreditScoreStateIndex05;
+    public $DistraintsAuthorization;
+    public $CreditScoreValueFinStatScore;
+    public $CreditScoreStateFinStatScore;
+}
