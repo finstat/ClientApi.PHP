@@ -165,7 +165,7 @@ class FinstatMonitoringApi extends AbstractFinstatApi
         $response =  array();
         if (!empty($detail->ProceedingResult)) {
             foreach ($detail->ProceedingResult as $element) {
-                $o = new ProceedingResult();
+                $o = new MonitoringProceedingResult();
                 if(!empty($element->DebtorsAddress)) {
                     $array = array();
                     foreach ($element->DebtorsAddress->PersonAddress as $address) {
