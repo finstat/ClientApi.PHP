@@ -43,4 +43,5 @@ class BaseResult extends CommonResult
     public $DebtUrl;
     public $Anonymized;
     public $BankAccounts;
+    public $TaxReliabilityIndex;
 }

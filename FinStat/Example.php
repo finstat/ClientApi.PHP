@@ -172,23 +172,23 @@ function echoBase($response, $json = false)
             echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
             switch ($response->Revenue) {
                 case 'Unknown': echo 'Neznámy';
-                break;
+                    break;
                 case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)';
-                break;
+                    break;
                 case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)';
-                break;
+                    break;
             }
             echo '<br />';
             echo '<b>Príznak nárastu/poklesu zisku firmy medzi posledným a predposledným rokom v databáze: </b>';
             switch ($response->Profit) {
                 case 'Unknown': echo 'Neznámy';
-                break;
+                    break;
                 case 'Up': echo 'Nárast (<a href="'.$response->Url.'">viac info</a>)';
-                break;
+                    break;
                 case 'Down': echo 'Pokles (<a href="'.$response->Url.'">viac info</a>)';
-                break;
+                    break;
                 case 'Loss': echo 'Firma bola posledný rok v strate (<a href="'.$response->Url.'">viac info</a>)';
-                break;
+                    break;
             }
             echo '<br />';
         }
@@ -225,6 +225,7 @@ function echoBase($response, $json = false)
                 echo "</table><br />";
             }
         }
+        echo '<b>Index daňovej spoľahlvosti: </b>'. $response->TaxReliabilityIndex.'<br />';
         if ($response instanceof ExtendedResult) {
             if (!empty($response->JudgementCounts)) {
                 echo '<b>Počty Súdnych rozhodnutí: </b><br />';

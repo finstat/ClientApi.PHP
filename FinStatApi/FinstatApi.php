@@ -111,6 +111,7 @@ class FinstatApi extends BaseFinstatApi
                 $response->BankAccounts[] = $o;
             }
         }
+        $response->TaxReliabilityIndex  = "{$detail->TaxReliabilityIndex}";
 
         return $response;
     }
