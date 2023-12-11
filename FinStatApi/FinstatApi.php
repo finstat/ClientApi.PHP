@@ -55,7 +55,6 @@ class FinstatApi extends BaseFinstatApi
                     break;
             }
         }
-
         return $detail;
     }
 
@@ -63,24 +62,25 @@ class FinstatApi extends BaseFinstatApi
     {
         $response = ($response == null) ? new BaseResult() : $response;
         $response = $this->parseCommonResult($detail, $response);
-        $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
+        $response->RegisterNumberText       = (string)$detail->RegisterNumberText;
 
-        $response->SuspendedAsPerson    = "{$detail->SuspendedAsPerson}"  == 'true' ;
-        $response->PaymentOrderWarning  = "{$detail->PaymentOrderWarning}"  == 'true';
-        $response->PaymentOrderUrl      = (string)$detail->PaymentOrderUrl;
-        $response->OrChange             = "{$detail->OrChange}"  == 'true';
-        $response->OrChangeUrl          = (string)$detail->OrChangeURL;
-        $response->SkNaceCode           = (string)$detail->SkNaceCode;
-        $response->SkNaceText           = (string)$detail->SkNaceText;
-        $response->SkNaceDivision       = (string)$detail->SkNaceDivision;
-        $response->SkNaceGroup          = (string)$detail->SkNaceGroup;
-        $response->LegalFormCode        = (string)$detail->LegalFormCode;
-        $response->LegalFormText        = (string)$detail->LegalFormText;
-        $response->RpvsInsert           = (string)$detail->RpvsInsert;
-        $response->RpvsUrl              = (string)$detail->RpvsUrl;
-        $response->SalesCategory        = (string)$detail->SalesCategory;
-        $response->RevenueActual        = empty($detail->RevenueActual) ? null : (float)"{$detail->RevenueActual}";
-        $response->ProfitActual         = empty($detail->ProfitActual) ? null : (float)"{$detail->ProfitActual}";
+        $response->SuspendedAsPerson        = "{$detail->SuspendedAsPerson}"  == 'true' ;
+        $response->SuspendedAsPersonUntil   = $this->parseDate($detail->SuspendedAsPersonUntil);
+        $response->PaymentOrderWarning      = "{$detail->PaymentOrderWarning}"  == 'true';
+        $response->PaymentOrderUrl          = (string)$detail->PaymentOrderUrl;
+        $response->OrChange                 = "{$detail->OrChange}"  == 'true';
+        $response->OrChangeUrl              = (string)$detail->OrChangeURL;
+        $response->SkNaceCode               = (string)$detail->SkNaceCode;
+        $response->SkNaceText               = (string)$detail->SkNaceText;
+        $response->SkNaceDivision           = (string)$detail->SkNaceDivision;
+        $response->SkNaceGroup              = (string)$detail->SkNaceGroup;
+        $response->LegalFormCode            = (string)$detail->LegalFormCode;
+        $response->LegalFormText            = (string)$detail->LegalFormText;
+        $response->RpvsInsert               = (string)$detail->RpvsInsert;
+        $response->RpvsUrl                  = (string)$detail->RpvsUrl;
+        $response->SalesCategory            = (string)$detail->SalesCategory;
+        $response->RevenueActual            = empty($detail->RevenueActual) ? null : (float)"{$detail->RevenueActual}";
+        $response->ProfitActual             = empty($detail->ProfitActual) ? null : (float)"{$detail->ProfitActual}";
 
         if (!empty($detail->IcDphAdditional)) {
             $response->IcDphAdditional = $this->parseIcDphAdditional($detail->IcDphAdditional);
@@ -239,6 +239,7 @@ class FinstatApi extends BaseFinstatApi
                 $o->Title = (string)$subject->Title;
                 $o->ValidFrom = $this->parseDate($subject->ValidFrom);
                 $o->SuspendedFrom = $this->parseDate($subject->SuspendedFrom);
+                $o->SuspendedTo = $this->parseDate($subject->SuspendedTo);
                 $response->Subjects[] = $o;
             }
         }
@@ -329,7 +330,6 @@ class FinstatApi extends BaseFinstatApi
             if (!empty($detail->RpvsPersons)) {
                 foreach ($detail->RpvsPersons->RpvsPerson as $rpvsPerson) {
                     $o = $this->parsePerson($rpvsPerson, new RpvsPersonResult());
-                    $o->BirthDate = (!empty($rpvsPerson->BirthDate)) ? $this->parseDate($rpvsPerson->BirthDate) : null;
                     $o->Ico = (!empty($rpvsPerson->Ico)) ? (string)$rpvsPerson->Ico : null;
                     $response->RpvsPersons[] = $o;
                 }

@@ -1,6 +1,6 @@
 <?php
 
-class ProceedingResult
+class MonitoringProceedingResult
 {
     public $DebtorsAddress;
     public $ProposersAddress;

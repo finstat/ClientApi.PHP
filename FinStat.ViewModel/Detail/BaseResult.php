@@ -44,4 +44,5 @@ class BaseResult extends CommonResult
     public $Anonymized;
     public $BankAccounts;
     public $TaxReliabilityIndex;
+    public $SuspendedAsPersonUntil;
 }

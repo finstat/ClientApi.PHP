@@ -38,6 +38,7 @@ class SubjectResult
     public $Title;
     public $ValidFrom;
     public $SuspendedFrom;
+    public $SuspendedTo;
 }
 
 class NamePartsResult

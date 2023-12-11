@@ -244,6 +244,10 @@ class AbstractFinstatApi
             $o->StructuredName = $this->parseStructuredName($person->StructuredName);
         }
 
+        if(!empty($person->BirthDate)) {
+            $o->BirthDate = (!empty($person->BirthDate)) ? $this->parseDate($person->BirthDate) : null;
+        }
+
         return $o;
     }
 

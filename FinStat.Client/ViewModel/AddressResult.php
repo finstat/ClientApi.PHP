@@ -16,4 +16,6 @@ class AddressResult
     public $District;
     public $Region;
     public $Country;
+    public $ValidFrom;
+    public $ValidTo;
 }

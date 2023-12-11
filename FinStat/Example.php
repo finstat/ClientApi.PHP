@@ -36,7 +36,7 @@ function echoBase($response, $json = false)
 {
     echo "<pre>";
     echo '<b>IČO: </b>'.                    $response->Ico.'<br />';
-    if ($response instanceof DetailResult) {
+    if ($response instanceof BaseResult) {
         echo '<b>Reg. Číslo: </b>'.         $response->RegisterNumberText.'<br />';
     }
     echo '<b>DIČ: </b>'.                    $response->Dic.'<br />';
@@ -52,7 +52,7 @@ function echoBase($response, $json = false)
             }
         }
     }
-    if ($response instanceof DetailResult) {
+    if ($response instanceof BaseResult) {
         echo '<b>Detail IČDPH: IČDPH: </b>'.                         (!empty($response->IcDphAdditional) ? $response->IcDphAdditional->IcDph : '') .'<br />';
         echo '<b>Detail IČDPH: Paragraf: </b>'.                      (!empty($response->IcDphAdditional) ? $response->IcDphAdditional->Paragraph : '') .'<br />';
         echo '<b>Detail IČDPH: Dátum detekovania v zozname subjektov, u ktorých nastali dôvody na zrušenie: </b>'.
@@ -70,7 +70,7 @@ function echoBase($response, $json = false)
     echo '<b>Kraj: </b>'.                   $response->Region.'<br />';
     echo '<b>Štát: </b>'.                   $response->Country.'<br />';
     echo '<b>Anonymizované: </b>'.                  ($response->Anonymized ? "Áno" : "nie").'<br />';
-    if ($response instanceof DetailResult) {
+    if ($response instanceof BaseResult) {
         echo '<b>Kategoria Tržieb: </b>'.       $response->SalesCategory.'<br />';
         if ($response instanceof ExtendedResult|| isset($response->ActualYear)) {
             echo '<b>Tel. čisla: </b>'.                                 implode(', ', $response->Phones).'<br />';
@@ -106,7 +106,7 @@ function echoBase($response, $json = false)
             }
         }
         echo '<b>SK Nace skupina: </b>'.        $response->SkNaceGroup.'<br />';
-        echo '<b>Pozastavená(živnosť): </b>'.   (($response->SuspendedAsPerson) ? "Ano" : "Nie").'<br />';
+        echo '<b>Pozastavená(živnosť): </b>'.   (($response->SuspendedAsPerson) ? (!empty($response->SuspendedAsPersonUntil) ? echoDate($response->SuspendedAsPersonUntil, $json) : "Ano") : "Nie").'<br />';
         echo '<b>Zisk za aktuálny rok: </b>'.                       $response->ProfitActual.'<br />';
         echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response->RevenueActual.'<br />';
         if ($response instanceof ExtendedResult || isset($response->ActualYear)) {
@@ -129,44 +129,46 @@ function echoBase($response, $json = false)
         }
     }
     echo '<b>Url: </b>'.            $response->Url.'<br />';
-    if ($response instanceof DetailResult) {
+    if ($response instanceof CommonResult) {
         echo '<b>Príznak, či sa daná firma nachádza v zoznamoch dlžníkov, konkurzov alebo likvidácií: </b>';
         if ($response->Warning) {
             echo 'Áno (<a href="'.$response->WarningUrl.'">viac info</a>)<br />';
         } else {
             echo 'Nie<br />';
         }
-        echo '<b>Príznak, či sa daná firma má evidované konkurzy: </b>';
-        if ($response->HasKaR) {
-            echo 'Áno (<a href="'.$response->KaRUrl.'">viac info</a>)<br />';
-        } else {
-            echo 'Nie<br />';
-        }
-        echo '<b>Príznak, či sa daná firma má evidované dlhy: </b>';
-        if ($response->HasDebt) {
-            echo 'Áno (<a href="'.$response->DebtUrl.'">viac info</a>)<br />';
-        } else {
-            echo 'Nie<br />';
-        }
-        if ($response instanceof ExtendedResult|| isset($response->ActualYear)) {
-            echo '<b>Príznak, či sa daná firma má evidované likvidácie: </b>';
-            if ($response->HasDisposal) {
-                echo 'Áno (<a href="'.$response->DisposalUrl.'">viac info</a>)<br />';
+        if ($response instanceof BaseResult) {
+            echo '<b>Príznak, či sa daná firma má evidované konkurzy: </b>';
+            if ($response->HasKaR) {
+                echo 'Áno (<a href="'.$response->KaRUrl.'">viac info</a>)<br />';
             } else {
                 echo 'Nie<br />';
             }
-        }
-        echo '<b>Príznak, či má platobné príkazy: </b> ';
-        if ($response->PaymentOrderWarning) {
-            echo 'Áno (<a href="'.$response->PaymentOrderUrl.'">viac info</a>)<br />';
-        } else {
-            echo 'Nie<br />';
-        }
-        echo '<b>Príznak, či nastala pre danú firmu zmena v ORSR počas posledných 3 mesiacov: </b> ';
-        if ($response->OrChange) {
-            echo 'Áno (<a href="'.$response->OrChangeUrl.'">viac info</a>)<br />';
-        } else {
-            echo 'Nie<br />';
+            echo '<b>Príznak, či sa daná firma má evidované dlhy: </b>';
+            if ($response->HasDebt) {
+                echo 'Áno (<a href="'.$response->DebtUrl.'">viac info</a>)<br />';
+            } else {
+                echo 'Nie<br />';
+            }
+            if ($response instanceof ExtendedResult|| isset($response->ActualYear)) {
+                echo '<b>Príznak, či sa daná firma má evidované likvidácie: </b>';
+                if ($response->HasDisposal) {
+                    echo 'Áno (<a href="'.$response->DisposalUrl.'">viac info</a>)<br />';
+                } else {
+                    echo 'Nie<br />';
+                }
+            }
+            echo '<b>Príznak, či má platobné príkazy: </b> ';
+            if ($response->PaymentOrderWarning) {
+                echo 'Áno (<a href="'.$response->PaymentOrderUrl.'">viac info</a>)<br />';
+            } else {
+                echo 'Nie<br />';
+            }
+            echo '<b>Príznak, či nastala pre danú firmu zmena v ORSR počas posledných 3 mesiacov: </b> ';
+            if ($response->OrChange) {
+                echo 'Áno (<a href="'.$response->OrChangeUrl.'">viac info</a>)<br />';
+            } else {
+                echo 'Nie<br />';
+            }
         }
         if ($response instanceof DetailResult || isset($response->Profit)) {
             echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
@@ -345,6 +347,7 @@ function echoBase($response, $json = false)
                         "<tr><th>Názov" .
                         "</th><th>Od" .
                         "</th><th>Pozastavené od".
+                        "</th><th>Pozastavené do".
                         "</th></tr>";
                 foreach ($response->Subjects as $subject) {
                     echo    "<tr><td>" .
@@ -353,6 +356,8 @@ function echoBase($response, $json = false)
                             (($subject->ValidFrom) ? echoDate($subject->ValidFrom, $json) : '').
                             "</td><td>" .
                             (($subject->SuspendedFrom) ? echoDate($subject->SuspendedFrom, $json) : '').
+                            "</td><td>" .
+                            (($subject->SuspendedTo) ? echoDate($subject->SuspendedTo, $json) : '').
                             "</td></tr>";
                 }
                 echo "</table><br />";
@@ -376,6 +381,7 @@ function echoBase($response, $json = false)
                 echo "<br /><table>";
                 echo
                     "<tr><th>Meno" .
+                    "</th><th>Datum nar." .
                     "</th><th>Adresa" .
                     "</th><th>Detekovane od" .
                     "</th><th>Detekovane do" .
@@ -396,7 +402,8 @@ function echoBase($response, $json = false)
                         }
                     }
                     echo
-                        "<tr><td>" . $person->FullName . "<br /> ". echoStructuredName($person->StructuredName) .
+                        "<tr><td>" .  $person->FullName . "<br /> ". echoStructuredName($person->StructuredName) .
+                        "</td><td>" . (($person->BirthDate) ? echoDate($person->BirthDate, $json) : '') .
                         "</td><td>" . $person->Street ." " . $person->StreetNumber. ", " . $person->ZipCode . ", " . $person->City .  ", " . $person->District .  ", " . $person->Region .  ", " . $person->Country .
                         "</td><td>" . (($person->DetectedFrom) ? echoDate($person->DetectedFrom, $json) : '') .
                         "</td><td>" . (($person->DetectedTo) ? echoDate($person->DetectedTo, $json) : '') .

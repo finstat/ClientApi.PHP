@@ -18,7 +18,12 @@ class AbstractPersonResult extends AddressResult
     public $Functions = array();
 }
 
-class PersonResult extends AbstractPersonResult
+class AbstractPersonBirthDateResult extends AbstractPersonResult
+{
+    public $BirthDate;
+}
+
+class PersonResult extends AbstractPersonBirthDateResult
 {
     public $DepositAmount;
     public $PaybackRange;
@@ -30,9 +35,8 @@ class OfficerResult extends AbstractPersonResult
     public $Source;
 }
 
-class RpvsPersonResult extends AbstractPersonResult
+class RpvsPersonResult extends AbstractPersonBirthDateResult
 {
-    public $BirthDate;
     public $Ico;
 }
 
