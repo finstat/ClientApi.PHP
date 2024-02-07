@@ -130,7 +130,8 @@ class AbstractFinstatApi
 
                 case 403:
                     throw new Requests_Exception('Access Forbidden!', 'FinstatApi', $dom->textContent, $response->status_code);
-
+                case 400:
+                    throw new Requests_Exception('Bad Request!', 'FinstatApi', $dom->textContent, $response->status_code);
                 default:
                     throw new Requests_Exception('Unknown exception while communication with Finstat api!', 'FinstatApi', $dom->textContent, $response->status_code);
             }
