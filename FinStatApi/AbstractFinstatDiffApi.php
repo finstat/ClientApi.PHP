@@ -32,16 +32,6 @@ class AbstractFinstatDailyDiffApi extends AbstractFinstatApi
         return null;
     }
 
-    protected function DownloadFile($requestUrl, $fileName, $exportPath)
-    {
-        $response = $this->DoBaseRequest($requestUrl, array('fileName' => $fileName), $fileName, false);
-
-        $url = $this->apiUrl. $requestUrl;
-        $this->parseResponseRaw($response, $url, $fileName);
-
-        return file_put_contents($exportPath, $response->body);
-    }
-
     protected function ParseDailyDiff($detail)
     {
         if($detail != false) {
