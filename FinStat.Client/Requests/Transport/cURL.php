@@ -90,7 +90,7 @@ class Requests_Transport_cURL implements Requests_Transport {
 				curl_setopt($this->fp, CURLOPT_POST, true);
                 if (empty($headers['Content-Type']) || $headers['Content-Type'] == 'application/x-www-form-urlencoded') {
 					curl_setopt($this->fp, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
-				    curl_setopt($this->fp, CURLOPT_POSTFIELDS, http_build_query($data, null, '&'));
+				    curl_setopt($this->fp, CURLOPT_POSTFIELDS, http_build_query($data, '', '&'));
 				} else {
                     curl_setopt($this->fp, CURLOPT_HTTPHEADER, 'Content-Type: ' . $headers['Content-Type']);
 				    curl_setopt($this->fp, CURLOPT_POSTFIELDS, $data);
