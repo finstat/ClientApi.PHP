@@ -4,6 +4,7 @@ require_once(__DIR__ . '/../FinStat.Client/Requests.php');
 require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
 require_once(__DIR__ . '/../FinStat.Client/BaseFinstatApi.php');
 require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/../FinStat.Client/ViewModel/Detail/BankAccount.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BaseResult.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BasicResult.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Detail/DetailResult.php');
@@ -63,6 +64,8 @@ class FinstatApi extends BaseFinstatApi
         $response = ($response == null) ? new BaseResult() : $response;
         $response = $this->parseCommonResult($detail, $response);
         $response->RegisterNumberText       = (string)$detail->RegisterNumberText;
+        $response->Dic                  = (string)$detail->Dic;
+        $response->IcDPH                = (string)$detail->IcDPH;
 
         $response->SuspendedAsPerson        = "{$detail->SuspendedAsPerson}"  == 'true' ;
         $response->SuspendedAsPersonUntil   = $this->parseDate($detail->SuspendedAsPersonUntil);
@@ -125,8 +128,6 @@ class FinstatApi extends BaseFinstatApi
         $response = new BasicResult();
         $response = $this->parseAbstractResult($detail, $response);
 
-        $response->Dic                  = (string)$detail->Dic;
-        $response->IcDPH                = (string)$detail->IcDPH;
         $response->Anonymized           = "{$detail->Anonymized}"  == 'true';
 
         return $response;

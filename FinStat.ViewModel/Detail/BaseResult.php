@@ -9,15 +9,11 @@ class JudgementIndicatorResult
     public $Value;
 }
 
-class BankAccount
-{
-    public $AccountNumber;
-    public $PublishedAt;
-}
-
 class BaseResult extends CommonResult
 {
     public $RegisterNumberText;
+    public $Dic;
+    public $IcDPH;
     public $SuspendedAsPerson;
     public $OrChange;
     public $OrChangeUrl;

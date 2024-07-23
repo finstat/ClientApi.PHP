@@ -2,6 +2,7 @@
 require_once(__DIR__ . '/../FinStatApiCZ/FinstatApi.php');
 require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
 require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/DetailResult.php');
+require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/PremiumCZResult.php');
 
 function echoDate($date, $json = false)
 {
@@ -38,6 +39,39 @@ function echoBase($response, $json = false)
         echo '<b>Počet zamestnancov: </b>'.     $response->EmployeeCount.'<br />';
         echo '<b>Založená: </b>'.               (($response->Created) ? echoDate($response->Created, $json) : '').'<br />';
         echo '<b>Zrušená: </b>'.                (($response->Cancelled) ? echoDate($response->Cancelled, $json) : '') .'<br />';
+    
+        if($response instanceof FinstatApiCz\PremiumCZResult) {
+            echo '<b>DIC: </b>'.                    $response->VatNumber.'<br />';
+            echo '<b>Platca DPH: </b>'.             $response->TaxPayer.'<br />';
+            echo '<b>Pozastavena zivnost: </b>'.    ($response->SuspendedAsPerson ? "ano": "nie") .'<br />';
+            echo '<b>CZ Nace Skupina: </b>'.        $response->CzNaceGroup.'<br />';
+            echo '<b>Právna forma(kod): </b>'.      $response->LegalFormCode.'<br />';
+            echo '<b>Druh vlastníctva(kod): </b>'.  $response->OwnershipCode.'<br />';
+            echo '<b>Nespoľahlivosť: </b>'.         ($response->UnReliability ? "ano": "").'<br />';
+            echo '<b>Registracia: </b>'.            $response->RegisterNumberText.'<br />';
+            echo '<b>Aktualny rok: </b>'.           $response->ActualYear.'<br />';
+            echo '<b>Trzby: </b>'.                  $response->Sales.'<br />';
+            echo '<b>Trzby: </b>'.                  $response->SalesActual.'<br />';
+            echo '<b>Zisk: </b>'.                   $response->Profit.'<br />';
+            echo '<b>Zisk: </b>'.                   $response->ProfitActual.'<br />';
+
+            if (!empty($response->BankAccounts)) {
+                echo '<b>Bankové účty: </b><br />';
+                if (!empty($response->BankAccounts)) {
+                    echo "<br /><table>";
+                    echo
+                    "<tr><th>Čislo účtu" .
+                    "</th><th>Dátum zverejnenia" .
+                    "</th></tr>";
+                    foreach ($response->BankAccounts as $bac) {
+                        echo "<tr><td>" . $bac->AccountNumber;
+                        echo "</td><td>" . echoDate($bac->PublishedAt, $json);
+                        echo "</td></tr>";
+                    }
+                    echo "</table><br />";
+                }
+            }
+        }
     }
 
     echo '<b>Url: </b>'.            $response->Url.'<br />';
@@ -173,7 +207,22 @@ echoBase($response, $json);
 echoLimits($api->GetAPILimits());
 echo '<hr />';
 ?>
+<h1>PremiumCZ test:</h1>
+<?php
+try {
+    if (!empty($ico)) {
+        $response = $api->Request($ico, "premiumcz", $json);
+    }
+} catch (Exception $e) {
+    echoLimits($api->GetAPILimits());
+    echoException($e);
+}
 
+
+echoBase($response, $json);
+echoLimits($api->GetAPILimits());
+echo '<hr />';
+?>
 <h1>AutoComplete test "volkswagen":</h1>
 <?php
 try {
