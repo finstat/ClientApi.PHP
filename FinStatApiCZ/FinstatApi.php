@@ -114,6 +114,7 @@ class FinstatApi extends \BaseFinstatApi
         $response->OwnershipCode        = (string)$detail->OwnershipCode;
         $response->UnReliability        = empty($detail->UnReliability) ? null : "{$detail->UnReliability}" == 'true';
         $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
+        $response->TradeLicensingOffice = (string)$detail->TradeLicensingOffice;
         $response->ActualYear           = (int)"{$detail->ActualYear}";
         $response->SalesActual          = empty($detail->SalesActual) ? null : (float)"{$detail->SalesActual}";
         $response->ProfitActual         = empty($detail->ProfitActual) ? null : (float)"{$detail->ProfitActual}";

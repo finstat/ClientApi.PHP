@@ -16,6 +16,7 @@ class PremiumCZResult extends DetailResult
     public $OwnershipCode;
     public $UnReliability;
     public $RegisterNumberText;
+    public $TradeLicensingOffice;
     public $ActualYear;
     public $SalesActual;
     public $ProfitActual;

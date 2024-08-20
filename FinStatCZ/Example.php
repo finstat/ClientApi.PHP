@@ -49,6 +49,7 @@ function echoBase($response, $json = false)
             echo '<b>Druh vlastníctva(kod): </b>'.  $response->OwnershipCode.'<br />';
             echo '<b>Nespoľahlivosť: </b>'.         ($response->UnReliability ? "ano": "").'<br />';
             echo '<b>Registracia: </b>'.            $response->RegisterNumberText.'<br />';
+            echo '<b>Evidujúci úrad: </b>'.         $response->TradeLicensingOffice.'<br />';
             echo '<b>Aktualny rok: </b>'.           $response->ActualYear.'<br />';
             echo '<b>Trzby: </b>'.                  $response->Sales.'<br />';
             echo '<b>Trzby: </b>'.                  $response->SalesActual.'<br />';
