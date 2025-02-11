@@ -103,7 +103,7 @@ class FinstatApi extends \BaseFinstatApi
         if (!empty($detail->BankAccounts)) {
             $response->BankAccounts = array();
             foreach ($detail->BankAccounts->BankAccount as $c) {
-                $o = new BankAccount();
+                $o = new \BankAccount();
                 $o->AccountNumber = (string)$c->AccountNumber;
                 $o->PublishedAt = $this->parseDate($c->PublishedAt);
                 $response->BankAccounts[] = $o;
