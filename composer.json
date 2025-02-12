@@ -3,7 +3,7 @@
     "type": "library",    
     "description": "PHP  Client for Finstat API",
     "keywords": ["api","finstat"],
-    "homepage": "https://github.com/finstat/ClientApi.CSharp",
+    "homepage": "https://github.com/finstat/ClientApi.PHP/",
     "license": "MIT",
     "authors": [
         {
