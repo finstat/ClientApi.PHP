@@ -1,6 +1,18 @@
 {
     "name": "finstat/client-api",
-    "type": "library",
+    "type": "library",    
+    "description": "PHP  Client for Finstat API",
+    "keywords": ["api","finstat"],
+    "homepage": "https://github.com/finstat/ClientApi.CSharp",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "František Bereň",
+            "email": "birko@live.com",
+            "homepage": "https://www.finstat.sk",
+            "role": "Developer"
+        }
+    ],
     "autoload": {
         "classmap": [""]
     }
