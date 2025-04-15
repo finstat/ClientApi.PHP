@@ -44,13 +44,11 @@ class AbstractFinstatApi
 
         Requests::register_autoloader();
 
-        $options = array(
+        return array(
             'timeout' => $this->timeout,
             'follow_redirects' => false,
             'auth' => false
         );
-
-        return $options;
     }
 
     public function DoBaseRequest($requestUrl, $requestData, $parameter = null, $json = false)
@@ -253,12 +251,12 @@ class AbstractFinstatApi
     }
 
     /**
-     * Parses date string received from API and returns DateTime object or null.
+     * Parse date string received from API and returns DateTime object or null.
      *
      * @param SimpleXMLElement $date
      * @return DateTime|null
      */
-    protected function parseDate(SimpleXMLElement $date = null)
+    protected function parseDate(?SimpleXMLElement $date = null)
     {
 
         if (empty($date) || !((string) $date)) {

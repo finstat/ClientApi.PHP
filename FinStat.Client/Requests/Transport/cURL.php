@@ -145,7 +145,6 @@ class Requests_Transport_cURL implements Requests_Transport {
 		}
 		if (curl_errno($this->fp)) {
 			throw new Requests_Exception('cURL error ' . curl_errno($this->fp) . ': ' . curl_error($this->fp), 'curlerror', $this->fp, curl_errno($this->fp));
-			return;
 		}
 		$this->info = curl_getinfo($this->fp);
 		curl_close($this->fp);

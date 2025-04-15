@@ -1,4 +1,3 @@
-
 <?php
 require_once(__DIR__ . '/../FinStatApi/FinstatReportingApi.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Reporting/ReportingResult.php');

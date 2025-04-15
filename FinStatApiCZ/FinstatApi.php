@@ -60,9 +60,8 @@ class FinstatApi extends \BaseFinstatApi
         }
 
         $response = ($response == null) ? new BasicResult() : $response;
-        $response = $this->parseAbstractResult($detail, $response);
 
-        return $response;
+        return $this->parseAbstractResult($detail, $response);
     }
 
     private function parseDetail($detail, $response = null)

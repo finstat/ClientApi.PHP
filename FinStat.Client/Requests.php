@@ -89,8 +89,8 @@ class Requests {
         }
 
         $file = str_replace('_', '/', $class);
-        if (file_exists(dirname(__FILE__) . '/' . $file . '.php')) {
-            require_once(dirname(__FILE__) . '/' . $file . '.php');
+        if (file_exists(__DIR__ . '/' . $file . '.php')) {
+            require_once(__DIR__ . '/' . $file . '.php');
         }
     }
 
@@ -343,7 +343,7 @@ class Requests {
         foreach ($headers as $header) {
             list($key, $value) = explode(':', $header, 2);
             $value = trim($value);
-            preg_replace('#(\s+)#i', ' ', $value);
+            preg_replace('#(\s+)#', ' ', $value);
             $return->headers[$key] = $value;
         }
         if (isset($return->headers['transfer-encoding'])) {
@@ -359,7 +359,7 @@ class Requests {
             unset($return->headers['connection']);
         }
 
-        if ((in_array($return->status_code, array(300, 301, 302, 303, 307)) || $return->status_code > 307 && $return->status_code < 400) && $options['follow_redirects'] === true) {
+        if ((in_array((int)$return->status_code, array(300, 301, 302, 303, 307)) || ($return->status_code > 307 && $return->status_code < 400)) && $options['follow_redirects'] === true) {
             if (isset($return->headers['location']) && $options['redirected'] < $options['redirects']) {
                 $options['redirected']++;
                 $location = $return->headers['location'];
@@ -488,14 +488,14 @@ class Requests {
             if ( $flg > 0 ) {
                 if ( $flg & 4 ) {
                     list($xlen) = unpack('v', substr($gzData, $i, 2) );
-                    $i = $i + 2 + $xlen;
+                    $i += 2 + $xlen;
                 }
                 if ( $flg & 8 )
                     $i = strpos($gzData, "\0", $i) + 1;
                 if ( $flg & 16 )
                     $i = strpos($gzData, "\0", $i) + 1;
                 if ( $flg & 2 )
-                    $i = $i + 2;
+                    $i += 2;
             }
             return gzinflate( substr($gzData, $i, -8) );
         } else {

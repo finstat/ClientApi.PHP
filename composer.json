@@ -15,5 +15,24 @@
     ],
     "autoload": {
         "classmap": [""]
-    }
+    },
+    "require": {
+        "php": "^7.1 || ^8.0",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-zlib": "*",
+        "ext-json": "*",
+        "ext-simplexml": "*"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "version": "1.5.1"
 }

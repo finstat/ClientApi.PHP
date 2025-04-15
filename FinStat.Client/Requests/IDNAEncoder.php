@@ -192,18 +192,18 @@ class Requests_IDNAEncoder {
 
 			if (
 				// Non-shortest form sequences are invalid
-				   $length > 1 && $character <= 0x7F
-				|| $length > 2 && $character <= 0x7FF
-				|| $length > 3 && $character <= 0xFFFF
+				   ($length > 1 && $character <= 0x7F)
+				|| ($length > 2 && $character <= 0x7FF)
+				|| ($length > 3 && $character <= 0xFFFF)
 				// Outside of range of ucschar codepoints
 				// Noncharacters
 				|| ($character & 0xFFFE) === 0xFFFE
-				|| $character >= 0xFDD0 && $character <= 0xFDEF
+				|| ($character >= 0xFDD0 && $character <= 0xFDEF)
 				|| (
 					// Everything else not in ucschar
-					   $character > 0xD7FF && $character < 0xF900
+					   ($character > 0xD7FF && $character < 0xF900)
 					|| $character < 0x20
-					|| $character > 0x7E && $character < 0xA0
+					|| ($character > 0x7E && $character < 0xA0)
 					|| $character > 0xEFFFD
 				)
 			) {
@@ -274,7 +274,7 @@ class Requests_IDNAEncoder {
 #			let n = m
 			$n = $m;
 #			for each code point c in the input (in order) do begin
-			for ($num = 0; $num < count($codepoints); $num++) {
+			for ($num = 0, $numMax = count($codepoints); $num < $numMax; $num++) {
 				$c = $codepoints[$num];
 #				if c < n then increment delta, fail on overflow
 				if ($c < $n) {

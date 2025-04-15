@@ -54,7 +54,6 @@ class Requests_Transport_fsockopen implements Requests_Transport {
 		$fp = @fsockopen($host, $url_parts['port'], $errno, $errstr, $options['timeout']);
 		if (!$fp) {
 			throw new Requests_Exception($errstr, 'fsockopenerror');
-			return;
 		}
 		stream_set_timeout($fp, $options['timeout']);
 
@@ -102,7 +101,7 @@ class Requests_Transport_fsockopen implements Requests_Transport {
 		}
 
 		$headers = Requests::flattern($headers);
-		$out .= implode($headers, "\r\n");
+		$out .= implode("\r\n", $headers);
 
 		$options['hooks']->dispatch('fsockopen.after_headers', array(&$out));
 
@@ -119,8 +118,6 @@ class Requests_Transport_fsockopen implements Requests_Transport {
 			$options['hooks']->dispatch('fsockopen.after_request', array(&$fake_headers));
 			return '';
 		}
-
-		$this->info = stream_get_meta_data($fp);
 
 		$this->headers = '';
 		$this->info = stream_get_meta_data($fp);

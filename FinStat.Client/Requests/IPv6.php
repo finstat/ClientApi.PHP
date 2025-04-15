@@ -110,7 +110,7 @@ class Requests_IPv6
         $ip_parts = self::split_v6_v4($ip);
 
         // Replace all leading zeros
-        $ip_parts[0] = preg_replace('/(^|:)0+([0-9])/', '\1\2', $ip_parts[0]);
+        $ip_parts[0] = preg_replace('/(^|:)0+(\d)/', '\1\2', $ip_parts[0]);
 
         // Find bunches of zeros
         if (preg_match_all('/(?:^|:)(?:0(?::|$))+/', $ip_parts[0], $matches, PREG_OFFSET_CAPTURE))
@@ -180,7 +180,7 @@ class Requests_IPv6
         list($ipv6, $ipv4) = self::split_v6_v4($ip);
         $ipv6 = explode(':', $ipv6);
         $ipv4 = explode('.', $ipv4);
-        if (count($ipv6) === 8 && count($ipv4) === 1 || count($ipv6) === 6 && count($ipv4) === 4)
+        if ((count($ipv6) === 8 && count($ipv4) === 1) || (count($ipv6) === 6 && count($ipv4) === 4))
         {
             foreach ($ipv6 as $ipv6_part)
             {
