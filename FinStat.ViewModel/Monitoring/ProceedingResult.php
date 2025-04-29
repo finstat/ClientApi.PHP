@@ -48,9 +48,3 @@ class IssuedPerson
     public $Name;
     public $Function;
 }
-
-class Deadline
-{
-    public $Type;
-    public $Date;
-}

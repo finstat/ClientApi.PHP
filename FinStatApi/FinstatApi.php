@@ -389,7 +389,7 @@ class FinstatApi extends BaseFinstatApi
             if (!empty($detail->AddressHistory)) {
                 $response->AddressHistory = array();
                 foreach ($detail->AddressHistory->HistoryAddress as $address) {
-                    $o = new AddressResult();
+                    $o = new HistoryAddressResult();
                     $o = $this->parseAddress($address, $o);
                     $o->ValidFrom = $this->parseDate($address->ValidFrom);
                     $o->ValidTo = $this->parseDate($address->ValidTo);

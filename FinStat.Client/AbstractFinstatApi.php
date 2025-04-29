@@ -2,6 +2,7 @@
 
 require_once(__DIR__ . '/Requests.php');
 require_once(__DIR__ . '/ViewModel/AutoCompleteResult.php');
+require_once(__DIR__ . '/ViewModel/AddressResult.php');
 
 class AbstractFinstatApi
 {
@@ -61,7 +62,7 @@ class AbstractFinstatApi
             'StationId' => $this->stationId,
             'StationName' => $this->stationName
         ), $requestData);
-
+        
         $url = $this->apiUrl. $requestUrl;
         try {
             $headers = null;
@@ -185,7 +186,7 @@ class AbstractFinstatApi
 
     protected function parsePersonAddress($element, $object = null)
     {
-        $o = ($object != null) ? $object : new PersonAddress();
+        $o = ($object != null) ? $object : new PersonAddressResult();
         $o = $this->parseFullAddress($element, $o);
         $o->Ico         = (string)$element->Ico;
         $o->BirthDate   = (string)$element->BirthDate;
@@ -258,7 +259,6 @@ class AbstractFinstatApi
      */
     protected function parseDate(?SimpleXMLElement $date = null)
     {
-
         if (empty($date) || !((string) $date)) {
             return null;
         }

@@ -24,6 +24,7 @@
     <Compile Include="Diff\DailyDiff.php" />
     <Compile Include="Diff\DailyDiffList.php" />
     <Compile Include="KeyValue.php" />
+    <Compile Include="Deadline.php" />
     <Compile Include="Monitoring\ProceedingResult.php" />
     <Compile Include="Statement\StatementResult.php" />
   </ItemGroup>

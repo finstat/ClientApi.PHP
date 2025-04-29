@@ -16,6 +16,10 @@ class AddressResult
     public $District;
     public $Region;
     public $Country;
-    public $ValidFrom;
-    public $ValidTo;
+}
+
+class PersonAddressResult extends AddressResult
+{
+    public $Ico;
+    public $BirthDate;
 }

@@ -3,6 +3,7 @@
 require_once(__DIR__ . '/../FinStat.Client/Requests.php');
 require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
 require_once(__DIR__ . '/../FinStat.Client/ViewModel/Monitoring/MonitoringReportResult.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Deadline.php');
 require_once(__DIR__ . '/../FinStat.ViewModel/Monitoring/ProceedingResult.php');
 
 class FinstatMonitoringApi extends AbstractFinstatApi
