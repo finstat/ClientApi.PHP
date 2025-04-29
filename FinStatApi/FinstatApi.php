@@ -498,7 +498,7 @@ class FinstatApi extends BaseFinstatApi
     protected function ParseProceeding($detail, $response = null)
     {
         if (!empty($detail)) {
-            $o = (!empty($response)) ? $response : new ProceedingResult();
+            $response = (!empty($response)) ? $response : new ProceedingResult();
             $o = $this->ParseLiquidationResult($detail, $response);
             if (!empty($o)) {
                 $o->FileReference = (string) $detail->FileReference;

@@ -130,7 +130,7 @@ class Requests_IRI
      */
     public function __toString()
     {
-        return $this->get_iri();
+        return (string)$this->get_iri();
     }
 
     /**
@@ -143,7 +143,7 @@ class Requests_IRI
     {
         if (method_exists($this, 'set_' . $name))
         {
-            call_user_func(array($this, 'set_' . $name), $value);
+            $this->{'set_' . $name}($value);
         }
         elseif (
                $name === 'iauthority'
@@ -154,7 +154,7 @@ class Requests_IRI
             || $name === 'ifragment'
         )
         {
-            call_user_func(array($this, 'set_' . substr($name, 1)), $value);
+            $this->{'set_' . substr($name, 1)}($value);
         }
     }
 
@@ -236,7 +236,7 @@ class Requests_IRI
     {
         if (method_exists($this, 'set_' . $name))
         {
-            call_user_func(array($this, 'set_' . $name), '');
+            $this->{'set_' . $name}('');
         }
     }
 
@@ -379,11 +379,8 @@ class Requests_IRI
             }
             return $match;
         }
-        else
-        {
-            trigger_error('This should never happen', E_USER_ERROR);
-            die;
-        }
+
+        trigger_error('This should never happen', E_USER_ERROR);
     }
 
     /**
@@ -544,25 +541,25 @@ class Requests_IRI
                 // Invalid sequences
                 !$valid
                 // Non-shortest form sequences are invalid
-                || $length > 1 && $character <= 0x7F
-                || $length > 2 && $character <= 0x7FF
-                || $length > 3 && $character <= 0xFFFF
+                || ($length > 1 && $character <= 0x7F)
+                || ($length > 2 && $character <= 0x7FF)
+                || ($length > 3 && $character <= 0xFFFF)
                 // Outside of range of ucschar codepoints
                 // Noncharacters
                 || ($character & 0xFFFE) === 0xFFFE
-                || $character >= 0xFDD0 && $character <= 0xFDEF
-                || (
-                    // Everything else not in ucschar
-                       $character > 0xD7FF && $character < 0xF900
-                    || $character < 0xA0
-                    || $character > 0xEFFFD
-                )
-                && (
-                    // Everything not in iprivate, if it applies
-                       !$iprivate
-                    || $character < 0xE000
-                    || $character > 0x10FFFD
-                )
+                || ($character >= 0xFDD0 && $character <= 0xFDEF)
+                || ((
+                        // Everything else not in ucschar
+                        ($character > 0xD7FF && $character < 0xF900)
+                        || $character < 0xA0
+                        || $character > 0xEFFFD
+                    )
+                    && (
+                        // Everything not in iprivate, if it applies
+                        !$iprivate
+                        || $character < 0xE000
+                        || $character > 0x10FFFD
+                    ))
             )
             {
                 // If we were a character, pretend we weren't, but rather an error.
@@ -677,22 +674,22 @@ class Requests_IRI
                     // Invalid sequences
                     !$valid
                     // Non-shortest form sequences are invalid
-                    || $length > 1 && $character <= 0x7F
-                    || $length > 2 && $character <= 0x7FF
-                    || $length > 3 && $character <= 0xFFFF
+                    || ($length > 1 && $character <= 0x7F)
+                    || ($length > 2 && $character <= 0x7FF)
+                    || ($length > 3 && $character <= 0xFFFF)
                     // Outside of range of iunreserved codepoints
                     || $character < 0x2D
                     || $character > 0xEFFFD
                     // Noncharacters
                     || ($character & 0xFFFE) === 0xFFFE
-                    || $character >= 0xFDD0 && $character <= 0xFDEF
+                    || ($character >= 0xFDD0 && $character <= 0xFDEF)
                     // Everything else not in iunreserved (this is all BMP)
                     || $character === 0x2F
-                    || $character > 0x39 && $character < 0x41
-                    || $character > 0x5A && $character < 0x61
-                    || $character > 0x7A && $character < 0x7E
-                    || $character > 0x7E && $character < 0xA0
-                    || $character > 0xD7FF && $character < 0xF900
+                    || ($character > 0x39 && $character < 0x41)
+                    || ($character > 0x5A && $character < 0x61)
+                    || ($character > 0x7A && $character < 0x7E)
+                    || ($character > 0x7E && $character < 0xA0)
+                    || ($character > 0xD7FF && $character < 0xF900)
                 )
                 {
                     for ($j = $start; $j <= $i; $j++)
@@ -762,10 +759,10 @@ class Requests_IRI
         $isauthority = $this->iuserinfo !== null || $this->ihost !== null || $this->port !== null;
         if ($this->ipath !== '' &&
             (
-                $isauthority && (
-                    $this->ipath[0] !== '/' ||
-                    substr($this->ipath, 0, 2) === '//'
-                ) ||
+                ($isauthority && (
+                        $this->ipath[0] !== '/' ||
+                        substr($this->ipath, 0, 2) === '//'
+                    )) ||
                 (
                     $this->scheme === null &&
                     !$isauthority &&

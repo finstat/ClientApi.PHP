@@ -30,7 +30,7 @@ function echoMonitoringReport($response, $json)
     echo '<b>Report: </b>'.           '<br />';
     if (!empty($response)) {
         $icodate = "";
-        if($report[0] instanceof MonitoringDateReportResult) {
+        if($response[0] instanceof MonitoringDateReportResult) {
             $icodate  = "Dátum";
         } else {
             $icodate  = "Ičo";
@@ -131,7 +131,7 @@ try {
     // funkcia $api->AddToMonitoring(string) vracia stav úspechu operácie
     if (!empty($ico)) {
         $response = $api->AddToMonitoring($ico, $json);
-        $response2 = $api->AddToMonitoring($ico + 'blaaa', $json);
+        $response2 = $api->AddToMonitoring($ico . 'blaaa', $json);
     }
     if (!empty($date)) {
         $response3 = $api->AddDateToMonitoring($date, $json);
