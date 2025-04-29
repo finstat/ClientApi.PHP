@@ -130,7 +130,7 @@ $reports = $api->MonitoringReport($json);
 $dateReports = $api->MonitoringDateReport($json);
 ```
 
-### Daily Diff API
+ Daily Diff API
 
 ```php
 <?php
@@ -147,6 +147,27 @@ $list = $api->RequestListOfDailyDiffs($json);
 // Download a specific daily diff file
 $file = "example_file.zip";
 $data = $api->DownloadDailyDiffFile($file, $file);
+```
+
+### Bankruptcy and Restructuring API
+
+```php
+require_once(__DIR__ . '/../FinStatApi/FinstatBankruptcyRestructuringApi.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/Deadline.php');
+require_once(__DIR__ . '/../FinStat.ViewModel/BankuptcyRestructuing/BankruptcyRestructuring.php');
+
+// Initialize the daily diff API client
+$api = new FinstatBankruptcyRestructuringApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+
+// Get list of person bankruptcy proceedings
+$list = $api->RequestPersonBankruptcyProceedings($name, $surname, $dateOfBirth, $json);
+
+// Get list of company bankruptcy and restructuring proceedings by ico
+$list = $api->RequestCompanyBankruptcyRestructuring($ico, null, $dateOfBirth, $json);
+
+// Get list of company bankruptcy and restructuring proceedings by name
+$list = $api->RequestCompanyBankruptcyRestructuring(null, $name, $dateOfBirth, $json);
+
 ```
 
 ## Response Data
