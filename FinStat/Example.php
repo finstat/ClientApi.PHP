@@ -461,7 +461,7 @@ function echoBase($response, $json = false)
                 "</th><th>Detekovane do" .
                 "</th><th>Funckcia" .
                 "</th></tr>";
-                foreach ($response->RpvsPersons as $person) {
+                foreach ($response->RPOPersons as $person) {
                     $functions = "";
                     if (!empty($person->Functions)) {
                         foreach ($person->Functions as $function) {
@@ -476,7 +476,7 @@ function echoBase($response, $json = false)
                     echo
                     "<tr><td>" . $person->FullName . "<br /> ". echoStructuredName($person->StructuredName) .
                     "</td><td>" . (($person->BirthDate) ? echoDate($person->BirthDate, $json) : '') .
-                    "</td><td>" .  $person->City .  ", " . $person->Citizenship .
+                    "</td><td>" . $person->Citizenship .
                     "</td><td>" . (($person->DetectedFrom) ? echoDate($person->DetectedFrom, $json) : '') .
                     "</td><td>" . (($person->DetectedTo) ? echoDate($person->DetectedTo, $json) : '') .
                     "</td><td>" . $functions .
@@ -511,7 +511,7 @@ function echoBase($response, $json = false)
                 echo "</table><br />";
             }
 
-            if (!empty($response->Bankrupt) || !empty($response->Restructuring) || !empty($response->Liquidation) || !empty($response->OtherProceeding)) {
+            if (!empty($response->Bankrupt) || !empty($response->Restructuring) || !empty($response->PreventiveRestructuring) || !empty($response->Liquidation) || !empty($response->OtherProceeding)) {
                 echo '<b>Konkurz / Reštruktualizácia / Likvidácia/Iné Konanie: </b><br />';
                 echo "<br /><table><tr>";
                 echo "<tr>";
@@ -537,7 +537,7 @@ function echoBase($response, $json = false)
                         (($response->Bankrupt->StartDate) ? echoDate($response->Bankrupt->StartDate, $json) : '') ."</td><td>".
                         (($response->Bankrupt->ExitDate) ? echoDate($response->Bankrupt->ExitDate, $json) : '') ."</td><td>".
                         $response->Bankrupt->ExitReason."</td><td>".
-                        (($response->Bankrupt->Officer) ? $response->Bankrupt->Officer->FullName . "<br />" . echoStructuredName($response->Bankrupt->Officer->StructuredName) : ''). "</td><td>".
+                        (($response->Bankrupt->Officers) ? count($response->Bankrupt->Officers) : ''). "</td><td>".
                          $response->Bankrupt->Source."</td><td>".
                          $response->Bankrupt->Status."</td><td>".
                         "</td></tr>";
@@ -560,9 +560,32 @@ function echoBase($response, $json = false)
                         (($response->Restructuring->StartDate) ? echoDate($response->Restructuring->StartDate, $json) : '') ."</td><td>".
                         (($response->Restructuring->ExitDate) ? echoDate($response->Restructuring->ExitDate, $json) : '') ."</td><td>".
                         $response->Restructuring->ExitReason."</td><td>".
-                        (($response->Restructuring->Officer) ? $response->Restructuring->Officer->FullName . "<br />" . echoStructuredName($response->Restructuring->Officer->StructuredName) : '')."</td><td>".
+                        (($response->Restructuring->Officers) ? count($response->Restructuring->Officers) : '') ."</td><td>".
                         $response->Restructuring->Source."</td><td>".
                         $response->Restructuring->Status."</td><td>".
+                        "</td></tr>";
+                    if (!empty($response->Restructuring->Deadlines)) {
+                        echo "<tr><th colspan='9'>Lehoty</th></tr>";
+                        foreach ($response->Restructuring->Deadlines as $deadline) {
+                            echo "<tr><td colspan='9'>".
+                            (($deadline->Date) ? echoDate($deadline->Date, $json) : '') . ' '.
+                            $deadline->Type.
+                            "</td></tr>";
+                        }
+                    }
+                }
+                if (!empty($response->PreventiveRestructuring)) {
+                    echo "<tr><th>Preventívna Reštrukturalizácia</th></td><td>".
+                        (($response->PreventiveRestructuring->FileReference) ? $response->PreventiveRestructuring->FileReference : '') ."</td><td>".
+                        (($response->PreventiveRestructuring->CourtCode) ? $response->PreventiveRestructuring->CourtCode : '') ."</td><td>".
+                        (($response->PreventiveRestructuring->FirstDate) ? echoDate($response->PreventiveRestructuring->FirstDate, $json) : '') ."</td><td>".
+                        "</td><td>".
+                        "</td><td>".
+                        (($response->PreventiveRestructuring->LastDate) ? echoDate($response->PreventiveRestructuring->LastDate, $json) : '') ."</td><td>".
+                        "</td><td>".
+                        "</td><td>".
+                        $response->PreventiveRestructuring->Source."</td><td>".
+                        "</td><td>".
                         "</td></tr>";
                     if (!empty($response->Restructuring->Deadlines)) {
                         echo "<tr><th colspan='9'>Lehoty</th></tr>";
@@ -583,7 +606,7 @@ function echoBase($response, $json = false)
                         "</td><td>".
                         (($response->Liquidation->ExitDate) ? echoDate($response->Liquidation->ExitDate, $json) : '') ."</td><td>".
                         "</td><td>".
-                        (($response->Liquidation->Officer) ? $response->Liquidation->Officer->FullName . "<br />" . echoStructuredName($response->Liquidation->Officer->StructuredName) : '')."</td><td>".
+                        (($response->Liquidation->Officers) ? count($response->Liquidation->Officers): '')."</td><td>".
                         $response->Bankrupt->Source."</td><td>".
                         "</td><td>".
                         "</td></tr>";
@@ -606,7 +629,7 @@ function echoBase($response, $json = false)
                         (($response->OtherProceeding->StartDate) ? echoDate($response->OtherProceeding->StartDate, $json) : '') ."</td><td>".
                         (($response->OtherProceeding->ExitDate) ? echoDate($response->OtherProceeding->ExitDate, $json) : '') ."</td><td>".
                         $response->OtherProceeding->ExitReason."</td><td>".
-                        (($response->OtherProceeding->Officer) ? $response->OtherProceeding->Officer->FullName . "<br />" . echoStructuredName($response->OtherProceeding->Officer->StructuredName) : '')."</td><td>".
+                        (($response->OtherProceeding->Officers) ? count($response->OtherProceeding->Officers) : '')."</td><td>".
                         $response->OtherProceeding->Source."</td><td>".
                         $response->OtherProceeding->Status."</td><td>".
                         "</td></tr>";

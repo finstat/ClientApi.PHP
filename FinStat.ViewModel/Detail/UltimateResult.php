@@ -90,6 +90,15 @@ class RestructuringResult extends ProceedingResult
 {
 }
 
+class PreventiveRestructuringResult
+{
+    public $FileReference;
+    public $CourtCode;
+    public $Source;
+    public $FirstDate;
+    public $LastDate;
+}
+
 class DeadlineResult
 {
     public $Type;
@@ -126,6 +135,7 @@ class UltimateResult extends ExtendedResult
     public $Liquidation;
     public $ORCancelled;
     public $OtherProceeding;
+    public $PreventiveRestructuring;
     public $RPOPersons;
     public $DistraintsAuthorizations;
 }

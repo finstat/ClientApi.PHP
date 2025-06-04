@@ -408,6 +408,15 @@ class FinstatApi extends BaseFinstatApi
             if (!empty($detail->Restructuring)) {
                 $response->Restructuring = $this->ParseProceeding($detail->Restructuring, new RestructuringResult());
             }
+            
+            if (!empty($detail->PreventiveRestructuring)) {
+                $response->PreventiveRestructuring = new PreventiveRestructuringResult();
+                $response->PreventiveRestructuring->Source = (string) $detail->PreventiveRestructuring->Source;
+                $response->PreventiveRestructuring->FileReference = (string) $detail->PreventiveRestructuring->FileReference;
+                $response->PreventiveRestructuring->CourtCode = (string) $detail->PreventiveRestructuring->CourtCode;
+                $response->PreventiveRestructuring->FirstDate = $this->parseDate($detail->PreventiveRestructuring->FirstDate);
+                $response->PreventiveRestructuring->LastDate = $this->parseDate($detail->PreventiveRestructuring->LastDate);
+            }
 
             if (!empty($detail->Liquidation)) {
                 $response->Liquidation = $this->ParseLiquidationResult($detail->Liquidation);
@@ -476,12 +485,11 @@ class FinstatApi extends BaseFinstatApi
             $o->ExitDate = $this->parseDate($detail->ExitDate);
             if (!empty($detail->Officers)) {
                 foreach ($detail->Officers->Officer as $officer) {
-                    $of = $this->parsePerson($officer);
+                    $of = $this->parsePerson($officer, new OfficerResult());
                     $of->Source  = (string)$officer->Source;
                     $o->Officers[] = $of;
                 }
             }
-            $o->Officer = $this->parsePerson($detail->Officer);
             if (!empty($detail->Deadlines)) {
                 foreach ($detail->Deadlines->Deadline as $deadline) {
                     $od = new DeadlineResult();
