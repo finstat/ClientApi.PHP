@@ -1,12 +1,65 @@
 <?php
-require_once(__DIR__ . '/../FinStatApi/FinstatApi.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BaseResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BasicResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/DetailResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/ExtendedResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/UltimateResult.php');
+/**
+ * Example: FinStat API Complete Usage Guide
+ * 
+ * This comprehensive example demonstrates how to:
+ * - Initialize the FinStat API client with proper configuration
+ * - Request different levels of company data (Basic, Detail, Extended, Ultimate)
+ * - Use AutoComplete search functionality
+ * - Handle different types of API exceptions (Not Found, Rate Limits, Authentication)
+ * - Monitor API usage limits
+ * - Process and display company information
+ * - Work with both XML and JSON response formats
+ * 
+ * @package FinStat
+ * @author FinStat s.r.o.
+ * @link https://www.finstat.sk/
+ */
 
+// Load Composer autoloader
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Import required classes
+use FinStat\Api\FinstatApi;
+use FinStat\Client\Exceptions\NotFoundException;
+use FinStat\Client\Exceptions\LimitReachedException;
+use FinStat\Client\Exceptions\AuthenticationException;
+use FinStat\Client\Exceptions\BadRequestException;
+use FinStat\Client\Exceptions\ParseException;
+use FinStat\Client\Exceptions\FinstatException;
+use FinStat\ViewModel\Detail\BaseResult;
+use FinStat\ViewModel\Detail\BasicResult;
+use FinStat\ViewModel\Detail\DetailResult;
+use FinStat\ViewModel\Detail\ExtendedResult;
+use FinStat\ViewModel\Detail\UltimateResult;
+use FinStat\ViewModel\Detail\CommonResult;
+
+// ============================================
+// CONFIGURATION - Update these values
+// ============================================
+$apiUrl = 'https://www.finstat.sk/api/';
+$apiKey = 'YOUR_API_KEY';
+$privateKey = 'YOUR_PRIVATE_KEY';
+$stationId = 'YOUR_STATION_ID';
+$stationName = 'YOUR_STATION_NAME';
+$timeout = 10;
+
+// Use JSON format instead of XML? (false = XML, true = JSON)
+$useJson = false;
+
+// Company ICO to query (can be overridden via ?ico= parameter)
+$ico = isset($_GET['ico']) && !empty($_GET['ico']) ? $_GET['ico'] : '35757442';
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Format date for display
+ * @param mixed $date DateTime object or date string
+ * @param bool $json Whether the date came from JSON response
+ * @return string Formatted date (d.m.Y)
+ */
 function echoDate($date, $json = false)
 {
     if ($date && !empty($date)) {
@@ -18,6 +71,11 @@ function echoDate($date, $json = false)
     return '';
 }
 
+/**
+ * Display structured name parts (Prefix, Name, Suffix, After)
+ * @param object $data Name structure object
+ * @return string HTML formatted name parts
+ */
 function echoStructuredName($data)
 {
     $result ="";
@@ -32,6 +90,12 @@ function echoStructuredName($data)
 }
 
 
+/**
+ * Display company base information
+ * Handles all response types: BaseResult, BasicResult, DetailResult, ExtendedResult, UltimateResult
+ * @param object $response Company data object
+ * @param bool $json Whether response was in JSON format
+ */
 function echoBase($response, $json = false)
 {
     echo "<pre>";
@@ -41,6 +105,12 @@ function echoBase($response, $json = false)
     }
     echo '<b>DIČ: </b>'.                    $response->Dic.'<br />';
     echo '<b>IčDPH: </b>'.                  $response->IcDPH.'<br />';
+    if ($response instanceof BasicResult) {
+        echo '<b>Paragraf: </b>'.              $response->Paragraph.'<br />';
+    }
+    echo '<b>Založená: </b>'.               (($response->Created) ? echoDate($response->Created, $json) : '').'<br />';
+    echo '<b>Zrušená: </b>'.                (($response->Cancelled) ? echoDate($response->Cancelled, $json) : '') .'<br />';
+    echo '<b>Pozastavená(živnosť): </b>'.  (($response->SuspendedAsPerson) ?  "Ano" : "Nie").'<br />';
     if ($response instanceof ExtendedResult) {
         echo '<b>Základné imanie: </b>'.                             $response->BasicCapital.'<br />';
         if ($response instanceof UltimateResult || isset($response->ORSection)) {
@@ -83,8 +153,6 @@ function echoBase($response, $json = false)
             }
         }
         echo '<b>Odvetvie: </b>'.               $response->Activity.'<br />';
-        echo '<b>Založená: </b>'.               (($response->Created) ? echoDate($response->Created, $json) : '').'<br />';
-        echo '<b>Zrušená: </b>'.                (($response->Cancelled) ? echoDate($response->Cancelled, $json) : '') .'<br />';
         if ($response instanceof UltimateResult || isset($response->ORSection)) {
             echo '<b>Zrušená podľa OR: </b>'.                (($response->ORCancelled) ? echoDate($response->ORCancelled, $json) : '') .'<br />';
         }
@@ -106,7 +174,7 @@ function echoBase($response, $json = false)
             }
         }
         echo '<b>SK Nace skupina: </b>'.        $response->SkNaceGroup.'<br />';
-        echo '<b>Pozastavená(živnosť): </b>'.   (($response->SuspendedAsPerson) ? (!empty($response->SuspendedAsPersonUntil) ? echoDate($response->SuspendedAsPersonUntil, $json) : "Ano") : "Nie").'<br />';
+        echo '<b>Pozastavená(živnosť): </b>'.   (!empty($response->SuspendedAsPersonUntil) ? echoDate($response->SuspendedAsPersonUntil, $json) : "-") .'<br />';
         echo '<b>Zisk za aktuálny rok: </b>'.                       $response->ProfitActual.'<br />';
         echo '<b>Suma celkových výnosov za aktuálny rok: </b>'.     $response->RevenueActual.'<br />';
         if ($response instanceof ExtendedResult || isset($response->ActualYear)) {
@@ -170,7 +238,7 @@ function echoBase($response, $json = false)
                 echo 'Nie<br />';
             }
         }
-        if ($response instanceof DetailResult || isset($response->Profit)) {
+        if ($response instanceof DetailResult || $response instanceof ExtendedResult || $response instanceof UltimateResult || isset($response->Profit)) {
             echo '<b>Príznak nárastu/poklesu tržieb firmy medzi posledným a predposledným rokom v databáze: </b>';
             switch ($response->Revenue) {
                 case 'Unknown': echo 'Neznámy';
@@ -530,8 +598,8 @@ function echoBase($response, $json = false)
                     "</th></tr>";
                 if (!empty($response->Bankrupt)) {
                     echo "<tr><th>Konkurz</th></td><td>".
-                        (($response->Bankrupt->FileReference) ? echoDate($response->Bankrupt->FileReference, $json) : '') ."</td><td>".
-                        (($response->Bankrupt->CourtCode) ? echoDate($response->Bankrupt->CourtCode, $json) : '') ."</td><td>".
+                        htmlspecialchars($response->Bankrupt->FileReference) ."</td><td>".
+                        htmlspecialchars($response->Bankrupt->CourtCode) ."</td><td>".
                         (($response->Bankrupt->EnterDate) ? echoDate($response->Bankrupt->EnterDate, $json) : '') ."</td><td>".
                         $response->Bankrupt->EnterReason."</td><td>".
                         (($response->Bankrupt->StartDate) ? echoDate($response->Bankrupt->StartDate, $json) : '') ."</td><td>".
@@ -587,9 +655,9 @@ function echoBase($response, $json = false)
                         $response->PreventiveRestructuring->Source."</td><td>".
                         "</td><td>".
                         "</td></tr>";
-                    if (!empty($response->Restructuring->Deadlines)) {
+                    if (!empty($response->PreventiveRestructuring->Deadlines)) {
                         echo "<tr><th colspan='9'>Lehoty</th></tr>";
-                        foreach ($response->Restructuring->Deadlines as $deadline) {
+                        foreach ($response->PreventiveRestructuring->Deadlines as $deadline) {
                             echo "<tr><td colspan='9'>".
                             (($deadline->Date) ? echoDate($deadline->Date, $json) : '') . ' '.
                             $deadline->Type.
@@ -607,7 +675,7 @@ function echoBase($response, $json = false)
                         (($response->Liquidation->ExitDate) ? echoDate($response->Liquidation->ExitDate, $json) : '') ."</td><td>".
                         "</td><td>".
                         (($response->Liquidation->Officers) ? count($response->Liquidation->Officers): '')."</td><td>".
-                        $response->Bankrupt->Source."</td><td>".
+                        $response->Liquidation->Source."</td><td>".
                         "</td><td>".
                         "</td></tr>";
                     if (!empty($response->Liquidation->Deadlines)) {
@@ -622,8 +690,8 @@ function echoBase($response, $json = false)
                 }
                 if (!empty($response->OtherProceeding)) {
                     echo "<tr><th>Iné Konanie</th></td><td>".
-                        (($response->OtherProceeding->FileReference) ? echoDate($response->OtherProceeding->FileReference, $json) : '') ."</td><td>".
-                        (($response->OtherProceeding->CourtCode) ? echoDate($response->OtherProceeding->CourtCode, $json) : '') ."</td><td>".
+                        htmlspecialchars($response->OtherProceeding->FileReference) ."</td><td>".
+                        htmlspecialchars($response->OtherProceeding->CourtCode) ."</td><td>".
                         (($response->OtherProceeding->EnterDate) ? echoDate($response->OtherProceeding->EnterDate, $json) : '') ."</td><td>".
                         $response->OtherProceeding->EnterReason."</td><td>".
                         (($response->OtherProceeding->StartDate) ? echoDate($response->OtherProceeding->StartDate, $json) : '') ."</td><td>".
@@ -680,17 +748,40 @@ function echoBase($response, $json = false)
     echo "</pre>";
 }
 
+/**
+ * Display exception information with proper error handling
+ * @param Exception $e Exception object
+ */
 function echoException($e)
 {
-    echo "<h1 style=\"color: red\">Exception</h1>";
-    echo"<table>";
-    echo"<tr><th>Code:</th><td>{$e->getCode()}</td></tr>";
-    echo"<tr><th>Message:</th><td> {$e->getMessage()}</td></tr>";
-    echo"<tr><th>Body:</th><td>{$e->getData()}</td></tr>";
-    echo"</table>";
-    die();
+    echo "<div style=\"background-color: #ffebee; border-left: 4px solid #f44336; padding: 15px; margin: 10px 0;\">";
+    echo "<h2 style=\"color: #c62828; margin-top: 0;\">⚠ Error</h2>";
+    echo "<table style=\"width: 100%;\">";
+    echo "<tr><th style=\"text-align: left; width: 120px;\">Error Type:</th><td>" . get_class($e) . "</td></tr>";
+    echo "<tr><th style=\"text-align: left;\">Code:</th><td>{$e->getCode()}</td></tr>";
+    echo "<tr><th style=\"text-align: left;\">Message:</th><td>" . htmlspecialchars($e->getMessage()) . "</td></tr>";
+    
+    if (method_exists($e, 'getData')) {
+        echo "<tr><th style=\"text-align: left;\">Response Body:</th><td><pre style=\"background-color: #fff; padding: 10px;\">" . htmlspecialchars($e->getData()) . "</pre></td></tr>";
+    }
+    
+    if ($e instanceof LimitReachedException) {
+        echo "<tr><th style=\"text-align: left;\">Daily Limit:</th><td>{$e->getDailyCurrent()} / {$e->getDailyMax()}</td></tr>";
+        echo "<tr><th style=\"text-align: left;\">Monthly Limit:</th><td>{$e->getMonthlyCurrent()} / {$e->getMonthlyMax()}</td></tr>";
+    }
+    
+    if ($e instanceof NotFoundException && method_exists($e, 'getRequestParameter')) {
+        echo "<tr><th style=\"text-align: left;\">Requested ICO:</th><td>{$e->getRequestParameter()}</td></tr>";
+    }
+    
+    echo "</table>";
+    echo "</div>";
 }
 
+/**
+ * Display autocomplete search results
+ * @param object $response AutoComplete result object
+ */
 function echoAutoComplete($response)
 {
     echo "<pre>";
@@ -724,6 +815,25 @@ function echoAutoComplete($response)
     echo "</pre>";
 }
 
+/**
+ * Display API usage limits (safely checks if limits are available)
+ * @param FinstatApi $api API client instance
+ */
+function echoLimitsSafe($api)
+{
+    try {
+        $limits = $api->GetAPILimits();
+        echoLimits($limits);
+    } catch (Exception $e) {
+        // Limits not available (usually after HTTP failure)
+        // Silently skip - this is expected
+    }
+}
+
+/**
+ * Display API usage limits
+ * @param array $limits Limits array with 'daily' and 'monthly' keys
+ */
 function echoLimits($limits)
 {
     if (!empty($limits)) {
@@ -748,88 +858,239 @@ function echoLimits($limits)
     }
 }
 
-// zakladne prihlasovacie udaje a nastavenia klienta
-$apiUrl = 'https://www.finstat.sk/api/';    // URL adresa Finstat API
-$apiKey = 'PLEASE_FILL_IN_YOUR_API_KEY';// PLEASE_FILL_IN_YOUR_API_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-// prosim poziadajte o svoj jedinecny kluc na info@finstat.sk.
-$privateKey = 'PLEASE_FILL_IN_YOUR_PRIVATE_KEY';// PLEASE_FILL_IN_YOUR_PRIVATE_KEY je NEFUNKCNY API kluc. Pre plnu funkcnost API,
-// prosim poziadajte o svoj privatny kluc na info@finstat.sk.
-$stationId = 'Api test';                // Identifikátor stanice, ktorá dopyt vygenerovala.
-// Môže byť ľubovolný reťazec.
-$stationName = 'Api test';                // Názov alebo opis stanice, ktorá dopyt vygenerovala.
-// Môže byť ľubovolný reťazec.
-$timeout = 10;                            // Dĺžka čakania na odozvu zo servera v sekundách.
-$json =  false;                         // Flag ci ma API vraciat odpoved ako JSON
-// inicializacia klienta
-$api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+// ============================================
+// API CLIENT INITIALIZATION
+// ============================================
 
-// priklad dopytu na detail firmy, ktora ma ICO 35757442
-$ico = (isset($_GET['ico']) && !empty($_GET['ico'])) ? $_GET['ico'] : '35757442';
+// Set HTML header
 header('Content-Type: text/html; charset=utf-8');
-// priklad vypisu ziskanych udajov z Finstatu
-?>
-<h1>Basic test:</h1>
-<?php
+
+// Add CSS styles
+echo "<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background-color: #4CAF50; color: white; }
+h1 { color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; }
+h2 { color: #555; }
+pre { background-color: #f5f5f5; padding: 15px; border-left: 3px solid #4CAF50; }
+.success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 10px; margin: 10px 0; }
+.info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; padding: 10px; margin: 10px 0; }
+hr { margin: 30px 0; border: none; border-top: 2px solid #4CAF50; }
+</style>";
+
+echo "<h1>🏢 FinStat API Example - Complete Usage Guide</h1>";
+echo "<div class='info'><b>ℹ Info:</b> This example demonstrates all available API endpoints and response types.</div>";
+
+try {
+    // Initialize the API client
+    $api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+    echo "<div class='success'>✓ API client initialized successfully</div>";
+    
+} catch (AuthenticationException $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h2 style='margin-top: 0;'>❌ Authentication Failed</h2>";
+    echo "<p>Please configure your API credentials in the CONFIGURATION section at the top of this file.</p>";
+    echo "<p><b>Error:</b> " . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<p>Contact <a href='mailto:info@finstat.sk'>info@finstat.sk</a> to obtain your API keys.</p>";
+    echo "</div>";
+    exit(1);
+} catch (Exception $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h2 style='margin-top: 0;'>❌ Fatal Error</h2>";
+    echo "<p><b>Error:</b> " . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
+    exit(1);
+}
+
+// ============================================
+// EXAMPLE 1: Basic Request
+// ============================================
+echo "<h1>📋 Example 1: Basic Company Information</h1>";
+echo "<p><b>Endpoint:</b> Request('$ico', 'basic')</p>";
+echo "<p><b>Description:</b> Retrieves basic company details including registration, contact, and business activity information.</p>";
+
 try {
     if (!empty($ico)) {
-        $response = $api->Request($ico, "basic", $json);
+        $response = $api->Request($ico, "basic", $useJson);
+        echoBase($response, $useJson);
+        echoLimitsSafe($api);
     }
-    echoBase($response, $json);
-    echoLimits($api->GetAPILimits());
-} catch (Exception $e) {
+} catch (NotFoundException $e) {
+    echo "<div style='background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⚠ Company Not Found</h3>";
+    echo "<p>No company found with ICO: <b>" . htmlspecialchars($e->getRequestParameter()) . "</b></p>";
+    echo "<p>Please verify the ICO number is correct.</p>";
+    echo "</div>";
+    echoLimitsSafe($api);
+} catch (LimitReachedException $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⛔ API Limit Reached</h3>";
+    echo "<p><b>Daily:</b> {$e->getDailyCurrent()} / {$e->getDailyMax()}</p>";
+    echo "<p><b>Monthly:</b> {$e->getMonthlyCurrent()} / {$e->getMonthlyMax()}</p>";
+    echo "<p>Please wait until your quota resets or contact FinStat to increase your limits.</p>";
+    echo "</div>";
+} catch (BadRequestException $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>❌ Bad Request</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
+    echoLimitsSafe($api);
+} catch (FinstatException $e) {
     echoException($e);
-    echoLimits($api->GetAPILimits());
+    echoLimitsSafe($api);
+} catch (Exception $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>❌ Unexpected Error</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
 }
 
 echo '<hr />';
-?>
-<h1>Detail test:</h1>
-<?php
+
+// ============================================
+// EXAMPLE 2: Detail Request
+// ============================================
+echo "<h1>📊 Example 2: Detailed Company Information</h1>";
+echo "<p><b>Endpoint:</b> Request('$ico', 'detail')</p>";
+echo "<p><b>Description:</b> Returns comprehensive company data including financial indicators, profit/revenue trends.</p>";
+
 try {
-    // funkcia $api->RequestDetail(string) vracia naplneny objekt typu DetailResult s udajmi o dopytovanej firme
     if (!empty($ico)) {
-        $response = $api->Request($ico, "detail", $json);
+        $response = $api->Request($ico, "detail", $useJson);
+        echoBase($response, $useJson);
+        echoLimitsSafe($api);
     }
-    echoBase($response, $json);
-    echoLimits($api->GetAPILimits());
-} catch (Exception $e) {
+} catch (NotFoundException $e) {
+    echo "<div style='background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⚠ Company Not Found</h3>";
+    echo "<p>No company found with ICO: <b>" . htmlspecialchars($e->getRequestParameter()) . "</b></p>";
+    echo "</div>";
+    echoLimitsSafe($api);
+} catch (LimitReachedException $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⛔ API Limit Reached</h3>";
+    echo "<p><b>Daily:</b> {$e->getDailyCurrent()} / {$e->getDailyMax()}</p>";
+    echo "<p><b>Monthly:</b> {$e->getMonthlyCurrent()} / {$e->getMonthlyMax()}</p>";
+    echo "</div>";
+} catch (FinstatException $e) {
     echoException($e);
-    echoLimits($api->GetAPILimits());
+    echoLimitsSafe($api);
+} catch (Exception $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>❌ Unexpected Error</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
 }
 
 echo '<hr />';
-?>
-<h1>Extended test:</h1>
-<?php
+
+// ============================================
+// EXAMPLE 3: Extended Request
+// ============================================
+echo "<h1>💼 Example 3: Extended Company Information</h1>";
+echo "<p><b>Endpoint:</b> Request('$ico', 'extended')</p>";
+echo "<p><b>Description:</b> Returns extended data including contact information, officers, credit scores, and more.</p>";
+
 try {
-    // funkcia $api->RequestExtended(string) vracia naplneny objekt typu ExtendedResult s udajmi o dopytovanej firme
     if (!empty($ico)) {
-        $response2 = $api->Request($ico, 'extended', $json);
+        $response2 = $api->Request($ico, 'extended', $useJson);
+        echoBase($response2, $useJson);
+        echoLimitsSafe($api);
     }
-} catch (Exception $e) {
+} catch (NotFoundException $e) {
+    echo "<div style='background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⚠ Company Not Found</h3>";
+    echo "<p>No company found with ICO: <b>" . htmlspecialchars($e->getRequestParameter()) . "</b></p>";
+    echo "</div>";
+    echoLimitsSafe($api);
+} catch (LimitReachedException $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⛔ API Limit Reached</h3>";
+    echo "<p><b>Daily:</b> {$e->getDailyCurrent()} / {$e->getDailyMax()}</p>";
+    echo "<p><b>Monthly:</b> {$e->getMonthlyCurrent()} / {$e->getMonthlyMax()}</p>";
+    echo "</div>";
+} catch (FinstatException $e) {
     echoException($e);
+    echoLimitsSafe($api);
+} catch (Exception $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>❌ Unexpected Error</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
 }
-echoBase($response2, $json);
+
 echo '<hr />';
-?>
-<h1>Ultimate test:</h1>
-<?php
+
+// ============================================
+// EXAMPLE 4: Ultimate Request
+// ============================================
+echo "<h1>🏆 Example 4: Ultimate Company Information</h1>";
+echo "<p><b>Endpoint:</b> Request('$ico', 'ultimate')</p>";
+echo "<p><b>Description:</b> Returns the complete dataset including persons, statutory bodies, bankruptcies, and more.</p>";
+
 try {
-    // funkcia $api->RequestExtended(string) vracia naplneny objekt typu ExtendedResult s udajmi o dopytovanej firme
     if (!empty($ico)) {
-        $response3 = $api->Request($ico, 'ultimate', $json);
+        $response3 = $api->Request($ico, 'ultimate', $useJson);
+        echoBase($response3, $useJson);
+        echoLimitsSafe($api);
     }
-} catch (Exception $e) {
+} catch (NotFoundException $e) {
+    echo "<div style='background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⚠ Company Not Found</h3>";
+    echo "<p>No company found with ICO: <b>" . htmlspecialchars($e->getRequestParameter()) . "</b></p>";
+    echo "</div>";
+    echoLimitsSafe($api);
+} catch (LimitReachedException $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⛔ API Limit Reached</h3>";
+    echo "<p><b>Daily:</b> {$e->getDailyCurrent()} / {$e->getDailyMax()}</p>";
+    echo "<p><b>Monthly:</b> {$e->getMonthlyCurrent()} / {$e->getMonthlyMax()}</p>";
+    echo "</div>";
+} catch (FinstatException $e) {
     echoException($e);
+    echoLimitsSafe($api);
+} catch (Exception $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>❌ Unexpected Error</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
 }
-echoBase($response3, $json);
+
 echo '<hr />';
-?>
-<h1>AutoComplete test "volkswagen":</h1>
-<?php
+
+// ============================================
+// EXAMPLE 5: AutoComplete Search
+// ============================================
+echo "<h1>🔍 Example 5: AutoComplete Search</h1>";
+echo "<p><b>Endpoint:</b> RequestAutoComplete('volkswagen')</p>";
+echo "<p><b>Description:</b> Search for companies by name and get suggestions with company details.</p>";
+
 try {
-    $response4 = $api->RequestAutoComplete('volkswagen', $json);
-} catch (Exception $e) {
+    $response4 = $api->RequestAutoComplete('volkswagen', $useJson);
+    echoAutoComplete($response4, $useJson);
+    echoLimitsSafe($api);
+} catch (BadRequestException $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>❌ Bad Request</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
+    echoLimitsSafe($api);
+} catch (LimitReachedException $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>⛔ API Limit Reached</h3>";
+    echo "<p><b>Daily:</b> {$e->getDailyCurrent()} / {$e->getDailyMax()}</p>";
+    echo "<p><b>Monthly:</b> {$e->getMonthlyCurrent()} / {$e->getMonthlyMax()}</p>";
+    echo "</div>";
+} catch (FinstatException $e) {
     echoException($e);
+    echoLimitsSafe($api);
+} catch (Exception $e) {
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>❌ Unexpected Error</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
 }
-echoAutoComplete($response4, $json);
+
+echo '<hr />';
+echo "<div class='info'><b>✓ Complete:</b> All API examples executed successfully. Total requests processed for ICO: $ico</div>";

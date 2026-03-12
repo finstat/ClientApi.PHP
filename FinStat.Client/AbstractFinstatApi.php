@@ -1,8 +1,19 @@
 <?php
 
-require_once(__DIR__ . '/Requests.php');
-require_once(__DIR__ . '/ViewModel/AutoCompleteResult.php');
-require_once(__DIR__ . '/ViewModel/AddressResult.php');
+namespace FinStat\Client;
+
+use DateTime;
+use DOMDocument;
+use SimpleXMLElement;
+use Exception;
+use RuntimeException;
+use FinStat\Client\Exceptions\FinstatException;
+use FinStat\Client\Exceptions\NotFoundException;
+use FinStat\Client\Exceptions\LimitReachedException;
+use FinStat\Client\Exceptions\AuthenticationException;
+use FinStat\Client\Exceptions\BadRequestException;
+use FinStat\Client\Exceptions\ParseException;
+use FinStat\ViewModel\Detail\IcDphAdditionalResult;
 
 class AbstractFinstatApi
 {
@@ -36,15 +47,13 @@ class AbstractFinstatApi
         $this->limits = null;
     }
 
+    /**
+     * Initialize HTTP client options
+     * 
+     * @return array Options array for HTTP client
+     */
     public function InitRequests()
     {
-        if(!class_exists('Requests')) {
-            trigger_error("Unable to load Requests class", E_USER_WARNING);
-            return false;
-        }
-
-        Requests::register_autoloader();
-
         return array(
             'timeout' => $this->timeout,
             'follow_redirects' => false,
@@ -52,6 +61,16 @@ class AbstractFinstatApi
         );
     }
 
+    /**
+     * Make HTTP request to API
+     * 
+     * @param string $requestUrl API endpoint
+     * @param array $requestData Request data
+     * @param string|null $parameter Request parameter
+     * @param bool $json Whether to request JSON response
+     * @return HttpResponse Response object
+     * @throws RuntimeException On HTTP error
+     */
     public function DoBaseRequest($requestUrl, $requestData, $parameter = null, $json = false)
     {
         $options = $this->InitRequests();
@@ -64,27 +83,35 @@ class AbstractFinstatApi
         ), $requestData);
         
         $url = $this->apiUrl. $requestUrl;
+        if ($json) {
+            $url = $url . ".json";
+        }
+
         try {
-            $headers = null;
-            if ($json) {
-                $url = $url . ".json";
-            }
-
-
-            return Requests::post($url, $headers, $data, $options);
-        } catch(Requests_Exception $e) {
+            return HttpClient::post($url, null, $data, $options);
+        } catch (RuntimeException $e) {
             throw $e;
         }
     }
 
+    /**
+     * Make API request and parse response
+     * 
+     * @param string $requestUrl API endpoint
+     * @param array $requestData Request data
+     * @param string|null $parameter Request parameter
+     * @param bool $json Whether to request JSON response
+     * @return mixed Parsed response
+     * @throws FinstatException On API error
+     */
     public function DoRequest($requestUrl, $requestData, $parameter = null, $json = false)
     {
         try {
             $url = $this->apiUrl. $requestUrl;
             $response = $this->DoBaseRequest($requestUrl, $requestData, $parameter, $json);
             return $this->parseResponse($response, $url, $parameter, $json);
-        } catch(Requests_Exception $e) {
-            throw $e;
+        } catch (RuntimeException $e) {
+            throw new FinstatException('HTTP request failed: ' . $e->getMessage(), 0, $e);
         }
     }
 
@@ -115,24 +142,39 @@ class AbstractFinstatApi
         if(!$response->success) {
             $dom = new DOMDocument();
             $dom->loadHTML($response->body);
+            
             switch($response->status_code) {
                 case 404:
-                    if(isset($parameter) && !empty($parameter)) {
-                        throw new Requests_Exception("Invalid URL: '{$url}' or specified parameter: '{$parameter}' not found in database!", 'FinstatApi', $dom->textContent, $response->status_code);
-                    } else {
-                        throw new Requests_Exception("Invalid URL: '{$url}'!", 'FinstatApi', $dom->textContent, $response->status_code);
-                    }
+                    $exception = new NotFoundException($parameter, $response->status_code);
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
 
-                    // no break
                 case 402:
-                    throw new Requests_Exception('Limit reached!', 'FinstatApi', $dom->textContent, $response->status_code);
+                    $exception = new LimitReachedException(
+                        (int)($this->limits['daily']['current'] ?? 0),
+                        (int)($this->limits['daily']['max'] ?? 0),
+                        (int)($this->limits['monthly']['current'] ?? 0),
+                        (int)($this->limits['monthly']['max'] ?? 0),
+                        $response->status_code
+                    );
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
 
                 case 403:
-                    throw new Requests_Exception('Access Forbidden!', 'FinstatApi', $dom->textContent, $response->status_code);
+                    $exception = new AuthenticationException('Access Forbidden. Check API credentials.', $response->status_code);
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
+                    
                 case 400:
-                    throw new Requests_Exception('Bad Request!', 'FinstatApi', $dom->textContent, $response->status_code);
+                    $exception = new BadRequestException('Bad Request. Invalid parameters.', $response->status_code);
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
+                    
                 default:
-                    throw new Requests_Exception('Unknown exception while communication with Finstat api!', 'FinstatApi', $dom->textContent, $response->status_code);
+                    $message = 'HTTP ' . $response->status_code . ': ' . $dom->textContent;
+                    $exception = new FinstatException($message, $response->status_code);
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
             }
         }
     }
@@ -140,18 +182,27 @@ class AbstractFinstatApi
     protected function parseResponse($response, $url, $parameter, $json = false)
     {
         $this->parseResponseRaw($response, $url, $parameter, $json);
-        $detail = false;
-        if($json) {
-            $detail = json_decode($response->body);
-        } else {
-            $detail = simplexml_load_string($response->body);
+        
+        try {
+            if($json) {
+                $detail = json_decode($response->body);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new ParseException('Error while parsing JSON data: ' . json_last_error_msg());
+                }
+            } else {
+                $detail = simplexml_load_string($response->body);
+                if($detail === false) {
+                    throw new ParseException('Error while parsing XML data.');
+                }
+            }
+            
+            return $detail;
+        } catch (Exception $e) {
+            if ($e instanceof ParseException) {
+                throw $e;
+            }
+            throw new ParseException('Error parsing response: ' . $e->getMessage(), 0, $e);
         }
-
-        if($detail === false) {
-            throw new Requests_Exception('Error while parsing XML data.', 'FinstatApi');
-        }
-
-        return $detail;
     }
 
     public function GetAPILimits()
@@ -257,7 +308,7 @@ class AbstractFinstatApi
      * @param SimpleXMLElement $date
      * @return DateTime|null
      */
-    protected function parseDate(?SimpleXMLElement $date = null)
+    protected function parseDate(SimpleXMLElement|null $date = null)
     {
         if (empty($date) || !((string) $date)) {
             return null;

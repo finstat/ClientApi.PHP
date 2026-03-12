@@ -1,16 +1,18 @@
 <?php
-namespace FinstatApiCz;
+namespace FinStatCZ;
 
-require_once(__DIR__ . '/../FinStat.Client/Requests.php');
-require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
-require_once(__DIR__ . '/../FinStat.Client/BaseFinstatApi.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/Detail/BankAccount.php');
-require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/BasicResult.php');
-require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/DetailResult.php');
-require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/PremiumCZResult.php');
+use FinStat\Client\BaseFinstatApi;
+use FinStat\Client\ViewModel\Detail\BankAccount;
+use FinStatCZ\ViewModel\Detail\BasicResult;
+use FinStatCZ\ViewModel\Detail\DetailResult;
+use FinStatCZ\ViewModel\Detail\PremiumCZResult;
+use FinStatCZ\ViewModel\Detail\EliteCZResult;
+use FinStatCZ\ViewModel\Detail\IsirResult;
+use FinStatCZ\ViewModel\Detail\IndicatorResult;
+use FinStatCZ\ViewModel\Detail\IndicatorValue;
 
-class FinstatApi extends \BaseFinstatApi
+
+class FinstatApi extends BaseFinstatApi
 {
     public function RequestBasic($ico, $json = false)
     {
@@ -60,6 +62,8 @@ class FinstatApi extends \BaseFinstatApi
         }
 
         $response = ($response == null) ? new BasicResult() : $response;
+        $response->VatNumber            = (string)$detail->VatNumber;
+        $response->TaxPayer             = (string)$detail->TaxPayer;
 
         return $this->parseAbstractResult($detail, $response);
     }
@@ -79,7 +83,7 @@ class FinstatApi extends \BaseFinstatApi
         $response->Created              = $this->parseDate($detail->Created);
         $response->Cancelled            = $this->parseDate($detail->Cancelled);
         $response->Activity             = (string)$detail->Activity;
-        $response->Warning              = "{$detail->Warning}"  == 'true' ;
+        $response->Warning              = $this->parseBoolean($detail->Warning);
         $response->WarningUrl           = (string)$detail->WarningUrl;
         $response->LegalForm            = (string)$detail->LegalForm;
         $response->OwnershipType        = (string)$detail->OwnershipType;
@@ -100,18 +104,16 @@ class FinstatApi extends \BaseFinstatApi
         $response->TaxPayer             = (string)$detail->TaxPayer;
 
         if (!empty($detail->BankAccounts)) {
-            $response->BankAccounts = array();
-            foreach ($detail->BankAccounts->BankAccount as $c) {
-                $o = new \BankAccount();
+            $response->BankAccounts = $this->parseObjectArray($detail->BankAccounts, 'BankAccount', function($c) {
+                $o = new BankAccount();
                 $o->AccountNumber = (string)$c->AccountNumber;
                 $o->PublishedAt = $this->parseDate($c->PublishedAt);
-                $response->BankAccounts[] = $o;
-            }
+                return $o;
+            });
         }
-        $response->SuspendedAsPerson    = "{$detail->SuspendedAsPerson}" == 'true';
         $response->LegalFormCode        = (string)$detail->LegalFormCode;
         $response->OwnershipCode        = (string)$detail->OwnershipCode;
-        $response->UnReliability        = empty($detail->UnReliability) ? null : "{$detail->UnReliability}" == 'true';
+        $response->UnReliability        = empty($detail->UnReliability) ? null : $this->parseBoolean($detail->UnReliability);
         $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
         $response->TradeLicensingOffice = (string)$detail->TradeLicensingOffice;
         $response->ActualYear           = (int)"{$detail->ActualYear}";

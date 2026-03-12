@@ -1,9 +1,11 @@
 <?php
 
-require_once(__DIR__ . '/../FinStat.Client/Requests.php');
-require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Deadline.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/BankuptcyRestructuing/BankruptcyRestructuring.php');
+namespace FinStat\Api;
+
+use FinStat\Client\AbstractFinstatApi;
+use FinStat\ViewModel\Deadline;
+use FinStat\ViewModel\BankuptcyRestructuing\BankruptcyRestructuring;
+use DateTime;
 
 class FinstatBankruptcyRestructuringApi extends AbstractFinstatApi
 {
@@ -47,41 +49,30 @@ class FinstatBankruptcyRestructuringApi extends AbstractFinstatApi
 
     private function parseBankruptcyRestructuringList($detail)
     {
-        $result = [];
-        if (!empty($detail->BankruptcyRestructuring)) {
-            foreach ($detail->BankruptcyRestructuring as $element) {
-                $o = new BankruptcyRestructuring();
-                $o->FileReference       = (string)$element->FileReference;
-                $o->FirstRecordDate     = empty($element->FirstRecordDate) ? null : new DateTime($element->FirstRecordDate);
-                $o->LastRecordDate      = empty($element->LastRecordDate) ? null : new DateTime($element->LastRecordDate);
-                $o->RUState             = (string)$element->RUState;
-                $o->RUStateDate         = empty($element->RUStateDate) ? null : new DateTime($element->RUStateDate);
-                $o->OVState             = (string)$element->OVState;
-                $o->OVStateDate         = empty($element->OVStateDate) ? null : new DateTime($element->OVStateDate);
-                $o->EnterDate           = empty($element->EnterDate) ? null : new DateTime($element->EnterDate);
-                $o->ExitDate            = empty($element->ExitDate) ? null : new DateTime($element->ExitDate);
-                $o->EndState            = (string)$element->EndState;
-                $o->EndReason           = (string)$element->EndReason;       
-                $o->FinstatURL          = (string)$element->FinstatURL;
-                $o->Debtors             = [];
-                if (!empty($element->Debtors)) {
-                    foreach ($element->Debtors->PersonAddress as $person) {
-                        $p = $this->parsePersonAddress($person);
-                        $o->Debtors[] = $p;
-                    }
-                }
-                $o->Deadlines           = [];
-                if (!empty($element->Deadlines)) {
-                    foreach ($element->Deadlines->Deadline as $deadline) {
-                        $d              = new Deadline();
-                        $d->Type        = (string)$deadline->Type;
-                        $d->Date        = empty($deadline->Date) ? null : new DateTime($deadline->Date);
-                        $o->Deadlines[] = $d;
-                    }
-                }
-                $result[] = $o;
-            }
-        }
-        return $result;
+        return $this->parseObjectArray($detail, 'BankruptcyRestructuring', function($element) {
+            $o = new BankruptcyRestructuring();
+            $o->FileReference       = (string)$element->FileReference;
+            $o->FirstRecordDate     = empty($element->FirstRecordDate) ? null : new DateTime($element->FirstRecordDate);
+            $o->LastRecordDate      = empty($element->LastRecordDate) ? null : new DateTime($element->LastRecordDate);
+            $o->RUState             = (string)$element->RUState;
+            $o->RUStateDate         = empty($element->RUStateDate) ? null : new DateTime($element->RUStateDate);
+            $o->OVState             = (string)$element->OVState;
+            $o->OVStateDate         = empty($element->OVStateDate) ? null : new DateTime($element->OVStateDate);
+            $o->EnterDate           = empty($element->EnterDate) ? null : new DateTime($element->EnterDate);
+            $o->ExitDate            = empty($element->ExitDate) ? null : new DateTime($element->ExitDate);
+            $o->EndState            = (string)$element->EndState;
+            $o->EndReason           = (string)$element->EndReason;       
+            $o->FinstatURL          = (string)$element->FinstatURL;
+            $o->Debtors = $this->parseObjectArray($element->Debtors, 'PersonAddress', function($person) {
+                return $this->parsePersonAddress($person);
+            });
+            $o->Deadlines = $this->parseObjectArray($element->Deadlines, 'Deadline', function($deadline) {
+                $d              = new Deadline();
+                $d->Type        = (string)$deadline->Type;
+                $d->Date        = empty($deadline->Date) ? null : new DateTime($deadline->Date);
+                return $d;
+            });
+            return $o;
+        });
     }
 }

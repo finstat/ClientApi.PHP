@@ -14,15 +14,23 @@
         }
     ],
     "autoload": {
-        "classmap": [""]
+        "psr-4": {
+            "FinStat\\Client\\": "FinStat.Client/",
+            "FinStat\\ViewModel\\": "FinStat.ViewModel/",
+            "FinStat\\": "FinStatApi/",
+            "FinStatCZ\\": "FinStatApiCZ/",
+            "FinStatCZ\\ViewModel\\": "FinStatCZ.ViewModel/"
+        }
     },
     "require": {
         "php": "^7.1 || ^8.0",
-        "ext-curl": "*",
         "ext-dom": "*",
         "ext-zlib": "*",
         "ext-json": "*",
         "ext-simplexml": "*"
+    },
+    "suggest": {
+        "ext-curl": "For better performance and features. Falls back to file_get_contents if not available."
     },
     "minimum-stability": "stable",
     "prefer-stable": true,

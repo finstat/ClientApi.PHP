@@ -1,5 +1,7 @@
 <?php
 
+namespace FinStat\ViewModel\Statement;
+
 abstract class AbstractStatementLegendResult
 {
     public $Assets;

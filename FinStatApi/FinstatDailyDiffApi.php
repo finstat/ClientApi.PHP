@@ -1,7 +1,6 @@
 <?php
 
-require_once(__DIR__ . '/AbstractFinstatDiffApi.php');
-
+namespace FinStat\Api;
 
 class FinstatDailyDiffApi extends AbstractFinstatDailyDiffApi
 {

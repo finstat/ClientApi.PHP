@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . '/BaseResult.php');
+namespace FinStat\ViewModel\Detail;
 
 class DetailResult extends BaseResult
 {

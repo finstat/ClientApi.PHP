@@ -1,10 +1,13 @@
 <?php
 
-require_once(__DIR__ . '/../FinStat.Client/Requests.php');
-require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/Monitoring/MonitoringReportResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Deadline.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Monitoring/ProceedingResult.php');
+namespace FinStat\Api;
+
+use FinStat\Client\AbstractFinstatApi;
+use FinStat\Client\ViewModel\Monitoring\MonitoringReportResult;
+use FinStat\Client\ViewModel\Monitoring\MonitoringDateReportResult;
+use FinStat\Client\ViewModel\Monitoring\MonitoringCategory;
+use FinStat\ViewModel\Deadline;
+use FinStat\ViewModel\Monitoring\ProceedingResult;
 
 class FinstatMonitoringApi extends AbstractFinstatApi
 {
@@ -12,16 +15,14 @@ class FinstatMonitoringApi extends AbstractFinstatApi
     {
         $detail = $this->DoRequest("AddToMonitoring", array('ico' => $ico, 'category' => $category), $ico, $json);
 
-        $parse = (string)$detail;
-        return ($json) ? $detail : ($parse == 'true');
+        return ($json) ? $detail : $this->parseBoolean($detail);
     }
 
     public function RemoveFromMonitoring($ico, $category = null, $json = false)
     {
         $detail = $this->DoRequest("RemoveFromMonitoring", array('ico' => $ico, 'category' => $category), $ico, $json);
 
-        $parse = (string)$detail;
-        return ($json) ? $detail : ($parse == 'true');
+        return ($json) ? $detail : $this->parseBoolean($detail);
     }
 
     public function MonitoringList($category = null, $json = false)
@@ -49,16 +50,14 @@ class FinstatMonitoringApi extends AbstractFinstatApi
     {
         $detail = $this->DoRequest("AddDateToMonitoring", array('date' => $date, 'category' => $category), $date, $json);
 
-        $parse = (string)$detail;
-        return ($json) ? $detail : ($parse == 'true');
+        return ($json) ? $detail : $this->parseBoolean($detail);
     }
 
     public function RemoveDateFromMonitoring($date, $category = null, $json = false)
     {
         $detail = $this->DoRequest("RemoveDateFromMonitoring", array('date' => $date, 'category' => $category), $date, $json);
 
-        $parse = (string)$detail;
-        return ($json) ? $detail : ($parse == 'true');
+        return ($json) ? $detail : $this->parseBoolean($detail);
     }
 
     public function MonitoringDateList($category = null, $json = false)
@@ -88,14 +87,7 @@ class FinstatMonitoringApi extends AbstractFinstatApi
             return $detail;
         }
 
-        $response =  array();
-        if (!empty($detail->string)) {
-            foreach ($detail->string as $s) {
-                $response[] = (string) $s;
-            }
-        }
-
-        return $response;
+        return $this->parseStringArray($detail);
     }
 
     private function parseMonitoringReport($detail)
@@ -104,26 +96,17 @@ class FinstatMonitoringApi extends AbstractFinstatApi
             return $detail;
         }
 
-        $response =  array();
-        if (!empty($detail->Monitoring)) {
-            foreach ($detail->Monitoring as $element) {
-                $o = new MonitoringReportResult();
-                $o->Ident        = (string)$element->Ident;
-                $o->Ico          = (string)$element->Ico;
-                $o->Name         = (string)$element->Name;
-                $o->PublishDate  = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
-                $o->Type         = (string)$element->Type;
-                $o->Description  = (string)$element->Description;
-                $o->Categories   = [];
-
-                foreach ($element->Categories->string as $category) {
-                    $o->Categories[] = $category;
-                }
-                $response[] = $o;
-            }
-        }
-
-        return $response;
+        return $this->parseObjectArray($detail, 'Monitoring', function($element) {
+            $o = new MonitoringReportResult();
+            $o->Ident        = (string)$element->Ident;
+            $o->Ico          = (string)$element->Ico;
+            $o->Name         = (string)$element->Name;
+            $o->PublishDate  = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
+            $o->Type         = (string)$element->Type;
+            $o->Description  = (string)$element->Description;
+            $o->Categories   = $this->parseStringArray($element->Categories);
+            return $o;
+        });
     }
 
     private function parseMonitoringDateReport($detail)
@@ -132,22 +115,17 @@ class FinstatMonitoringApi extends AbstractFinstatApi
             return $detail;
         }
 
-        $response =  array();
-        if (!empty($detail->MonitoringDate)) {
-            foreach ($detail->MonitoringDate as $element) {
-                $o = new MonitoringDateReportResult();
-                $o->Ident        = (string)$element->Ident;
-                $o->Date         = (string)$element->Date;
-                $o->Name         = (string)$element->Name;
-                $o->PublishDate  = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
-                $o->Type         = (string)$element->Type;
-                $o->Description  = (string)$element->Description;
-                $o->Url          = (string)$element->Url;
-                $response[] = $o;
-            }
-        }
-
-        return $response;
+        return $this->parseObjectArray($detail, 'MonitoringDate', function($element) {
+            $o = new MonitoringDateReportResult();
+            $o->Ident        = (string)$element->Ident;
+            $o->Date         = (string)$element->Date;
+            $o->Name         = (string)$element->Name;
+            $o->PublishDate  = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
+            $o->Type         = (string)$element->Type;
+            $o->Description  = (string)$element->Description;
+            $o->Url          = (string)$element->Url;
+            return $o;
+        });
     }
 
     public function parseAdministratorAddress($address)
@@ -163,73 +141,49 @@ class FinstatMonitoringApi extends AbstractFinstatApi
             return $detail;
         }
 
-        $response =  array();
-        if (!empty($detail->ProceedingResult)) {
-            foreach ($detail->ProceedingResult as $element) {
-                $o = new MonitoringProceedingResult();
-                if(!empty($element->DebtorsAddress)) {
-                    $array = array();
-                    foreach ($element->DebtorsAddress->PersonAddress as $address) {
-                        $array[] = $this->parsePersonAddress($address);
-                    }
-                    $o->DebtorsAddress = $array;
-                }
-                if(!empty($element->ProposersAddress)) {
-                    $array = array();
-                    foreach ($element->ProposersAddress->PersonAddress as $address) {
-                        $array[] = $this->parsePersonAddress($address);
-                    }
-                    $o->ProposersAddress = $array;
-                }
-                if(!empty($element->AdministratorsAddress)) {
-                    $array = array();
-                    foreach ($element->AdministratorsAddress->AdministratorAddress as $address) {
-                        $array[] = $this->parseAdministratorAddress($address);
-                    }
-                    $o->AdministratorsAddress = $array;
-                }
-                if(!empty($element->CourtsAddress)) {
-                    $o->CourtsAddress  = $this->parseFullAddress($element->CourtsAddress);
-                }
-                $o->ReferenceFileNumber     = (string)$element->ReferenceFileNumber;
-                $o->Status                  = (string)$element->Status;
-                $o->Character               = (string)$element->Character;
-                $o->EndReason               = (string)$element->EndReason;
-                $o->EndStatus               = (string)$element->EndStatus;
-                $o->Url                     = (string)$element->Url;
-                $o->Type                    = (string)$element->Type;
-                $o->PublishDate             = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
-                $o->Deadline                = empty($element->Deadline) ? null : new DateTime($element->Deadline);
-                $o->PostedBy                = (string)$element->PostedBy;
-
-                if (!empty($element->FileIdentifierNumber)) {
-                    $array  = array();
-                    foreach ($element->FileIdentifierNumber->string as $s) {
-                        $array[] = (string) $s;
-                    }
-                    $o->FileIdentifierNumber = $array;
-                }
-
-                if(!empty($element->IssuedBy)) {
-                    $p = new IssuedPerson();
-                    $p->Name        = (string)$element->Name;
-                    $p->Function    = (string)$element->Function;
-                    $o->IssuedBy  = $p;
-                }
-
-                if(!empty($element->DatesInProceeding)) {
-                    $array  = array();
-                    foreach ($element->DatesInProceeding->Deadline as $deadline) {
-                        $d = new Deadline();
-                        $d->Type        = (string)$deadline->Type;
-                        $d->Date        = empty($deadline->Date) ? null : new DateTime($deadline->Date);
-                        $array[] = $d;
-                    }
-                }
-                $response[] = $array;
+        return $this->parseObjectArray($detail, 'ProceedingResult', function($element) {
+            $o = new MonitoringProceedingResult();
+            $o->DebtorsAddress = $this->parseObjectArray($element->DebtorsAddress, 'PersonAddress', function($address) {
+                return $this->parsePersonAddress($address);
+            });
+            $o->ProposersAddress = $this->parseObjectArray($element->ProposersAddress, 'PersonAddress', function($address) {
+                return $this->parsePersonAddress($address);
+            });
+            $o->AdministratorsAddress = $this->parseObjectArray($element->AdministratorsAddress, 'AdministratorAddress', function($address) {
+                return $this->parseAdministratorAddress($address);
+            });
+            if(!empty($element->CourtsAddress)) {
+                $o->CourtsAddress  = $this->parseFullAddress($element->CourtsAddress);
             }
-        }
+            $o->ReferenceFileNumber     = (string)$element->ReferenceFileNumber;
+            $o->Status                  = (string)$element->Status;
+            $o->Character               = (string)$element->Character;
+            $o->EndReason               = (string)$element->EndReason;
+            $o->EndStatus               = (string)$element->EndStatus;
+            $o->Url                     = (string)$element->Url;
+            $o->Type                    = (string)$element->Type;
+            $o->PublishDate             = empty($element->PublishDate) ? null : new DateTime($element->PublishDate);
+            $o->Deadline                = empty($element->Deadline) ? null : new DateTime($element->Deadline);
+            $o->PostedBy                = (string)$element->PostedBy;
 
-        return $response;
+            $o->FileIdentifierNumber = $this->parseStringArray($element->FileIdentifierNumber);
+
+            if(!empty($element->IssuedBy)) {
+                $p = new IssuedPerson();
+                $p->Name        = (string)$element->Name;
+                $p->Function    = (string)$element->Function;
+                $o->IssuedBy  = $p;
+            }
+
+            if(!empty($element->DatesInProceeding)) {
+                $o->DatesInProceeding = $this->parseObjectArray($element->DatesInProceeding, 'Deadline', function($deadline) {
+                    $d = new Deadline();
+                    $d->Type        = (string)$deadline->Type;
+                    $d->Date        = empty($deadline->Date) ? null : new DateTime($deadline->Date);
+                    return $d;
+                });
+            }
+            return $o;
+        });
     }
 }

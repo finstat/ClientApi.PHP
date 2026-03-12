@@ -1,7 +1,8 @@
 <?php
 
-require_once(__DIR__ . '/../../FinStat.Client/ViewModel/AddressResult.php');
-require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/CommonResult.php');
+namespace FinStat\ViewModel\Detail;
+
+use FinStat\Client\ViewModel\Detail\CommonResult;
 
 class JudgementIndicatorResult
 {
@@ -14,7 +15,6 @@ class BaseResult extends CommonResult
     public $RegisterNumberText;
     public $Dic;
     public $IcDPH;
-    public $SuspendedAsPerson;
     public $OrChange;
     public $OrChangeUrl;
     public $PaymentOrderWarning;

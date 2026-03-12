@@ -1,10 +1,6 @@
 <?php
 
-namespace FinstatApiCz;
-
-require_once(__DIR__ . '/../../FinStat.Client/ViewModel/AddressResult.php');
-require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/AbstractResult.php');
-require_once(__DIR__ . '/DetailResult.php');
+namespace FinStatCZ\ViewModel\Detail;
 
 class PremiumCZResult extends DetailResult
 {

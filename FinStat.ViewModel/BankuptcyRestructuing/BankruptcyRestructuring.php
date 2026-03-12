@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__ . '/../../FinStat.Client/ViewModel/AddressResult.php');
+namespace FinStat\ViewModel\BankuptcyRestructuing;
 
 class BankruptcyRestructuring
 {

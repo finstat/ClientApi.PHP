@@ -1,9 +1,11 @@
 <?php
 
-require_once(__DIR__ . '/../FinStat.Client/Requests.php');
-require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/KeyValue.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Statement/StatementResult.php');
+namespace FinStat\Api;
+
+use FinStat\Client\AbstractFinstatApi;
+use FinStat\ViewModel\KeyValue;
+use FinStat\ViewModel\Statement\StatementResult;
+use FinStat\ViewModel\Statement\StatementItem;
 
 class FinstatStatementApi extends AbstractFinstatApi
 {

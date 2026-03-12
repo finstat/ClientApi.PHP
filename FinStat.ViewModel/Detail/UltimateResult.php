@@ -1,6 +1,8 @@
 <?php
 
-require_once(__DIR__ . '/ExtendedResult.php');
+namespace FinStat\ViewModel\Detail;
+
+use FinStat\Client\ViewModel\AddressResult;
 
 class FunctionResult
 {

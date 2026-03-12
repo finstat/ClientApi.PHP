@@ -1,11 +1,10 @@
 <?php
 
-namespace FinstatApiCz;
+namespace FinStatCZ\ViewModel\Detail;
 
-require_once(__DIR__ . '/../../FinStat.Client/ViewModel/AddressResult.php');
-require_once(__DIR__ . '/../../FinStat.Client/ViewModel/Detail/AbstractResult.php');
+use FinStat\Client\ViewModel\Detail\CommonResult;
 
-class DetailResult extends \CommonResult
+class DetailResult extends CommonResult
 {
     public $LegalForm;
     public $OwnershipType;

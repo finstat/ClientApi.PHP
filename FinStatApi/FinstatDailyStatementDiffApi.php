@@ -1,7 +1,8 @@
 <?php
 
-require_once(__DIR__ . '/AbstractFinstatDiffApi.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/KeyValue.php');
+namespace FinStat\Api;
+
+use FinStat\ViewModel\KeyValue;
 
 class FinstatDailyStatementDiffApi extends AbstractFinstatDailyDiffApi
 {

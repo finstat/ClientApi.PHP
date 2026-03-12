@@ -1,5 +1,7 @@
 <?php
 
+namespace FinStat\Client\ViewModel;
+
 class CompanyResult
 {
     public $Ico;

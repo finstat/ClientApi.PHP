@@ -1,9 +1,10 @@
 <?php
 
-require_once(__DIR__ . '/../FinStat.Client/Requests.php');
-require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Diff/DailyDiff.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Diff/DailyDiffList.php');
+namespace FinStat\Api;
+
+use FinStat\Client\AbstractFinstatApi;
+use FinStat\ViewModel\Diff\DailyDiff;
+use FinStat\ViewModel\Diff\DailyDiffList;
 
 
 class AbstractFinstatDailyDiffApi extends AbstractFinstatApi

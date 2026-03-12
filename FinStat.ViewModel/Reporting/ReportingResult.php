@@ -1,5 +1,7 @@
 <?php
 
+namespace FinStat\ViewModel\Reporting;
+
 class ReportOutput
 {
     public $FileName;

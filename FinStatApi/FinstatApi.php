@@ -1,15 +1,12 @@
 <?php
 
-require_once(__DIR__ . '/../FinStat.Client/Requests.php');
-require_once(__DIR__ . '/../FinStat.Client/AbstractFinstatApi.php');
-require_once(__DIR__ . '/../FinStat.Client/BaseFinstatApi.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/Detail/BankAccount.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BaseResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BasicResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/DetailResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/ExtendedResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/UltimateResult.php');
+namespace FinStat\Api;
+
+use FinStat\Client\BaseFinstatApi;
+use FinStat\ViewModel\Detail\BasicResult;
+use FinStat\ViewModel\Detail\DetailResult;
+use FinStat\ViewModel\Detail\ExtendedResult;
+use FinStat\ViewModel\Detail\UltimateResult;
 
 class FinstatApi extends BaseFinstatApi
 {
@@ -67,11 +64,10 @@ class FinstatApi extends BaseFinstatApi
         $response->Dic                  = (string)$detail->Dic;
         $response->IcDPH                = (string)$detail->IcDPH;
 
-        $response->SuspendedAsPerson        = "{$detail->SuspendedAsPerson}"  == 'true' ;
         $response->SuspendedAsPersonUntil   = $this->parseDate($detail->SuspendedAsPersonUntil);
-        $response->PaymentOrderWarning      = "{$detail->PaymentOrderWarning}"  == 'true';
+        $response->PaymentOrderWarning      = $this->parseBoolean($detail->PaymentOrderWarning);
         $response->PaymentOrderUrl          = (string)$detail->PaymentOrderUrl;
-        $response->OrChange                 = "{$detail->OrChange}"  == 'true';
+        $response->OrChange                 = $this->parseBoolean($detail->OrChange);
         $response->OrChangeUrl              = (string)$detail->OrChangeURL;
         $response->SkNaceCode               = (string)$detail->SkNaceCode;
         $response->SkNaceText               = (string)$detail->SkNaceText;
@@ -90,21 +86,20 @@ class FinstatApi extends BaseFinstatApi
         }
 
         if (!empty($detail->JudgementIndicators)) {
-            $response->JudgementIndicators = array();
-            foreach ($detail->JudgementIndicators->JudgementIndicator as $c) {
+            $response->JudgementIndicators = $this->parseObjectArray($detail->JudgementIndicators, 'JudgementIndicator', function($c) {
                 $o = new JudgementIndicatorResult();
                 $o->Name = (string) $c->Name;
-                $o->Value = "{$c->Value}"  == 'true';
-                $response->JudgementIndicators[] = $o;
-            }
+                $o->Value = $this->parseBoolean($c->Value);
+                return $o;
+            });
         }
         $response->JudgementFinstatLink =  (string)$detail->JudgementFinstatLink;
 
         $response->KaRUrl               = (string)$detail->KaRUrl;
         $response->DebtUrl              = (string)$detail->DebtUrl;
-        $response->HasKaR               = "{$detail->HasKaR}"  == 'true';
-        $response->HasDebt              = "{$detail->HasDebt}"  == 'true';
-        $response->Anonymized           = "{$detail->Anonymized}"  == 'true';
+        $response->HasKaR               = $this->parseBoolean($detail->HasKaR);
+        $response->HasDebt              = $this->parseBoolean($detail->HasDebt);
+        $response->Anonymized           = $this->parseBoolean($detail->Anonymized);
         if (!empty($detail->BankAccounts)) {
             $response->BankAccounts = array();
             foreach ($detail->BankAccounts->BankAccount as $c) {
@@ -128,8 +123,10 @@ class FinstatApi extends BaseFinstatApi
         $response = new BasicResult();
         $response = $this->parseAbstractResult($detail, $response);
 
-        $response->Anonymized           = "{$detail->Anonymized}"  == 'true';
-
+        $response->Anonymized           = $this->parseBoolean($detail->Anonymized);
+        $response->Dic                  = (string)$detail->Dic;
+        $response->IcDPH                = (string)$detail->IcDPH;
+        $response->Paragraph            = (string)$detail->Paragraph;         
         return $response;
     }
 
@@ -165,84 +162,55 @@ class FinstatApi extends BaseFinstatApi
         $response->WarningKaR                   = $this->parseDate($detail->WarningKaR);
         $response->WarningLiquidation           = $this->parseDate($detail->WarningLiquidation);
         $response->DisposalUrl                  = (string)$detail->DisposalUrl;
-        $response->HasDisposal                  = "{$detail->HasDisposal}"  == 'true';
-        $response->SelfEmployed                 = "{$detail->SelfEmployed}"  == 'true';
+        $response->HasDisposal                  = $this->parseBoolean($detail->HasDisposal);
+        $response->SelfEmployed                 = $this->parseBoolean($detail->SelfEmployed);
         $response->CreditScoreValueIndex05      = (float)$detail->CreditScoreValueIndex05;
         $response->CreditScoreStateIndex05      = (string)$detail->CreditScoreStateIndex05;
         $response->CreditScoreValueFinStatScore = (float)$detail->CreditScoreValueFinStatScore;
         $response->CreditScoreStateFinStatScore = (string)$detail->CreditScoreStateFinStatScore;
 
-        $response->Phones = array();
-        if (!empty($detail->Phones)) {
-            foreach ($detail->Phones->string as $s) {
-                $response->Phones[] = (string)$s;
-            }
-        }
+        $response->Phones = $this->parseStringArray($detail->Phones);
 
-        $response->Emails = array();
-        if (!empty($detail->Emails)) {
-            foreach ($detail->Emails->string as $s) {
-                $response->Emails[] = (string)$s;
-            }
-        }
+        $response->Emails = $this->parseStringArray($detail->Emails);
 
-        $response->Debts = array();
-        if (!empty($detail->Debts)) {
-            foreach ($detail->Debts->Debt as $debt) {
-                $response->Debts[] = $this->parseDebtResult($debt);
-            }
-        }
+        $response->Debts = $this->parseObjectArray($detail->Debts, 'Debt', function($debt) {
+            return $this->parseDebtResult($debt);
+        });
 
-        $response->StateReceivables = array();
-        if (!empty($detail->StateReceivables)) {
-            foreach ($detail->StateReceivables->ReceivableDebt as $debt) {
-                $response->StateReceivables[] = $this->ParseReceivableDebtResult($debt);
-            }
-        }
+        $response->StateReceivables = $this->parseObjectArray($detail->StateReceivables, 'ReceivableDebt', function($debt) {
+            return $this->ParseReceivableDebtResult($debt);
+        });
 
-        $response->CommercialReceivables = array();
-        if (!empty($detail->CommercialReceivables)) {
-            foreach ($detail->CommercialReceivables->ReceivableDebt as $debt) {
-                $response->CommercialReceivables[] = $this->ParseReceivableDebtResult($debt);
-            }
-        }
+        $response->CommercialReceivables = $this->parseObjectArray($detail->CommercialReceivables, 'ReceivableDebt', function($debt) {
+            return $this->ParseReceivableDebtResult($debt);
+        });
 
-        $response->PaymentOrders = array();
-        if (!empty($detail->PaymentOrders)) {
-            foreach ($detail->PaymentOrders->PaymentOrder as $paymentOrder) {
-                $o = new PaymentOrderResult();
-                $o->PublishDate  = $this->parseDate($paymentOrder->PublishDate);
-                $o->Value   = (float)$paymentOrder->Value;
-                $response->PaymentOrders[] = $o;
-            }
-        }
+        $response->PaymentOrders = $this->parseObjectArray($detail->PaymentOrders, 'PaymentOrder', function($paymentOrder) {
+            $o = new PaymentOrderResult();
+            $o->PublishDate  = $this->parseDate($paymentOrder->PublishDate);
+            $o->Value   = (float)$paymentOrder->Value;
+            return $o;
+        });
 
         if (!empty($detail->Offices)) {
-            $response->Offices = array();
-            foreach ($detail->Offices->Office as $office) {
+            $response->Offices = $this->parseObjectArray($detail->Offices, 'Office', function($office) {
                 $o = new OfficeResult();
                 $o = $this->parseAddress($office, $o);
                 $o->Type = (string)$office->Type;
-                if (!empty($office->Subjects)) {
-                    $o->Subjects = array();
-                    foreach ($office->Subjects->string as $s) {
-                        $o->Subjects[] = (string)$s;
-                    }
-                }
-                $response->Offices[] = $o;
-            }
+                $o->Subjects = $this->parseStringArray($office->Subjects);
+                return $o;
+            });
         }
 
         if (!empty($detail->Subjects)) {
-            $response->Subjects = array();
-            foreach ($detail->Subjects->Subject as $subject) {
+            $response->Subjects = $this->parseObjectArray($detail->Subjects, 'Subject', function($subject) {
                 $o = new SubjectResult();
                 $o->Title = (string)$subject->Title;
                 $o->ValidFrom = $this->parseDate($subject->ValidFrom);
                 $o->SuspendedFrom = $this->parseDate($subject->SuspendedFrom);
                 $o->SuspendedTo = $this->parseDate($subject->SuspendedTo);
-                $response->Subjects[] = $o;
-            }
+                return $o;
+            });
         }
 
 
@@ -251,45 +219,35 @@ class FinstatApi extends BaseFinstatApi
         }
 
         if (!empty($detail->ContactSources)) {
-            $response->ContactSources = array();
-            foreach ($detail->ContactSources->ContactSource as $c) {
+            $response->ContactSources = $this->parseObjectArray($detail->ContactSources, 'ContactSource', function($c) {
                 $o = new ContactSourceResult();
                 $o->Contact = (string) $c->Contact;
-                if (!empty($c->Sources)) {
-                    $o->Sources = array();
-                    foreach ($c->Sources->string as $s) {
-                        $o->Sources[] = (string)$s;
-                    }
-                }
-                $response->ContactSources[] = $o;
-            }
+                $o->Sources = $this->parseStringArray($c->Sources);
+                return $o;
+            });
         }
 
         if (!empty($detail->Ratios)) {
-            $response->Ratios = array();
-            foreach ($detail->Ratios->Ratio as $c) {
+            $response->Ratios = $this->parseObjectArray($detail->Ratios, 'Ratio', function($c) {
                 $o = new RatioResult();
                 $o->Name = (string) $c->Name;
-                if (!empty($c->Values)) {
-                    foreach ($c->Values->Item as $v) {
-                        $ov = new  RatioItemResult();
-                        $ov->Year = (int)$v->Year;
-                        $ov->Value = (float)$v->Value;
-                        $o->Values[] = $ov;
-                    }
-                }
-                $response->Ratios[] = $o;
-            }
+                $o->Values = $this->parseObjectArray($c->Values, 'Item', function($v) {
+                    $ov = new  RatioItemResult();
+                    $ov->Year = (int)$v->Year;
+                    $ov->Value = (float)$v->Value;
+                    return $ov;
+                });
+                return $o;
+            });
         }
 
         if (!empty($detail->JudgementCounts)) {
-            $response->JudgementCounts = array();
-            foreach ($detail->JudgementCounts->JudgementCount as $c) {
+            $response->JudgementCounts = $this->parseObjectArray($detail->JudgementCounts, 'JudgementCount', function($c) {
                 $o = new JudgementCountResult();
                 $o->Name = (string) $c->Name;
                 $o->Value = (int) $c->Value;
-                $response->JudgementCounts[] = $o;
-            }
+                return $o;
+            });
         }
 
         $response->JudgementLastPublishedDate = $this->parseDate($detail->JudgementLastPublishedDate);
@@ -316,53 +274,41 @@ class FinstatApi extends BaseFinstatApi
             $response->ORSection = (string)$detail->ORSection;
             $response->ORInsertNo = (string)$detail->ORInsertNo;
             $response->PaybackRange  = (!empty($detail->PaybackRange)) ? (float)$detail->PaybackRange : null;
-            $response->Persons = array();
-            if (!empty($detail->Persons)) {
-                foreach ($detail->Persons->Person as $person) {
-                    $o = $this->parsePerson($person);
-                    $o->DepositAmount  = (!empty($person->DepositAmount)) ? (float)$person->DepositAmount : null;
-                    $o->PartnersSharePercentage  = (!empty($person->PartnersSharePercentage)) ? (float)$person->PartnersSharePercentage : null;
-                    $o->PaybackRange  = (!empty($person->PaybackRange)) ? (float)$person->PaybackRange : null;
-                    $response->Persons[] = $o;
-                }
-            }
+            $response->Persons = $this->parseObjectArray($detail->Persons, 'Person', function($person) {
+                $o = $this->parsePerson($person);
+                $o->DepositAmount  = (!empty($person->DepositAmount)) ? (float)$person->DepositAmount : null;
+                $o->PartnersSharePercentage  = (!empty($person->PartnersSharePercentage)) ? (float)$person->PartnersSharePercentage : null;
+                $o->PaybackRange  = (!empty($person->PaybackRange)) ? (float)$person->PaybackRange : null;
+                return $o;
+            });
 
-            $response->RpvsPersons = array();
-            if (!empty($detail->RpvsPersons)) {
-                foreach ($detail->RpvsPersons->RpvsPerson as $rpvsPerson) {
-                    $o = $this->parsePerson($rpvsPerson, new RpvsPersonResult());
-                    $o->Ico = (!empty($rpvsPerson->Ico)) ? (string)$rpvsPerson->Ico : null;
-                    $response->RpvsPersons[] = $o;
-                }
-            }
+            $response->RpvsPersons = $this->parseObjectArray($detail->RpvsPersons, 'RpvsPerson', function($rpvsPerson) {
+                $o = $this->parsePerson($rpvsPerson, new RpvsPersonResult());
+                $o->Ico = (!empty($rpvsPerson->Ico)) ? (string)$rpvsPerson->Ico : null;
+                return $o;
+            });
 
-            $response->RPOPersons = array();
-            if (!empty($detail->RPOPersons)) {
-                foreach ($detail->RPOPersons->RPOPerson as $rpoPerson) {
-                    $o = new RPOPersonResult();
-                    $o->BirthDate = (!empty($rpoPerson->BirthDate)) ? $this->parseDate($rpoPerson->BirthDate) : null;
-                    $o->Citizenship = (!empty($rpoPerson->Citizenship)) ? (string)$rpoPerson->Citizenship : null;
-                    $o->FullName = (string)$rpoPerson->FullName;
-                    $o->Country = (string)$rpoPerson->Country;
-                    $o->DetectedFrom = $this->parseDate($rpoPerson->DetectedFrom);
-                    $o->DetectedTo  = $this->parseDate($rpoPerson->DetectedTo);
-                    $o->Functions = array();
-                    if (!empty($rpoPerson->Functions) && !empty($rpoPerson->Functions->FunctionAssigment)) {
-                        foreach ($rpoPerson->Functions->FunctionAssigment as $function) {
-                            $of = new FunctionResult();
-                            $of->Type = (string)$function->Type;
-                            $of->Description = (string)$function->Description;
-                            $of->From = $this->parseDate($function->From);
-                            $o->Functions[] = $of;
-                        }
-                    }
-                    if (!empty($rpoPerson->StructuredName)) {
-                        $o->StructuredName = $this->parseStructuredName($rpoPerson->StructuredName);
-                    }
-
-                    $response->RPOPersons[] = $o;
+            $response->RPOPersons = $this->parseObjectArray($detail->RPOPersons, 'RPOPerson', function($rpoPerson) {
+                $o = new RPOPersonResult();
+                $o->BirthDate = (!empty($rpoPerson->BirthDate)) ? $this->parseDate($rpoPerson->BirthDate) : null;
+                $o->Citizenship = (!empty($rpoPerson->Citizenship)) ? (string)$rpoPerson->Citizenship : null;
+                $o->FullName = (string)$rpoPerson->FullName;
+                $o->Country = (string)$rpoPerson->Country;
+                $o->DetectedFrom = $this->parseDate($rpoPerson->DetectedFrom);
+                $o->DetectedTo  = $this->parseDate($rpoPerson->DetectedTo);
+                $o->Functions = $this->parseObjectArray($rpoPerson->Functions, 'FunctionAssigment', function($function) {
+                    $of = new FunctionResult();
+                    $of->Type = (string)$function->Type;
+                    $of->Description = (string)$function->Description;
+                    $of->From = $this->parseDate($function->From);
+                    return $of;
+                });
+                if (!empty($rpoPerson->StructuredName)) {
+                    $o->StructuredName = $this->parseStructuredName($rpoPerson->StructuredName);
                 }
-            }
+
+                return $o;
+            });
 
             if (!empty($detail->RegistrationCourt)) {
                 $o = new PersonResult();
@@ -372,10 +318,7 @@ class FinstatApi extends BaseFinstatApi
             }
 
             if (!empty($detail->WebPages)) {
-                $response->WebPages = array();
-                foreach ($detail->WebPages->string as $s) {
-                    $response->WebPages[] = (string)$s;
-                }
+                $response->WebPages = $this->parseStringArray($detail->WebPages);
             }
 
             if (!empty($detail->StatutoryAction)) {
@@ -387,14 +330,13 @@ class FinstatApi extends BaseFinstatApi
             }
 
             if (!empty($detail->AddressHistory)) {
-                $response->AddressHistory = array();
-                foreach ($detail->AddressHistory->HistoryAddress as $address) {
+                $response->AddressHistory = $this->parseObjectArray($detail->AddressHistory, 'HistoryAddress', function($address) {
                     $o = new HistoryAddressResult();
                     $o = $this->parseAddress($address, $o);
                     $o->ValidFrom = $this->parseDate($address->ValidFrom);
                     $o->ValidTo = $this->parseDate($address->ValidTo);
-                    $response->AddressHistory[] = $o;
-                }
+                    return $o;
+                });
             }
 
             if (!empty($detail->ORCancelled)) {
@@ -427,27 +369,23 @@ class FinstatApi extends BaseFinstatApi
             }
 
             if (!empty($detail->DistraintsAuthorizations)) {
-                $response->DistraintsAuthorizations = array();
-                foreach ($detail->DistraintsAuthorizations->DistraintsAuthorizationDetail as $dad) {
+                $response->DistraintsAuthorizations = $this->parseObjectArray($detail->DistraintsAuthorizations, 'DistraintsAuthorizationDetail', function($dad) {
                     $o = new DistraintsAuthorizationDetailResult();
                     $o->ReferenceNumber = (string) $dad->ReferenceNumber;
-                    if (!empty($dad->Authorized)) {
-                        $o->Authorized = [];
-                        foreach ($dad->Authorized->BaseInfo as $bi) {
-                            $obi = new BaseInfo();
-                            $obi->Name = (string)$bi->Name;
-                            $obi->Ico = (string)$bi->Ico;
-                            $o->Authorized[] = $obi;
-                        }
-                    }
+                    $o->Authorized = $this->parseObjectArray($dad->Authorized, 'BaseInfo', function($bi) {
+                        $obi = new BaseInfo();
+                        $obi->Name = (string)$bi->Name;
+                        $obi->Ico = (string)$bi->Ico;
+                        return $obi;
+                    });
                     $o->TypeOfClaim = (string) $dad->TypeOfClaim;
                     $o->Plaintiff = (string) $dad->Plaintiff;
                     $o->PublishDate = $this->parseDate($dad->PublishDate);
                     $o->Url = (string) $dad->Url;
                     $o->Court = (string) $dad->Court;
                     $o->IdentifierNumber = (string) $dad->IdentifierNumber;
-                    $response->DistraintsAuthorizations[] = $o;
-                }
+                    return $o;
+                });
             }
         }
 

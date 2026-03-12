@@ -1,5 +1,7 @@
 <?php
 
+namespace FinStat\ViewModel\Monitoring;
+
 class MonitoringProceedingResult
 {
     public $DebtorsAddress;

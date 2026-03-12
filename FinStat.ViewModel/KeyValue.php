@@ -1,5 +1,7 @@
 <?php
 
+namespace FinStat\ViewModel;
+
 class KeyValue
 {
     public $Key;

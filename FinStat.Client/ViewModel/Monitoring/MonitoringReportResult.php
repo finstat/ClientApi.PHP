@@ -1,5 +1,7 @@
 <?php
 
+namespace FinStat\Client\ViewModel\Monitoring;
+
 class AbstractMonitoringReportResult
 {
     public $Ident;

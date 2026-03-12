@@ -1,6 +1,8 @@
 <?php
 
-require_once(__DIR__ . '/BaseResult.php');
+namespace FinStat\ViewModel\Detail;
+
+use FinStat\Client\ViewModel\AddressResult;
 
 class DebtResult
 {
