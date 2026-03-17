@@ -79,7 +79,7 @@ require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/PremiumCZResult.php');
 
 // Initialize the API client for Czech companies
 $apiUrl = 'https://cz.finstat.sk/api/';
-$api = new FinstatApiCz\FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+$api = new FinStatCZ\FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
 
 // Get basic company information
 $ico = '48207349'; // Example Czech company ICO
@@ -163,10 +163,10 @@ $api = new FinstatBankruptcyRestructuringApi($apiUrl, $apiKey, $privateKey, $sta
 $list = $api->RequestPersonBankruptcyProceedings($name, $surname, $dateOfBirth, $json);
 
 // Get list of company bankruptcy and restructuring proceedings by ico
-$list = $api->RequestCompanyBankruptcyRestructuring($ico, null, $dateOfBirth, $json);
+$list = $api->RequestCompanyBankruptcyRestructuring($ico, null, $json);
 
 // Get list of company bankruptcy and restructuring proceedings by name
-$list = $api->RequestCompanyBankruptcyRestructuring(null, $name, $dateOfBirth, $json);
+$list = $api->RequestCompanyBankruptcyRestructuring(null, $name, $json);
 
 ```
 
