@@ -17,7 +17,7 @@
         "psr-4": {
             "FinStat\\Client\\": "FinStat.Client/",
             "FinStat\\ViewModel\\": "FinStat.ViewModel/",
-            "FinStat\\": "FinStatApi/",
+            "FinStat\\Api\\": "FinStatApi/",
             "FinStatCZ\\": "FinStatApiCZ/",
             "FinStatCZ\\ViewModel\\": "FinStatCZ.ViewModel/"
         }

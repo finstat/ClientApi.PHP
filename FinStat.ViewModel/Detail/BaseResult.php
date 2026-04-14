@@ -4,12 +4,6 @@ namespace FinStat\ViewModel\Detail;
 
 use FinStat\Client\ViewModel\Detail\CommonResult;
 
-class JudgementIndicatorResult
-{
-    public $Name;
-    public $Value;
-}
-
 class BaseResult extends CommonResult
 {
     public $RegisterNumberText;

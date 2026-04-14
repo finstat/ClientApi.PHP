@@ -3,9 +3,36 @@
 namespace FinStat\Api;
 
 use FinStat\Client\BaseFinstatApi;
+use FinStat\Client\ViewModel\BaseInfo;
+use FinStat\Client\ViewModel\Detail\BankAccount;
+use FinStat\ViewModel\Detail\BankruptResult;
+use FinStat\ViewModel\Detail\BaseResult;
 use FinStat\ViewModel\Detail\BasicResult;
+use FinStat\ViewModel\Detail\ContactSourceResult;
+use FinStat\ViewModel\Detail\DeadlineResult;
+use FinStat\ViewModel\Detail\DebtResult;
 use FinStat\ViewModel\Detail\DetailResult;
+use FinStat\ViewModel\Detail\DistraintsAuthorizationDetailResult;
+use FinStat\ViewModel\Detail\DistraintsAuthorizationInfoResult;
 use FinStat\ViewModel\Detail\ExtendedResult;
+use FinStat\ViewModel\Detail\FunctionResult;
+use FinStat\ViewModel\Detail\HistoryAddressResult;
+use FinStat\ViewModel\Detail\JudgementCountResult;
+use FinStat\ViewModel\Detail\JudgementIndicatorResult;
+use FinStat\ViewModel\Detail\LiquidationResult;
+use FinStat\ViewModel\Detail\OfficerResult;
+use FinStat\ViewModel\Detail\OfficeResult;
+use FinStat\ViewModel\Detail\PaymentOrderResult;
+use FinStat\ViewModel\Detail\PersonResult;
+use FinStat\ViewModel\Detail\PreventiveRestructuringResult;
+use FinStat\ViewModel\Detail\ProceedingResult;
+use FinStat\ViewModel\Detail\RatioItemResult;
+use FinStat\ViewModel\Detail\RatioResult;
+use FinStat\ViewModel\Detail\ReceivableDebtResult;
+use FinStat\ViewModel\Detail\RestructuringResult;
+use FinStat\ViewModel\Detail\RPOPersonResult;
+use FinStat\ViewModel\Detail\RpvsPersonResult;
+use FinStat\ViewModel\Detail\SubjectResult;
 use FinStat\ViewModel\Detail\UltimateResult;
 
 class FinstatApi extends BaseFinstatApi

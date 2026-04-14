@@ -13,7 +13,10 @@ use FinStat\Client\Exceptions\LimitReachedException;
 use FinStat\Client\Exceptions\AuthenticationException;
 use FinStat\Client\Exceptions\BadRequestException;
 use FinStat\Client\Exceptions\ParseException;
+use FinStat\ViewModel\Detail\FunctionResult;
 use FinStat\ViewModel\Detail\IcDphAdditionalResult;
+use FinStat\ViewModel\Detail\NamePartsResult;
+use FinStat\ViewModel\Detail\PersonResult;
 
 class AbstractFinstatApi
 {
