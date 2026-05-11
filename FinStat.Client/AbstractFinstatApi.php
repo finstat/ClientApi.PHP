@@ -19,6 +19,8 @@ use FinStat\Client\Exceptions\InvalidHashException;
 use FinStat\Client\Exceptions\LicenseExpiredException;
 use FinStat\Client\Exceptions\ParseException;
 use FinStat\Client\Exceptions\UnauthorizedException;
+use FinStat\Client\ViewModel\Limit;
+use FinStat\Client\ViewModel\Limits;
 use FinStat\ViewModel\Detail\FunctionResult;
 use FinStat\ViewModel\Detail\IcDphAdditionalResult;
 use FinStat\ViewModel\Detail\NamePartsResult;
@@ -32,7 +34,10 @@ class AbstractFinstatApi
     protected $stationId;
     protected $stationName;
     protected $timeout;
+    /** @var array|null Legacy associative-array view of the API limits — preserved for BC. */
     protected $limits;
+    /** @var Limits|null Typed view populated by parseResponseRaw(); read via GetAPILimitsTyped(). */
+    protected $limitsTyped;
 
     //
     // Constructor
@@ -54,6 +59,7 @@ class AbstractFinstatApi
         $this->stationName = $stationName;
         $this->timeout = $timeout;
         $this->limits = null;
+        $this->limitsTyped = null;
     }
 
     /**
@@ -147,6 +153,18 @@ class AbstractFinstatApi
                 "max"=> ($response->headers->offsetExists('finstat-monthly-limit-max')) ? $response->headers->offsetGet('finstat-monthly-limit-max') : null
             ),
         );
+
+        // Typed mirror of the same headers — matches FinstatApi.ViewModel.Limits in C#.
+        $typed = new Limits();
+        $daily = new Limit();
+        $daily->Current = isset($this->limits['daily']['current']) ? (int)$this->limits['daily']['current'] : null;
+        $daily->Max     = isset($this->limits['daily']['max'])     ? (int)$this->limits['daily']['max']     : null;
+        $monthly = new Limit();
+        $monthly->Current = isset($this->limits['monthly']['current']) ? (int)$this->limits['monthly']['current'] : null;
+        $monthly->Max     = isset($this->limits['monthly']['max'])     ? (int)$this->limits['monthly']['max']     : null;
+        $typed->Daily = $daily;
+        $typed->Monthly = $monthly;
+        $this->limitsTyped = $typed;
 
         if(!$response->success) {
             $dom = new DOMDocument();
@@ -257,6 +275,22 @@ class AbstractFinstatApi
         }
 
         return $this->limits;
+    }
+
+    /**
+     * Typed view of the current quota usage (matches `FinstatApi.ViewModel.Limits`
+     * in the C# client). Available after the first successful API call; throws if
+     * called before any request has been issued.
+     *
+     * @return Limits
+     * @throws Exception
+     */
+    public function GetAPILimitsTyped(): Limits
+    {
+        if ($this->limitsTyped === null) {
+            throw new Exception('Limits are available after API call');
+        }
+        return $this->limitsTyped;
     }
 
     protected function parseAddress($detail, $response)
