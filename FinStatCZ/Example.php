@@ -23,7 +23,13 @@ use FinStatCZ\FinstatApi;
 use FinStat\Client\Exceptions\NotFoundException;
 use FinStat\Client\Exceptions\LimitReachedException;
 use FinStat\Client\Exceptions\AuthenticationException;
+use FinStat\Client\Exceptions\AccessDisabledException;
 use FinStat\Client\Exceptions\BadRequestException;
+use FinStat\Client\Exceptions\GdprRestrictionException;
+use FinStat\Client\Exceptions\InsufficientAccessException;
+use FinStat\Client\Exceptions\InvalidHashException;
+use FinStat\Client\Exceptions\LicenseExpiredException;
+use FinStat\Client\Exceptions\UnauthorizedException;
 use FinStat\Client\Exceptions\FinstatException;
 
 // ============================================
@@ -356,6 +362,14 @@ try {
     echo "<p><b>Daily:</b> {$e->getDailyCurrent()} / {$e->getDailyMax()}</p>";
     echo "<p><b>Monthly:</b> {$e->getMonthlyCurrent()} / {$e->getMonthlyMax()}</p>";
     echo "</div>";
+} catch (GdprRestrictionException $e) {
+    // HTTP 451 — the requested company is GDPR-anonymized and the current
+    // licence does not permit anonymized records.
+    echo "<div style='background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 15px;'>";
+    echo "<h3 style='margin-top: 0;'>🔒 GDPR Restricted</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
+    echoLimitsSafe($api);
 } catch (FinstatException $e) {
     echoException($e);
     echoLimitsSafe($api);

@@ -26,6 +26,7 @@ use FinStat\Client\Exceptions\NotFoundException;
 use FinStat\Client\Exceptions\LimitReachedException;
 use FinStat\Client\Exceptions\AuthenticationException;
 use FinStat\Client\Exceptions\BadRequestException;
+use FinStat\Client\Exceptions\UnauthorizedException;
 use FinStat\Client\Exceptions\FinstatException;
 
 // ============================================
@@ -293,6 +294,13 @@ try {
     echo "<h3 style='margin-top: 0;'>⛔ API Limit Reached</h3>";
     echo "<p><b>Daily:</b> {$e->getDailyCurrent()} / {$e->getDailyMax()}</p>";
     echo "<p><b>Monthly:</b> {$e->getMonthlyCurrent()} / {$e->getMonthlyMax()}</p>";
+    echo "</div>";
+} catch (UnauthorizedException $e) {
+    // HTTP 401 — the caller's licence does not cover editing this monitoring topic.
+    // Server message (SK): "Nemáte platnú licenciu pre editáciu tohto monitoringu!"
+    echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px;'>";
+    echo "<h3 style='margin-top: 0;'>🚫 Unauthorized for this topic</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
     echo "</div>";
 } catch (FinstatException $e) {
     echoException($e);

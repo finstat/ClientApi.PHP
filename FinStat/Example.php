@@ -24,8 +24,14 @@ use FinStat\Api\FinstatApi;
 use FinStat\Client\Exceptions\NotFoundException;
 use FinStat\Client\Exceptions\LimitReachedException;
 use FinStat\Client\Exceptions\AuthenticationException;
+use FinStat\Client\Exceptions\AccessDisabledException;
 use FinStat\Client\Exceptions\BadRequestException;
+use FinStat\Client\Exceptions\GdprRestrictionException;
+use FinStat\Client\Exceptions\InsufficientAccessException;
+use FinStat\Client\Exceptions\InvalidHashException;
+use FinStat\Client\Exceptions\LicenseExpiredException;
 use FinStat\Client\Exceptions\ParseException;
+use FinStat\Client\Exceptions\UnauthorizedException;
 use FinStat\Client\Exceptions\FinstatException;
 use FinStat\ViewModel\Detail\BaseResult;
 use FinStat\ViewModel\Detail\BasicResult;
@@ -38,8 +44,8 @@ use FinStat\ViewModel\Detail\CommonResult;
 // CONFIGURATION - Update these values
 // ============================================
 $apiUrl = 'https://www.finstat.sk/api/';
-$apiKey = 'YOUR_API_KEY';
-$privateKey = 'YOUR_PRIVATE_KEY';
+$apiKey = 'F0C44EBE9E4D4CDE9FB51C7B811495F9';
+$privateKey = 'C5278277CA944B5CB428E559356937E4';
 $stationId = 'YOUR_STATION_ID';
 $stationName = 'YOUR_STATION_NAME';
 $timeout = 10;
@@ -48,7 +54,7 @@ $timeout = 10;
 $useJson = false;
 
 // Company ICO to query (can be overridden via ?ico= parameter)
-$ico = isset($_GET['ico']) && !empty($_GET['ico']) ? $_GET['ico'] : '35757442';
+$ico = isset($_GET['ico']) && !empty($_GET['ico']) ? $_GET['ico'] : '47004428';
 
 // ============================================
 // HELPER FUNCTIONS
@@ -934,6 +940,15 @@ try {
     echo "<div style='background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; margin: 10px 0;'>";
     echo "<h3 style='margin-top: 0;'>❌ Bad Request</h3>";
     echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "</div>";
+    echoLimitsSafe($api);
+} catch (GdprRestrictionException $e) {
+    // HTTP 451 — the requested company is GDPR-anonymized and the current
+    // licence does not permit anonymized records.
+    echo "<div style='background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 15px; margin: 10px 0;'>";
+    echo "<h3 style='margin-top: 0;'>🔒 GDPR Restricted</h3>";
+    echo "<p>" . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<p>Contact <a href='mailto:info@finstat.sk'>info@finstat.sk</a> to extend your licence with anonymized-records access.</p>";
     echo "</div>";
     echoLimitsSafe($api);
 } catch (FinstatException $e) {
