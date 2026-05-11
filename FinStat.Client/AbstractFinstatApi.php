@@ -11,8 +11,14 @@ use FinStat\Client\Exceptions\FinstatException;
 use FinStat\Client\Exceptions\NotFoundException;
 use FinStat\Client\Exceptions\LimitReachedException;
 use FinStat\Client\Exceptions\AuthenticationException;
+use FinStat\Client\Exceptions\AccessDisabledException;
 use FinStat\Client\Exceptions\BadRequestException;
+use FinStat\Client\Exceptions\GdprRestrictionException;
+use FinStat\Client\Exceptions\InsufficientAccessException;
+use FinStat\Client\Exceptions\InvalidHashException;
+use FinStat\Client\Exceptions\LicenseExpiredException;
 use FinStat\Client\Exceptions\ParseException;
+use FinStat\Client\Exceptions\UnauthorizedException;
 use FinStat\ViewModel\Detail\FunctionResult;
 use FinStat\ViewModel\Detail\IcDphAdditionalResult;
 use FinStat\ViewModel\Detail\NamePartsResult;
@@ -145,7 +151,8 @@ class AbstractFinstatApi
         if(!$response->success) {
             $dom = new DOMDocument();
             $dom->loadHTML($response->body);
-            
+            $body = (string)$response->body;
+
             switch($response->status_code) {
                 case 404:
                     $exception = new NotFoundException($parameter, $response->status_code);
@@ -163,16 +170,51 @@ class AbstractFinstatApi
                     $exception->setRequestContext($url, $parameter);
                     throw $exception;
 
+                case 401:
+                    $exception = new UnauthorizedException(
+                        !empty($body) ? $body : 'Unauthorized.',
+                        $response->status_code
+                    );
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
+
                 case 403:
-                    $exception = new AuthenticationException('Access Forbidden. Check API credentials.', $response->status_code);
+                    // Discriminate the generic 403 into its semantic sub-types by inspecting
+                    // the response body — server messages are stable strings emitted from
+                    // finstat.Controllers.ApiFinstatController.CheckAccess.
+                    if (strpos($body, 'Insufficient access') !== false) {
+                        $exception = new InsufficientAccessException($body, $response->status_code);
+                    } elseif (strpos($body, 'Your API access and FinStat license expired') !== false) {
+                        $exception = new LicenseExpiredException($body, $response->status_code);
+                    } elseif (strpos($body, 'Your API access is disabled') !== false) {
+                        $exception = new AccessDisabledException($body, $response->status_code);
+                    } elseif (strpos($body, 'Invalid verification hash') !== false) {
+                        $exception = new InvalidHashException($body, $response->status_code);
+                    } else {
+                        $exception = new AuthenticationException(
+                            !empty($body) ? $body : 'Access Forbidden. Check API credentials.',
+                            $response->status_code
+                        );
+                    }
                     $exception->setRequestContext($url, $parameter);
                     throw $exception;
-                    
+
                 case 400:
-                    $exception = new BadRequestException('Bad Request. Invalid parameters.', $response->status_code);
+                    $exception = new BadRequestException(
+                        !empty($body) ? $body : 'Bad Request. Invalid parameters.',
+                        $response->status_code
+                    );
                     $exception->setRequestContext($url, $parameter);
                     throw $exception;
-                    
+
+                case 451:
+                    $exception = new GdprRestrictionException(
+                        !empty($body) ? $body : 'Limited access due to GDPR restrictions.',
+                        $response->status_code
+                    );
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
+
                 default:
                     $message = 'HTTP ' . $response->status_code . ': ' . $dom->textContent;
                     $exception = new FinstatException($message, $response->status_code);
