@@ -236,3 +236,7 @@ _Pvt_Extensions
 .fake/
 vendor
 composer.lock
+
+# Composer tooling - fetch from getcomposer.org, never vendored here
+composer.phar
+composer-setup.php
