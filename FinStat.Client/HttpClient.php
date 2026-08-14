@@ -92,15 +92,15 @@ class HttpClient
         if ($body === false) {
             $error = curl_error($ch);
             $errno = curl_errno($ch);
-            curl_close($ch);
             throw new \RuntimeException("cURL error ({$errno}): {$error}");
         }
 
         // Get status code
         $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        // Close cURL handle
-        curl_close($ch);
+        // No curl_close() here: it is a no-op since PHP 8.0 and deprecated since
+        // PHP 8.5. The handle is a function local, so it is released as soon as
+        // this method returns (or unwinds) on every supported PHP version.
 
         // Return response object
         return new HttpResponse($statusCode, $body, $responseHeaders);
