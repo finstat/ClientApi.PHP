@@ -167,8 +167,6 @@ class AbstractFinstatApi
         $this->limitsTyped = $typed;
 
         if(!$response->success) {
-            $dom = new DOMDocument();
-            $dom->loadHTML($response->body);
             $body = (string)$response->body;
 
             switch($response->status_code) {
@@ -234,11 +232,38 @@ class AbstractFinstatApi
                     throw $exception;
 
                 default:
-                    $message = 'HTTP ' . $response->status_code . ': ' . $dom->textContent;
+                    $message = 'HTTP ' . $response->status_code . ': ' . self::htmlErrorToText($body);
                     $exception = new FinstatException($message, $response->status_code);
                     $exception->setRequestContext($url, $parameter);
                     throw $exception;
             }
+        }
+    }
+
+    /**
+     * Flatten an HTML error page into plain text for an exception message.
+     *
+     * Error bodies are whatever the server happened to render, so libxml's
+     * complaints about them are noise: they are collected internally instead of
+     * being emitted as warnings into the caller's output. Only the unmapped
+     * status codes need this, so the parse stays out of the mapped branches.
+     *
+     * @param string $html Raw response body
+     * @return string Text content, or the raw body when it cannot be parsed
+     */
+    protected static function htmlErrorToText($html)
+    {
+        if ($html === '') {
+            return '';
+        }
+
+        $previous = libxml_use_internal_errors(true);
+        try {
+            $dom = new DOMDocument();
+            return $dom->loadHTML($html) ? $dom->textContent : $html;
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
         }
     }
 
