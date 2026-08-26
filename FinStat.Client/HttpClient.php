@@ -150,6 +150,16 @@ class HttpClient
             ]
         ]);
 
+        // Pre-initialize the locally scoped variable the http:// stream wrapper
+        // fills in after the request. Two reasons:
+        //  - the wrapper only populates it when the calling function already
+        //    declares it, and
+        //  - PHP 8.5 deprecates *reading* the predefined $http_response_header,
+        //    but only in a function that never assigns to it, so assigning here
+        //    keeps PHP 8.5 quiet. The replacement, http_get_last_response_headers(),
+        //    exists only since PHP 8.4, hence the fallback below.
+        $http_response_header = null;
+
         // Make request
         $body = @file_get_contents($url, false, $context);
 
@@ -158,21 +168,27 @@ class HttpClient
             throw new \RuntimeException('HTTP request failed: ' . ($error['message'] ?? 'Unknown error'));
         }
 
+        // Prefer the PHP 8.4+ API, fall back to the variable it replaces
+        $rawHeaders = function_exists('http_get_last_response_headers')
+            ? http_get_last_response_headers()
+            : $http_response_header;
+        if (!is_array($rawHeaders)) {
+            $rawHeaders = [];
+        }
+
         // Parse response headers
         $responseHeaders = [];
-        if (isset($http_response_header)) {
-            foreach ($http_response_header as $header) {
-                $parts = explode(':', $header, 2);
-                if (count($parts) === 2) {
-                    $responseHeaders[trim($parts[0])] = trim($parts[1]);
-                }
+        foreach ($rawHeaders as $header) {
+            $parts = explode(':', $header, 2);
+            if (count($parts) === 2) {
+                $responseHeaders[trim($parts[0])] = trim($parts[1]);
             }
         }
 
         // Extract status code from first header line
         $statusCode = 500; // Default to server error
-        if (isset($http_response_header[0])) {
-            if (preg_match('/HTTP\/\d\.\d\s+(\d+)/', $http_response_header[0], $matches)) {
+        if (isset($rawHeaders[0])) {
+            if (preg_match('/HTTP\/\d\.\d\s+(\d+)/', $rawHeaders[0], $matches)) {
                 $statusCode = (int)$matches[1];
             }
         }
