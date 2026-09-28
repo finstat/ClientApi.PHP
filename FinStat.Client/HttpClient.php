@@ -14,7 +14,7 @@ class HttpClient
      * Make a POST request using native cURL or file_get_contents fallback
      *
      * @param string $url Request URL
-     * @param array|null $headers Custom headers (not used in current implementation)
+     * @param array|null $headers Custom headers as "Name: value" strings or name => value pairs
      * @param array $data POST data
      * @param array $options Request options (timeout, etc.)
      * @return HttpResponse Response object
@@ -63,6 +63,14 @@ class HttpClient
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $options['follow_redirects'] ?? false);
         curl_setopt($ch, CURLOPT_TIMEOUT, $options['timeout'] ?? 10);
+
+        // Custom headers, if any. Field names go out lowercase: HTTP/2 and HTTP/3
+        // require it (RFC 9113 8.2.1), and HTTP/1.1 treats them case-insensitively,
+        // so lowercase is the one spelling valid on every version.
+        $curlHeaders = self::normalizeHeaders($headers);
+        if ($curlHeaders !== []) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $curlHeaders);
+        }
 
         // SSL verification (disable for localhost, enable for production)
         if (strpos($url, 'localhost') === false && strpos($url, '127.0.0.1') === false) {
@@ -122,11 +130,11 @@ class HttpClient
         // Prepare POST data
         $postData = http_build_query($data);
 
-        // Prepare headers
-        $httpHeaders = [
-            'Content-Type: application/x-www-form-urlencoded',
-            'Content-Length: ' . strlen($postData)
-        ];
+        // Prepare headers. Lowercase field names — see normalizeHeaders().
+        $httpHeaders = array_merge([
+            'content-type: application/x-www-form-urlencoded',
+            'content-length: ' . strlen($postData)
+        ], self::normalizeHeaders($headers));
 
         // SSL verification (disable for localhost, enable for production)
         $sslVerify = true;
@@ -188,11 +196,54 @@ class HttpClient
         // Extract status code from first header line
         $statusCode = 500; // Default to server error
         if (isset($rawHeaders[0])) {
-            if (preg_match('/HTTP\/\d\.\d\s+(\d+)/', $rawHeaders[0], $matches)) {
+            if (preg_match('/HTTP\/\d(?:\.\d)?\s+(\d+)/', $rawHeaders[0], $matches)) {
                 $statusCode = (int)$matches[1];
             }
         }
 
         return new HttpResponse($statusCode, $body, $responseHeaders);
+    }
+
+    /**
+     * Normalize custom headers to a list of "name: value" strings with
+     * lowercase field names.
+     *
+     * HTTP/2 and HTTP/3 carry field names in lowercase only — an uppercase
+     * name is a malformed request that the peer may reset (RFC 9113 8.2.1).
+     * HTTP/1.1 compares names case-insensitively, so lowercasing is safe
+     * across every protocol version. Values are left untouched.
+     *
+     * Accepts either ["Name: value", ...] or ["Name" => "value", ...].
+     *
+     * @param array|null $headers Custom headers
+     * @return array List of "name: value" strings
+     */
+    private static function normalizeHeaders(?array $headers): array
+    {
+        if (empty($headers)) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($headers as $name => $value) {
+            if (is_int($name)) {
+                // "Name: value" form — split on the first colon only
+                $parts = explode(':', (string)$value, 2);
+                if (count($parts) < 2) {
+                    continue;
+                }
+                $name = $parts[0];
+                $value = $parts[1];
+            }
+
+            $name = strtolower(trim((string)$name));
+            if ($name === '') {
+                continue;
+            }
+
+            $normalized[] = $name . ': ' . trim((string)$value);
+        }
+
+        return $normalized;
     }
 }

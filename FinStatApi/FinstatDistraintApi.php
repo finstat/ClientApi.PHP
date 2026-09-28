@@ -16,11 +16,15 @@ use FinStat\ViewModel\Distraint\DistraintResult;
  *
  * Mirrors `FinstatApi.ApiDistraintClient` in the C# client. Five endpoints:
  *
- *   - distraintSearch          → DistraintResult  (pre-check, lighter quota)
- *   - distraintResults         → DistraintResult  (full results, charges)
- *   - distraintResultsByToken  → DistraintResult  (re-fetch by token)
- *   - distraintDetail          → DistraintDetailResults
- *   - distraintStoredDetail    → DistraintDetailResults
+ *   - distraintSearch          → DistraintResult         (CHARGED, live CRE query)
+ *   - distraintResults         → DistraintResult         (free, reads last stored search)
+ *   - distraintResultsByToken  → DistraintResult         (free, reads stored search by token)
+ *   - distraintDetail          → DistraintDetailResults  (CHARGED per unique id, live CRE query)
+ *   - distraintStoredDetail    → DistraintDetailResults  (free, reads a stored detail)
+ *
+ * Only the two live endpoints spend credit. The three "stored" ones re-read data
+ * that a previous live call already paid for, so they cost nothing beyond the
+ * daily/monthly API call allowance, which every endpoint counts against.
  *
  * All five share the SK API hash convention used by other endpoints:
  * `sha256("SomeSalt+{apiKey}+{privateKey}++{hashParameter}+ended")`.
@@ -30,13 +34,22 @@ use FinStat\ViewModel\Distraint\DistraintResult;
 class FinstatDistraintApi extends AbstractFinstatApi
 {
     /**
-     * Pre-check search — same parameter set as RequestDistraintResults but
-     * billed under a lighter quota. Use to confirm hits before paying for
-     * the full result.
+     * Live distraint search against CRE. **This is the charged endpoint** — it
+     * spends credit for one query and returns fresh results.
+     *
+     * It is not a cheap pre-check: to re-read results you have already paid for,
+     * use RequestDistraintResults (same criteria) or RequestDistraintResultsByToken,
+     * both of which are free.
+     *
+     * The server rejects the call with HTTP 400 unless at least one of $ico,
+     * $companyName, $fileReference or $surname is filled in, and $surname on its
+     * own additionally requires $dateOfBirth or $city.
      *
      * @param string|null $ico
      * @param string|null $surname
-     * @param string|null $dateOfBirth Pass as `Y-m-d` (the server expects a string).
+     * @param string|null $dateOfBirth Pass as `d.m.Y` (e.g. `12.03.1975`) — the
+     *                                 server accepts no other format and answers
+     *                                 HTTP 400 if it cannot parse the value.
      * @param string|null $city
      * @param string|null $companyName
      * @param string|null $fileReference
@@ -60,7 +73,11 @@ class FinstatDistraintApi extends AbstractFinstatApi
     }
 
     /**
-     * Full distraint search.
+     * Re-read the last stored search for these criteria (free — no credit is
+     * spent). Returns nothing if no live RequestDistraintSearch has been paid
+     * for with the same criteria before.
+     *
+     * Parameter validation is identical to RequestDistraintSearch.
      *
      * @param string|null $ico
      * @param string|null $surname
@@ -109,8 +126,15 @@ class FinstatDistraintApi extends AbstractFinstatApi
     /**
      * Fetch full distraint detail for one or more `DetailId`s under a token.
      *
+     * **Charged per identifier, not per call** — the price is the number of
+     * unique ids in $ids, so expanding 10 ids costs 10 queries. Duplicates are
+     * removed by the server before charging. When credit does not cover the
+     * whole batch the server answers HTTP 402 and queries nothing.
+     *
      * @param string $token DetailToken from prior search.
-     * @param int[] $ids List of DetailIds to expand.
+     * @param int[] $ids List of DetailIds to expand. At most 200 (after the
+     *                   server removes duplicates), all numeric, or the server
+     *                   answers HTTP 400.
      * @param bool $json
      * @return DistraintDetailResults|object|null
      */
@@ -118,9 +142,16 @@ class FinstatDistraintApi extends AbstractFinstatApi
     {
         // Hash input must match C# behaviour: token + ids concatenated with no
         // separator (see ApiDistraintClient.RequestDistraintDetail).
+        //
+        // Cast to int first: the server parses each id before it builds the string
+        // it hashes, so a numeric string that is not already in canonical form
+        // (`'007'`, `' 7'`) would otherwise be concatenated verbatim here and hash
+        // differently than the `7` the server ends up with. C# takes int[] and so
+        // cannot hit this.
         $idsConcat = '';
         $idsParam = '';
         foreach ($ids as $id) {
+            $id = (int)$id;
             $idsConcat .= $id;
             $idsParam .= ($idsParam !== '' ? ',' : '') . $id;
         }
