@@ -170,6 +170,45 @@ $list = $api->RequestCompanyBankruptcyRestructuring(null, $name, $json);
 
 ```
 
+### Distraints API (Centrálny register exekúcií)
+
+```php
+// This client is namespaced and loaded through composer's PSR-4 autoloader
+require_once(__DIR__ . '/vendor/autoload.php');
+
+use FinStat\Api\FinstatDistraintApi;
+
+// Initialize the distraint API client
+$api = new FinstatDistraintApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+
+// Live search — CHARGED. At least one of ico / companyName / fileReference /
+// surname is required, and surname alone additionally needs dateOfBirth or city.
+// dateOfBirth must be `d.m.Y`; any other format is rejected with HTTP 400.
+$result = $api->RequestDistraintSearch(null, 'Mrkvicka', '12.03.1975', null, null, null, $json);
+
+// Expand details — CHARGED PER UNIQUE ID, not per call. Max 200 ids.
+// Returns a DistraintDetailResults wrapper holding a DistraintDetails list.
+$token = $result->Distraints[0]->DetailToken;
+$ids = array_map(function ($d) { return $d->DetailId; }, $result->Distraints);
+$details = $api->RequestDistraintDetail($token, $ids, $json);
+foreach ($details->DistraintDetails as $detail) {
+    echo $detail->Code . ' ' . $detail->SumOutstanding . ' ' . $detail->Currency;
+}
+
+// Re-read what a previous live call already paid for — these three cost no credit
+$stored     = $api->RequestDistraintResults(null, 'Mrkvicka', '12.03.1975', null, null, null, $json);
+$byToken    = $api->RequestDistraintResultsByToken($token, $json);
+$oneDetail  = $api->RequestDistraintStoredDetail($result->Distraints[0]->StoredDetailId, $json);
+```
+
+Only `RequestDistraintSearch` and `RequestDistraintDetail` spend credit; the three
+"stored" calls re-read data a previous live call already paid for. Every call still
+counts against the daily/monthly API call allowance.
+
+When the CRE register itself is unreachable the two live calls throw
+`RegisterUnavailableException` (HTTP 502) — **no credit is charged**, so the request
+is safe to retry.
+
 ## Response Data
 
 The API returns structured data objects containing company information. Depending on the request type, different data fields are available:
@@ -204,15 +243,36 @@ The API returns structured data objects containing company information. Dependin
 The API client throws exceptions in case of errors. Make sure to handle these appropriately:
 
 ```php
+use FinStat\Client\Exceptions\FinstatException;
+use FinStat\Client\Exceptions\LimitReachedException;
+use FinStat\Client\Exceptions\NotFoundException;
+use FinStat\Client\Exceptions\RegisterUnavailableException;
+
 try {
     $response = $api->Request($ico, "basic", $json);
-} catch (Exception $e) {
-    // Handle error
-    $code = $e->getCode();
-    $message = $e->getMessage();
-    $data = $e->getData();
+} catch (NotFoundException $e) {
+    // HTTP 404 - no company for this ICO
+} catch (LimitReachedException $e) {
+    // HTTP 402 - daily/monthly allowance spent, or not enough credit
+    $daily = $e->getDailyCurrent() . '/' . $e->getDailyMax();
+} catch (RegisterUnavailableException $e) {
+    // HTTP 502 - upstream register down; no credit was charged, safe to retry
+} catch (FinstatException $e) {
+    // Every exception above extends FinstatException, so this catches the rest
+    $code    = $e->getCode();        // the HTTP status code
+    $message = $e->getMessage();     // the server response body, when it sent one
+    $url     = $e->getRequestUrl();  // request context, set on every exception
+    $param   = $e->getRequestParameter();
 }
 ```
+
+All exceptions extend `FinstatException`, so a single `catch (FinstatException $e)`
+is enough if you do not need to tell the cases apart. The specific types are
+`NotFoundException` (404), `LimitReachedException` (402), `UnauthorizedException` (401),
+`AuthenticationException` / `InsufficientAccessException` / `LicenseExpiredException` /
+`AccessDisabledException` / `InvalidHashException` (403), `BadRequestException` (400),
+`RateLimitExceededException` (429), `GdprRestrictionException` (451),
+`RegisterUnavailableException` (502) and `ParseException`.
 
 ## API Limits
 

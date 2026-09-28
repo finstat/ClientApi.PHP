@@ -18,6 +18,8 @@ use FinStat\Client\Exceptions\InsufficientAccessException;
 use FinStat\Client\Exceptions\InvalidHashException;
 use FinStat\Client\Exceptions\LicenseExpiredException;
 use FinStat\Client\Exceptions\ParseException;
+use FinStat\Client\Exceptions\RateLimitExceededException;
+use FinStat\Client\Exceptions\RegisterUnavailableException;
 use FinStat\Client\Exceptions\UnauthorizedException;
 use FinStat\Client\ViewModel\Limit;
 use FinStat\Client\ViewModel\Limits;
@@ -223,6 +225,25 @@ class AbstractFinstatApi
                     $exception->setRequestContext($url, $parameter);
                     throw $exception;
 
+                case 429:
+                    $exception = new RateLimitExceededException(
+                        !empty($body) ? $body : 'Request per second quota exceeded.',
+                        $response->status_code
+                    );
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
+
+                case 502:
+                    // An upstream register (currently CRE, behind the live distraint
+                    // endpoints) was unreachable. No credit is charged for this, so the
+                    // caller may safely retry.
+                    $exception = new RegisterUnavailableException(
+                        !empty($body) ? $body : 'Upstream register is temporarily unavailable, no credit was charged.',
+                        $response->status_code
+                    );
+                    $exception->setRequestContext($url, $parameter);
+                    throw $exception;
+
                 case 451:
                     $exception = new GdprRestrictionException(
                         !empty($body) ? $body : 'Limited access due to GDPR restrictions.',
@@ -409,16 +430,20 @@ class AbstractFinstatApi
     /**
      * Parse date string received from API and returns DateTime object or null.
      *
-     * @param SimpleXMLElement $date
+     * Declared with the nullable-type syntax (`?Type`) rather than a `Type|null`
+     * union so the library keeps parsing on PHP 7.1, which composer.json still
+     * supports; unions are PHP 8.0+.
+     *
+     * @param SimpleXMLElement|null $date
      * @return DateTime|null
      */
-    protected function parseDate(SimpleXMLElement|null $date = null)
+    protected function parseDate(?SimpleXMLElement $date = null)
     {
         if (empty($date) || !((string) $date)) {
             return null;
         }
 
-        return new DateTime($date);
+        return new DateTime((string) $date);
     }
 
     protected function parseIcDphAdditional(SimpleXMLElement $icDphAdditional)
