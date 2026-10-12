@@ -72,10 +72,7 @@ $limits = $api->GetAPILimits();
 
 ```php
 <?php
-require_once(__DIR__ . '/../FinStatApiCZ/FinstatApi.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/DetailResult.php');
-require_once(__DIR__ . '/../FinStatCZ.ViewModel/Detail/PremiumCZResult.php');
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Initialize the API client for Czech companies
 $apiUrl = 'https://cz.finstat.sk/api/';
@@ -88,8 +85,23 @@ $basicInfo = $api->Request($ico, "basic", $json);
 // Get detailed company information
 $detailInfo = $api->Request($ico, "detail", $json);
 
-// Get premium company information
-$premiumInfo = $api->Request($ico, "premiumcz", $json);
+// Get premium company information (financial data, bank accounts, turnover category)
+$premiumInfo = $api->RequestPremiumCZ($ico, $json);
+
+// Get elite company information: contacts, other CZ NACE activities, office count,
+// vehicle fleet, ISIR insolvency proceedings, financial indicators (2 years)
+$eliteInfo = $api->RequestEliteCZ($ico, $json);
+
+// Get ultimate company information: everything from elite plus OR ČR / RŽP persons,
+// statutory and procuration action, business subjects / trade licences, office list,
+// vehicle fleet breakdowns, ISIR creditors and claim applications, credit scores and
+// financial indicators (4 years), insolvency claims filed by the company as creditor
+$ultimateInfo = $api->RequestUltimateCZ($ico, $json);
+
+// Language of response texts (code list titles, NACE, ...): 'cs' or 'sk', passed per request
+// as the last parameter of every Request* method; honoured by the Czech API only.
+// Without it the server uses its default (Czech) or the Accept-Language header.
+$eliteInfoSk = $api->RequestEliteCZ($ico, $json, 'sk');
 
 // Search for companies by name
 $autocompleteResults = $api->RequestAutoComplete('volkswagen', $json);

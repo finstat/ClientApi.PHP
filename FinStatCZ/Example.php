@@ -5,8 +5,10 @@
  * This example demonstrates how to:
  * - Request basic company information (Czech Republic)
  * - Get detailed company data with CZ NACE codes
- * - Retrieve premium data with financial indicators
- * - Access elite tier data with ISIR bankruptcy information
+ * - Retrieve premium data with financial data and turnover category
+ * - Access elite tier data with contacts, vehicle fleet, ISIR proceedings and financial indicators
+ * - Access ultimate tier data with persons, trade licences, credit scores and filed insolvency claims
+ * - Choose the language of response texts (cs|sk) per request
  * - Use autocomplete for company search
  * - Handle API exceptions properly
  * 
@@ -44,6 +46,9 @@ $timeout = 10;
 
 // Use JSON format instead of XML?
 $useJson = false;
+
+// Language of response texts, passed with each request: 'cs', 'sk' or null for the server default (Czech on the Czech API)
+$lang = null;
 
 // Test values
 $testIco = '00177041';
@@ -150,6 +155,11 @@ function echoBase($response, $json = false)
             echo '<b>Tržby (aktuální):</b> ' . htmlspecialchars($response->SalesActual) . '<br />';
             echo '<b>Zisk:</b> ' . htmlspecialchars($response->Profit) . '<br />';
             echo '<b>Zisk (aktuální):</b> ' . htmlspecialchars($response->ProfitActual) . '<br />';
+            echo '<b>Pozastavena živnost do:</b> ' . echoDate($response->SuspendedAsPersonUntil, $json) . '<br />';
+            if (!empty($response->TurnoverCategory)) {
+                echo '<b>Kategorie obratu:</b> ' . htmlspecialchars($response->TurnoverCategory->Text)
+                    . ' (kód ' . htmlspecialchars($response->TurnoverCategory->Code) . ', rok ' . htmlspecialchars($response->TurnoverCategory->Year) . ')<br />';
+            }
 
             // Display bank accounts if available
             if (!empty($response->BankAccounts)) {
@@ -166,43 +176,14 @@ function echoBase($response, $json = false)
             }
         }
         
-        // Elite CZ tier includes bankruptcy and advanced financial data
+        // Elite CZ tier includes contacts, offices, vehicle fleet, ISIR proceedings and financial indicators
         if ($response instanceof \FinStatCZ\ViewModel\Detail\EliteCZResult) {
-            echo '<b>Kategorie obratu:</b> ' . htmlspecialchars($response->TurnoverCategory) . ' - ' . htmlspecialchars($response->TurnoverCategoryCode) . '<br />';
-            
-            // Display ISIR bankruptcy information
-            if (!empty($response->Isir)) {
-                echo '<b>ISIR pohledávky:</b><br />';
-                echo "<table style=\"margin-left: 20px;\">";
-                echo "<tr><th>Typ</th><th>Poslední změna</th><th>Počet</th><th>Suma</th></tr>";
-                foreach ($response->Isir as $isr) {
-                    echo "<tr>";
-                    echo "<td>" . htmlspecialchars($isr->Type) . "</td>";
-                    echo "<td>" . echoDate($isr->LastChange, $json) . "</td>";
-                    echo "<td>" . htmlspecialchars($isr->ReceivablesCount) . "</td>";
-                    echo "<td>" . htmlspecialchars($isr->ReceivablesAmount) . "</td>";
-                    echo "</tr>";
-                }
-                echo "</table><br />";
-            }
-            
-            // Display financial indicators
-            if (!empty($response->FinancialIndicators)) {
-                echo '<b>Finanční ukazatele:</b><br />';
-                echo "<table style=\"margin-left: 20px;\">";
-                echo "<tr><th>Název</th><th>Hodnoty</th></tr>";
-                foreach ($response->FinancialIndicators as $fi) {
-                    echo "<tr>";
-                    echo "<td>" . htmlspecialchars($fi->Name) . "</td>";
-                    echo "<td>";
-                    foreach ($fi->Values as $fiv) {
-                        echo "<strong>" . htmlspecialchars($fiv->Year) . ":</strong> " . htmlspecialchars($fiv->Value) . "<br />";
-                    }
-                    echo "</td>";
-                    echo "</tr>";
-                }
-                echo "</table><br />";
-            }
+            echoEliteCZ($response, $json);
+        }
+
+        // Ultimate CZ tier includes persons, trade licences, credit scores and filed insolvency claims
+        if ($response instanceof \FinStatCZ\ViewModel\Detail\UltimateCZResult) {
+            echoUltimateCZ($response, $json);
         }
     }
 
@@ -219,6 +200,268 @@ function echoBase($response, $json = false)
     }
 
     echo "</pre>";
+}
+
+/**
+ * Format ISIR parties (debtors, creditors, officers) as one line
+ * @param array $parties IsirPartyResult objects
+ * @param bool $json Whether response was in JSON format
+ * @return string HTML
+ */
+function echoIsirParties($parties, $json = false)
+{
+    $items = array();
+    foreach ((array)$parties as $p) {
+        if (empty($p)) {
+            continue;
+        }
+        $item = htmlspecialchars($p->Name);
+        if (!empty($p->Ico)) {
+            $item .= ' (IČO ' . htmlspecialchars($p->Ico) . ')';
+        } elseif (!empty($p->BirthDate)) {
+            $item .= ' (nar. ' . echoDate($p->BirthDate, $json) . ')';
+        }
+        $items[] = $item;
+    }
+    return implode(', ', $items);
+}
+
+/**
+ * Display year => value series (financial indicators, credit scores)
+ * @param array $series Objects with Name and Values (Year, Value[, State])
+ * @return void
+ */
+function echoYearSeries($series)
+{
+    $years = array();
+    foreach ($series as $s) {
+        foreach ($s->Values as $v) {
+            $years[$v->Year] = true;
+        }
+    }
+    krsort($years);
+    echo "<table style=\"margin-left: 20px;\">";
+    echo "<tr><th>Název</th>";
+    foreach (array_keys($years) as $year) {
+        echo "<th>" . htmlspecialchars($year) . "</th>";
+    }
+    echo "</tr>";
+    foreach ($series as $s) {
+        echo "<tr><td>" . htmlspecialchars($s->Name) . "</td>";
+        foreach (array_keys($years) as $year) {
+            $cell = '';
+            foreach ($s->Values as $v) {
+                if ($v->Year == $year) {
+                    $cell = ($v->Value === null) ? '---' : htmlspecialchars($v->Value);
+                    if (!empty($v->State)) {
+                        $cell .= ' (' . htmlspecialchars($v->State) . ')';
+                    }
+                }
+            }
+            echo "<td>{$cell}</td>";
+        }
+        echo "</tr>";
+    }
+    echo "</table><br />";
+}
+
+/**
+ * Display Elite CZ tier data
+ * Fields marked "UltimateCZ" in the view models stay empty in EliteCZ responses.
+ * @param \FinStatCZ\ViewModel\Detail\EliteCZResult $response
+ * @param bool $json Whether response was in JSON format
+ */
+function echoEliteCZ($response, $json = false)
+{
+    if (!empty($response->Contacts)) {
+        echo '<b>Kontakty:</b><br />';
+        echo "<table style=\"margin-left: 20px;\">";
+        echo "<tr><th>Typ</th><th>Kontakt</th><th>Zdroje</th></tr>";
+        foreach ($response->Contacts as $c) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($c->Type) . "</td>";
+            echo "<td>" . htmlspecialchars($c->Contact) . "</td>";
+            echo "<td>" . htmlspecialchars(implode(', ', (array)$c->Sources)) . "</td>";
+            echo "</tr>";
+        }
+        echo "</table><br />";
+    }
+
+    if (!empty($response->OtherCzNaces)) {
+        echo '<b>Další CZ NACE:</b><br />';
+        echo "<table style=\"margin-left: 20px;\">";
+        echo "<tr><th>Kód</th><th>Název</th></tr>";
+        foreach ($response->OtherCzNaces as $n) {
+            echo "<tr><td>" . htmlspecialchars($n->Code) . "</td><td>" . htmlspecialchars($n->Text) . "</td></tr>";
+        }
+        echo "</table><br />";
+    }
+
+    if (!empty($response->Offices)) {
+        echo '<b>Provozovny:</b> ' . htmlspecialchars($response->Offices->Count) . '<br />';
+        // UltimateCZ only
+        if (!empty($response->Offices->Items)) {
+            echo "<table style=\"margin-left: 20px;\">";
+            echo "<tr><th>Název</th><th>Adresa</th><th>Předměty</th></tr>";
+            foreach ($response->Offices->Items as $o) {
+                echo "<tr>";
+                echo "<td>" . htmlspecialchars($o->Name) . "</td>";
+                echo "<td>" . htmlspecialchars(trim("{$o->Street} {$o->StreetNumber}, {$o->ZipCode} {$o->City}", ' ,')) . "</td>";
+                echo "<td>" . htmlspecialchars(implode(', ', (array)$o->Subjects)) . "</td>";
+                echo "</tr>";
+            }
+            echo "</table><br />";
+        }
+    }
+
+    if (!empty($response->VehicleFleet)) {
+        $f = $response->VehicleFleet;
+        echo '<b>Vozový park (' . htmlspecialchars($f->Year) . '):</b> aktivní vozidla ' . htmlspecialchars($f->ActiveCount)
+            . ' (<a href="' . htmlspecialchars($f->Url) . '" target="_blank">detail</a>)<br />';
+        // UltimateCZ only
+        if ($f->VehicleCount !== null) {
+            echo '<b>Počet vozidel:</b> ' . htmlspecialchars($f->VehicleCount) . '<br />';
+            $breakdowns = array(
+                'Vlastnictví' => $f->OwnershipTypes,
+                'Druh vozidla' => $f->VehicleTypes,
+                'Rok výroby' => $f->ProductionYears,
+            );
+            foreach ($breakdowns as $title => $items) {
+                $parts = array();
+                foreach ($items as $i) {
+                    $parts[] = htmlspecialchars($i->Type) . ': ' . htmlspecialchars($i->Count);
+                }
+                echo '<b>' . $title . ':</b> ' . implode(', ', $parts) . '<br />';
+            }
+            $brands = array();
+            foreach ($f->TopBrands as $b) {
+                $brands[] = htmlspecialchars($b->Name) . ': ' . htmlspecialchars($b->Count);
+            }
+            echo '<b>Top značky:</b> ' . implode(', ', $brands) . '<br />';
+        }
+    }
+
+    if (!empty($response->IsirProceedings)) {
+        echo '<b>Insolvenční řízení (ISIR):</b><br />';
+        echo "<table style=\"margin-left: 20px;\">";
+        echo "<tr><th>Spisová značka</th><th>Soud</th><th>Stav</th><th>První / poslední událost</th><th>Dlužníci</th></tr>";
+        foreach ($response->IsirProceedings as $p) {
+            echo "<tr>";
+            echo "<td><a href=\"" . htmlspecialchars($p->Url) . "\" target=\"_blank\">" . htmlspecialchars($p->FileReference) . "</a></td>";
+            echo "<td>" . htmlspecialchars($p->Court) . "</td>";
+            echo "<td>" . htmlspecialchars($p->Status) . "</td>";
+            echo "<td>" . echoDate($p->FirstEvent, $json) . " / " . echoDate($p->LastEvent, $json) . "</td>";
+            echo "<td>" . echoIsirParties($p->Debtors, $json) . "</td>";
+            echo "</tr>";
+            // UltimateCZ only
+            if ($p->Type !== null || $p->CreditorsCount !== null) {
+                echo "<tr><td colspan=\"5\" style=\"padding-left: 30px;\">";
+                echo '<b>Typ:</b> ' . htmlspecialchars($p->Type) . ', <b>zahájeno:</b> ' . echoDate($p->StartDate, $json) . '<br />';
+                echo '<b>Správci:</b> ' . echoIsirParties($p->Officers, $json) . '<br />';
+                echo '<b>Věřitelé (' . htmlspecialchars($p->CreditorsCount) . '):</b> ' . echoIsirParties($p->Creditors, $json) . '<br />';
+                echo '<b>Výše přihlášených pohledávek:</b> ' . htmlspecialchars($p->AmountOfClaims) . '<br />';
+                foreach ($p->ReceivableApplications as $a) {
+                    echo '&nbsp;&nbsp;- ' . echoDate($a->PublishDate, $json) . ' ' . echoIsirParties(array($a->Creditor), $json)
+                        . (!empty($a->Representative) ? ' zast. ' . echoIsirParties(array($a->Representative), $json) : '')
+                        . ': ' . htmlspecialchars($a->ClaimsCount) . ' pohl., ' . htmlspecialchars($a->TotalAmount) . '<br />';
+                }
+                echo "</td></tr>";
+            }
+        }
+        echo "</table><br />";
+    }
+
+    if (!empty($response->FinancialIndicators)) {
+        echo '<b>Finanční ukazatele:</b><br />';
+        echoYearSeries($response->FinancialIndicators);
+    }
+}
+
+/**
+ * Display Ultimate CZ tier data (on top of Elite CZ data)
+ * @param \FinStatCZ\ViewModel\Detail\UltimateCZResult $response
+ * @param bool $json Whether response was in JSON format
+ */
+function echoUltimateCZ($response, $json = false)
+{
+    echo '<b>Jednání statutárního orgánu:</b> ' . htmlspecialchars($response->StatutoryAction) . '<br />';
+    echo '<b>Jednání prokury:</b> ' . htmlspecialchars($response->ProcurationAction) . '<br />';
+
+    if (!empty($response->ORCRPersons)) {
+        echo '<b>Osoby (OR ČR):</b><br />';
+        echo "<table style=\"margin-left: 20px;\">";
+        echo "<tr><th>Jméno</th><th>IČO / narozen</th><th>Funkce</th><th>Vklad</th><th>Podíl %</th></tr>";
+        foreach ($response->ORCRPersons as $p) {
+            $functions = array();
+            foreach ($p->Functions as $f) {
+                $functions[] = htmlspecialchars($f->Description ?: $f->Type) . ' od ' . echoDate($f->From, $json);
+            }
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($p->FullName) . "</td>";
+            echo "<td>" . (!empty($p->Ico) ? htmlspecialchars($p->Ico) : echoDate($p->BirthDate, $json)) . "</td>";
+            echo "<td>" . implode('<br />', $functions) . "</td>";
+            echo "<td>" . htmlspecialchars($p->DepositAmount) . "</td>";
+            echo "<td>" . htmlspecialchars($p->PartnersSharePercentage) . "</td>";
+            echo "</tr>";
+        }
+        echo "</table><br />";
+    }
+
+    if (!empty($response->RZPPersons)) {
+        echo '<b>Osoby (RŽP):</b><br />';
+        echo "<table style=\"margin-left: 20px;\">";
+        echo "<tr><th>Jméno</th><th>Narozen</th><th>Funkce</th><th>Od</th><th>Živnosti</th></tr>";
+        foreach ($response->RZPPersons as $p) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($p->FullName) . "</td>";
+            echo "<td>" . echoDate($p->BirthDate, $json) . "</td>";
+            echo "<td>" . htmlspecialchars($p->Function) . "</td>";
+            echo "<td>" . echoDate($p->FunctionFrom, $json) . "</td>";
+            echo "<td>" . htmlspecialchars(implode(', ', (array)$p->Subjects)) . "</td>";
+            echo "</tr>";
+        }
+        echo "</table><br />";
+    }
+
+    if (!empty($response->Subjects)) {
+        echo '<b>Předměty podnikání / živnosti:</b><br />';
+        echo "<table style=\"margin-left: 20px;\">";
+        echo "<tr><th>Název</th><th>Platnost od</th><th>Přerušeno</th></tr>";
+        foreach ($response->Subjects as $s) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($s->Title) . "</td>";
+            echo "<td>" . echoDate($s->ValidFrom, $json) . "</td>";
+            echo "<td>" . ($s->SuspendedFrom ? echoDate($s->SuspendedFrom, $json) . ' - ' . echoDate($s->SuspendedTo, $json) : '') . "</td>";
+            echo "</tr>";
+        }
+        echo "</table><br />";
+    }
+
+    if (!empty($response->CreditScores)) {
+        echo '<b>Kreditní skóre:</b><br />';
+        echoYearSeries($response->CreditScores);
+    }
+
+    if (!empty($response->FiledInsolvencyClaims)) {
+        $c = $response->FiledInsolvencyClaims;
+        echo '<b>Přihlášené pohledávky v insolvencích (jako věřitel):</b> řízení ' . htmlspecialchars($c->ProceedingsCount)
+            . ', celkem ' . ($c->AmountOfClaims === null ? '---' : htmlspecialchars($c->AmountOfClaims)) . '<br />';
+        if (!empty($c->Applications)) {
+            echo "<table style=\"margin-left: 20px;\">";
+            echo "<tr><th>Spisová značka</th><th>Zveřejněno</th><th>Dlužníci</th><th>Zástupce</th><th>Počet</th><th>Suma</th></tr>";
+            foreach ($c->Applications as $a) {
+                echo "<tr>";
+                echo "<td><a href=\"" . htmlspecialchars($a->Url) . "\" target=\"_blank\">" . htmlspecialchars($a->FileReference) . "</a></td>";
+                echo "<td>" . echoDate($a->PublishDate, $json) . "</td>";
+                echo "<td>" . echoIsirParties($a->Debtors, $json) . "</td>";
+                echo "<td>" . echoIsirParties(array($a->Representative), $json) . "</td>";
+                echo "<td>" . htmlspecialchars($a->ClaimsCount) . "</td>";
+                echo "<td>" . htmlspecialchars($a->TotalAmount) . "</td>";
+                echo "</tr>";
+            }
+            echo "</table><br />";
+        }
+    }
 }
 
 /**
@@ -347,7 +590,7 @@ echo "<p><b>Endpoint:</b> Request('$testIco', 'basic')</p>";
 echo "<p>Basic tier includes: company identification, address, registration dates, VAT status</p>";
 
 try {
-    $response = $api->Request($testIco, 'basic', $useJson);
+    $response = $api->Request($testIco, 'basic', $useJson, $lang);
     echoBase($response, $useJson);
     echoLimitsSafe($api);
 } catch (NotFoundException $e) {
@@ -385,7 +628,7 @@ echo "<p><b>Endpoint:</b> Request('$testIco', 'detail')</p>";
 echo "<p>Detail tier adds: CZ NACE codes, legal form, ownership type, employee count, insolvency warnings</p>";
 
 try {
-    $response = $api->Request($testIco, 'detail', $useJson);
+    $response = $api->Request($testIco, 'detail', $useJson, $lang);
     echoBase($response, $useJson);
     echoLimitsSafe($api);
 } catch (NotFoundException $e) {
@@ -409,7 +652,7 @@ echo "<p><b>Endpoint:</b> Request('$testIco', 'premiumcz')</p>";
 echo "<p>Premium CZ tier adds: financial data (sales, profit), unreliability status, bank accounts, registration details</p>";
 
 try {
-    $response = $api->Request($testIco, 'premiumcz', $useJson);
+    $response = $api->Request($testIco, 'premiumcz', $useJson, $lang);
     echoBase($response, $useJson);
     echoLimitsSafe($api);
 } catch (NotFoundException $e) {
@@ -430,10 +673,10 @@ echo '<hr />';
 // ============================================
 echo "<h1>👑 Example 4: Elite CZ Company Information</h1>";
 echo "<p><b>Endpoint:</b> Request('$testIco', 'elitecz')</p>";
-echo "<p>Elite CZ tier adds: ISIR bankruptcy proceedings, financial indicators, turnover categories, advanced analytics</p>";
+echo "<p>Elite CZ tier adds: contacts, other CZ NACE activities, office count, vehicle fleet, ISIR insolvency proceedings, financial indicators (2 years)</p>";
 
 try {
-    $response = $api->Request($testIco, 'elitecz', $useJson);
+    $response = $api->RequestEliteCZ($testIco, $useJson, $lang);
     echoBase($response, $useJson);
     echoLimitsSafe($api);
 } catch (NotFoundException $e) {
@@ -450,9 +693,35 @@ try {
 echo '<hr />';
 
 // ============================================
-// EXAMPLE 5: AutoComplete Search
+// EXAMPLE 5: Ultimate CZ Tier Request
 // ============================================
-echo "<h1>🔍 Example 5: Company Search (AutoComplete)</h1>";
+echo "<h1>🏆 Example 5: Ultimate CZ Company Information</h1>";
+echo "<p><b>Endpoint:</b> RequestUltimateCZ('$testIco')</p>";
+echo "<p>Ultimate CZ tier adds: OR ČR / RŽP persons, statutory and procuration action, business subjects / trade licences, office list, "
+    . "vehicle fleet breakdowns, ISIR creditors and claim applications, financial indicators and credit scores (4 years), "
+    . "insolvency claims filed by the company as creditor, web and social network contacts</p>";
+
+try {
+    $response = $api->RequestUltimateCZ($testIco, $useJson, $lang);
+    echoBase($response, $useJson);
+    echoLimitsSafe($api);
+} catch (NotFoundException $e) {
+    echo "<div style='background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 15px;'>";
+    echo "<h3 style='margin-top: 0;'>⚠ Company Not Found</h3>";
+    echo "<p>IČO: " . htmlspecialchars($testIco) . "</p>";
+    echo "</div>";
+    echoLimitsSafe($api);
+} catch (FinstatException $e) {
+    echoException($e);
+    echoLimitsSafe($api);
+}
+
+echo '<hr />';
+
+// ============================================
+// EXAMPLE 6: AutoComplete Search
+// ============================================
+echo "<h1>🔍 Example 6: Company Search (AutoComplete)</h1>";
 echo "<p><b>Endpoint:</b> RequestAutoComplete('$testSearchTerm')</p>";
 echo "<p>Search for companies by name, get suggestions and company list with basic info</p>";
 
