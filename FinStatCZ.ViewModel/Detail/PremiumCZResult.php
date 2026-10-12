@@ -8,6 +8,7 @@ class PremiumCZResult extends DetailResult
     public $TaxPayer;
     public $BankAccounts = array();
     public $SuspendedAsPerson;
+    public $SuspendedAsPersonUntil;
     public $LegalFormCode;
     public $OwnershipCode;
     public $UnReliability;
@@ -18,4 +19,6 @@ class PremiumCZResult extends DetailResult
     public $ProfitActual;
     public $Sales;
     public $Profit;
+    /** @var TurnoverCategoryResult|null */
+    public $TurnoverCategory;
 }

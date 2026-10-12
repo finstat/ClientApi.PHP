@@ -20,6 +20,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Detail\BasicResult.php" />
+    <Compile Include="Detail\ContactResult.php" />
+    <Compile Include="Detail\CreditScoreResult.php" />
+    <Compile Include="Detail\CreditScoreValueResult.php" />
+    <Compile Include="Detail\CzNaceResult.php" />
     <Compile Include="Detail\DetailResult.php" />
+    <Compile Include="Detail\EliteCZResult.php" />
+    <Compile Include="Detail\FiledClaimApplicationResult.php" />
+    <Compile Include="Detail\FiledInsolvencyClaimsResult.php" />
+    <Compile Include="Detail\IndicatorResult.php" />
+    <Compile Include="Detail\IndicatorValueResult.php" />
+    <Compile Include="Detail\IsirPartyResult.php" />
+    <Compile Include="Detail\IsirProceedingResult.php" />
+    <Compile Include="Detail\ORCRPersonResult.php" />
+    <Compile Include="Detail\OfficesResult.php" />
+    <Compile Include="Detail\PremiumCZResult.php" />
+    <Compile Include="Detail\RZPPersonResult.php" />
+    <Compile Include="Detail\ReceivableApplicationResult.php" />
+    <Compile Include="Detail\TurnoverCategoryResult.php" />
+    <Compile Include="Detail\UltimateCZResult.php" />
+    <Compile Include="Detail\VehicleFleetBrandResult.php" />
+    <Compile Include="Detail\VehicleFleetItemResult.php" />
+    <Compile Include="Detail\VehicleFleetResult.php" />
   </ItemGroup>
 </Project>
