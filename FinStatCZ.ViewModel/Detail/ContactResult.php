@@ -17,5 +17,4 @@ class ContactResult
 
     public $Contact;
     public $Type;
-    public $Sources = array();
 }

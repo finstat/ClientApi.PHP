@@ -33,7 +33,9 @@
     <Compile Include="Detail\IsirPartyResult.php" />
     <Compile Include="Detail\IsirProceedingResult.php" />
     <Compile Include="Detail\ORCRPersonResult.php" />
+    <Compile Include="Detail\OfficeItemResult.php" />
     <Compile Include="Detail\OfficesResult.php" />
+    <Compile Include="Detail\PersonFunctionResult.php" />
     <Compile Include="Detail\PremiumCZResult.php" />
     <Compile Include="Detail\RZPPersonResult.php" />
     <Compile Include="Detail\ReceivableApplicationResult.php" />

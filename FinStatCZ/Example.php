@@ -147,13 +147,14 @@ function echoBase($response, $json = false)
             echo '<b>Plátce DPH:</b> ' . htmlspecialchars($response->TaxPayer) . '<br />';
             echo '<b>Právní forma (kód):</b> ' . htmlspecialchars($response->LegalFormCode) . '<br />';
             echo '<b>Druh vlastnictví (kód):</b> ' . htmlspecialchars($response->OwnershipCode) . '<br />';
+            echo '<b>Počet zaměstnanců (kód):</b> ' . htmlspecialchars($response->EmployeeCode ?? '') . '<br />';
             echo '<b>Nespolehlivost:</b> ' . ($response->UnReliability ? "ano" : "nie") . '<br />';
             echo '<b>Registrace:</b> ' . htmlspecialchars($response->RegisterNumberText) . '<br />';
             echo '<b>Evidující úřad:</b> ' . htmlspecialchars($response->TradeLicensingOffice) . '<br />';
             echo '<b>Aktuální rok:</b> ' . htmlspecialchars($response->ActualYear) . '<br />';
-            echo '<b>Tržby:</b> ' . htmlspecialchars($response->Sales) . '<br />';
+            echo '<b>Tržby:</b> ' . htmlspecialchars($response->Sales ?? '') . '<br />';
             echo '<b>Tržby (aktuální):</b> ' . htmlspecialchars($response->SalesActual) . '<br />';
-            echo '<b>Zisk:</b> ' . htmlspecialchars($response->Profit) . '<br />';
+            echo '<b>Zisk:</b> ' . htmlspecialchars($response->Profit ?? '') . '<br />';
             echo '<b>Zisk (aktuální):</b> ' . htmlspecialchars($response->ProfitActual) . '<br />';
             echo '<b>Pozastavena živnost do:</b> ' . echoDate($response->SuspendedAsPersonUntil, $json) . '<br />';
             if (!empty($response->TurnoverCategory)) {
@@ -273,15 +274,16 @@ function echoYearSeries($series)
  */
 function echoEliteCZ($response, $json = false)
 {
+    echo '<b>Skupina DPH:</b> ' . (!empty($response->VatGroupMember) ? "ano" : "ne") . '<br />';
+
     if (!empty($response->Contacts)) {
         echo '<b>Kontakty:</b><br />';
         echo "<table style=\"margin-left: 20px;\">";
-        echo "<tr><th>Typ</th><th>Kontakt</th><th>Zdroje</th></tr>";
+        echo "<tr><th>Typ</th><th>Kontakt</th></tr>";
         foreach ($response->Contacts as $c) {
             echo "<tr>";
             echo "<td>" . htmlspecialchars($c->Type) . "</td>";
             echo "<td>" . htmlspecialchars($c->Contact) . "</td>";
-            echo "<td>" . htmlspecialchars(implode(', ', (array)$c->Sources)) . "</td>";
             echo "</tr>";
         }
         echo "</table><br />";
@@ -348,15 +350,15 @@ function echoEliteCZ($response, $json = false)
         foreach ($response->IsirProceedings as $p) {
             echo "<tr>";
             echo "<td><a href=\"" . htmlspecialchars($p->Url) . "\" target=\"_blank\">" . htmlspecialchars($p->FileReference) . "</a></td>";
-            echo "<td>" . htmlspecialchars($p->Court) . "</td>";
-            echo "<td>" . htmlspecialchars($p->Status) . "</td>";
+            echo "<td>" . htmlspecialchars($p->CourtName ?? '') . " (" . htmlspecialchars($p->Court ?? '') . ")</td>";
+            echo "<td>" . htmlspecialchars($p->StatusText ?? '') . " (" . htmlspecialchars($p->Status) . ")</td>";
             echo "<td>" . echoDate($p->FirstEvent, $json) . " / " . echoDate($p->LastEvent, $json) . "</td>";
             echo "<td>" . echoIsirParties($p->Debtors, $json) . "</td>";
             echo "</tr>";
             // UltimateCZ only
-            if ($p->Type !== null || $p->CreditorsCount !== null) {
+            if (isset($p->Type) || isset($p->CreditorsCount)) {
                 echo "<tr><td colspan=\"5\" style=\"padding-left: 30px;\">";
-                echo '<b>Typ:</b> ' . htmlspecialchars($p->Type) . ', <b>zahájeno:</b> ' . echoDate($p->StartDate, $json) . '<br />';
+                echo '<b>Typ:</b> ' . htmlspecialchars($p->TypeText ?? '') . ' (' . htmlspecialchars($p->Type ?? '') . '), <b>zahájeno:</b> ' . echoDate($p->StartDate, $json) . '<br />';
                 echo '<b>Správci:</b> ' . echoIsirParties($p->Officers, $json) . '<br />';
                 echo '<b>Věřitelé (' . htmlspecialchars($p->CreditorsCount) . '):</b> ' . echoIsirParties($p->Creditors, $json) . '<br />';
                 echo '<b>Výše přihlášených pohledávek:</b> ' . htmlspecialchars($p->AmountOfClaims) . '<br />';
@@ -394,7 +396,7 @@ function echoUltimateCZ($response, $json = false)
         foreach ($response->ORCRPersons as $p) {
             $functions = array();
             foreach ($p->Functions as $f) {
-                $functions[] = htmlspecialchars($f->Description ?: $f->Type) . ' od ' . echoDate($f->From, $json);
+                $functions[] = htmlspecialchars($f->Description ?: $f->TypeText) . ' (' . htmlspecialchars($f->Type) . ') od ' . echoDate($f->From, $json);
             }
             echo "<tr>";
             echo "<td>" . htmlspecialchars($p->FullName) . "</td>";

@@ -6,6 +6,6 @@ class OfficesResult
 {
     public $Count;
     // UltimateCZ only
-    /** @var \FinStat\ViewModel\Detail\OfficeResult[] */
+    /** @var OfficeItemResult[] */
     public $Items = array();
 }

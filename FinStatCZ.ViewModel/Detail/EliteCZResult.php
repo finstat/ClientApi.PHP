@@ -4,6 +4,8 @@ namespace FinStatCZ\ViewModel\Detail;
 
 class EliteCZResult extends PremiumCZResult
 {
+    // current VAT registration is a group registration (skupina DPH)
+    public $VatGroupMember;
     /** @var ContactResult[] */
     public $Contacts = array();
     /** @var CzNaceResult[] */

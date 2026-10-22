@@ -3,7 +3,6 @@ namespace FinStatCZ;
 
 use FinStat\Client\BaseFinstatApi;
 use FinStat\Client\ViewModel\Detail\BankAccount;
-use FinStat\ViewModel\Detail\OfficeResult;
 use FinStat\ViewModel\Detail\SubjectResult;
 use FinStatCZ\ViewModel\Detail\BasicResult;
 use FinStatCZ\ViewModel\Detail\DetailResult;
@@ -13,6 +12,7 @@ use FinStatCZ\ViewModel\Detail\EliteCZResult;
 use FinStatCZ\ViewModel\Detail\ContactResult;
 use FinStatCZ\ViewModel\Detail\CzNaceResult;
 use FinStatCZ\ViewModel\Detail\OfficesResult;
+use FinStatCZ\ViewModel\Detail\OfficeItemResult;
 use FinStatCZ\ViewModel\Detail\VehicleFleetResult;
 use FinStatCZ\ViewModel\Detail\VehicleFleetItemResult;
 use FinStatCZ\ViewModel\Detail\VehicleFleetBrandResult;
@@ -23,6 +23,7 @@ use FinStatCZ\ViewModel\Detail\IndicatorResult;
 use FinStatCZ\ViewModel\Detail\IndicatorValueResult;
 use FinStatCZ\ViewModel\Detail\UltimateCZResult;
 use FinStatCZ\ViewModel\Detail\ORCRPersonResult;
+use FinStatCZ\ViewModel\Detail\PersonFunctionResult;
 use FinStatCZ\ViewModel\Detail\RZPPersonResult;
 use FinStatCZ\ViewModel\Detail\CreditScoreResult;
 use FinStatCZ\ViewModel\Detail\CreditScoreValueResult;
@@ -152,6 +153,7 @@ class FinstatApi extends BaseFinstatApi
         }
         $response->LegalFormCode        = (string)$detail->LegalFormCode;
         $response->OwnershipCode        = (string)$detail->OwnershipCode;
+        $response->EmployeeCode         = (string)$detail->EmployeeCode;
         $response->UnReliability        = empty($detail->UnReliability) ? null : $this->parseBoolean($detail->UnReliability);
         $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
         $response->TradeLicensingOffice = (string)$detail->TradeLicensingOffice;
@@ -181,12 +183,12 @@ class FinstatApi extends BaseFinstatApi
 
         $response = ($response == null) ? new EliteCZResult() : $response;
         $response = $this->parsePremiumCZ($detail, $response);
+        $response->VatGroupMember = $this->parseBoolean($detail->VatGroupMember);
 
         $response->Contacts = $this->parseObjectArray($detail->Contacts, 'Contact', function($c) {
             $o = new ContactResult();
             $o->Contact = (string)$c->Contact;
             $o->Type    = (string)$c->Type;
-            $o->Sources = $this->parseStringArray($c->Sources);
             return $o;
         });
 
@@ -201,7 +203,7 @@ class FinstatApi extends BaseFinstatApi
             $o = new OfficesResult();
             $o->Count = (int)"{$detail->Offices->Count}";
             $o->Items = $this->parseObjectArray($detail->Offices->Items, 'Office', function($office) {
-                $oo = new OfficeResult();
+                $oo = new OfficeItemResult();
                 $oo = $this->parseAddress($office, $oo);
                 $oo->Name     = $this->parseNullableString($office->Name);
                 $oo->Type     = (string)$office->Type;
@@ -245,6 +247,15 @@ class FinstatApi extends BaseFinstatApi
 
         $response->ORCRPersons = $this->parseObjectArray($detail->ORCRPersons, 'ORCRPerson', function($person) {
             $o = $this->parsePerson($person, new ORCRPersonResult());
+            // CZ functions are <Function> elements with English codes, not the SK <FunctionAssigment>
+            $o->Functions = $this->parseObjectArray($person->Functions, 'Function', function($f) {
+                $of = new PersonFunctionResult();
+                $of->Type        = (string)$f->Type;
+                $of->TypeText    = (string)$f->TypeText;
+                $of->Description = (string)$f->Description;
+                $of->From        = $this->parseDate($f->From);
+                return $of;
+            });
             $o->DepositAmount           = $this->parseNullableFloat($person->DepositAmount);
             $o->PartnersSharePercentage = $this->parseNullableFloat($person->PartnersSharePercentage);
             $o->PaybackRange            = $this->parseNullableFloat($person->PaybackRange);
@@ -342,13 +353,16 @@ class FinstatApi extends BaseFinstatApi
         $o->FileReference  = (string)$p->FileReference;
         $o->Url            = (string)$p->Url;
         $o->Court          = $this->parseNullableString($p->Court);
+        $o->CourtName      = $this->parseNullableString($p->CourtName);
         $o->FirstEvent     = $this->parseDate($p->FirstEvent);
         $o->LastEvent      = $this->parseDate($p->LastEvent);
         $o->Status         = (string)$p->Status;
+        $o->StatusText     = (string)$p->StatusText;
         $o->Debtors        = $this->parseIsirParties($p->Debtors);
 
         // UltimateCZ only, the elements are missing in EliteCZ
         $o->Type           = $this->parseNullableString($p->Type);
+        $o->TypeText       = $this->parseNullableString($p->TypeText);
         $o->StartDate      = $this->parseDate($p->StartDate);
         $o->Officers       = $this->parseIsirParties($p->Officers);
         $o->CreditorsCount = $this->parseNullableInt($p->CreditorsCount);
