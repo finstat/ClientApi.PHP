@@ -17,6 +17,7 @@ class PremiumCZResult extends DetailResult
     public $UnReliability;
     public $RegisterNumberText;
     public $TradeLicensingOffice;
+    // PremiumCZ only; EliteCZ/UltimateCZ send the values per year in FinancialIndicators, these stay empty
     public $ActualYear;
     public $SalesActual;
     public $ProfitActual;

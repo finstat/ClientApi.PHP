@@ -151,11 +151,14 @@ function echoBase($response, $json = false)
             echo '<b>Nespolehlivost:</b> ' . ($response->UnReliability ? "ano" : "nie") . '<br />';
             echo '<b>Registrace:</b> ' . htmlspecialchars($response->RegisterNumberText) . '<br />';
             echo '<b>Evidující úřad:</b> ' . htmlspecialchars($response->TradeLicensingOffice) . '<br />';
-            echo '<b>Aktuální rok:</b> ' . htmlspecialchars($response->ActualYear) . '<br />';
+            // EliteCZ/UltimateCZ have the yearly values in FinancialIndicators instead
+            if (!($response instanceof \FinStatCZ\ViewModel\Detail\EliteCZResult)) {
+                echo '<b>Aktuální rok:</b> ' . htmlspecialchars($response->ActualYear ?? '') . '<br />';
+                echo '<b>Tržby (aktuální):</b> ' . htmlspecialchars($response->SalesActual ?? '') . '<br />';
+                echo '<b>Zisk (aktuální):</b> ' . htmlspecialchars($response->ProfitActual ?? '') . '<br />';
+            }
             echo '<b>Tržby:</b> ' . htmlspecialchars($response->Sales ?? '') . '<br />';
-            echo '<b>Tržby (aktuální):</b> ' . htmlspecialchars($response->SalesActual) . '<br />';
             echo '<b>Zisk:</b> ' . htmlspecialchars($response->Profit ?? '') . '<br />';
-            echo '<b>Zisk (aktuální):</b> ' . htmlspecialchars($response->ProfitActual) . '<br />';
             echo '<b>Pozastavena živnost do:</b> ' . echoDate($response->SuspendedAsPersonUntil, $json) . '<br />';
             if (!empty($response->TurnoverCategory)) {
                 echo '<b>Kategorie obratu:</b> ' . htmlspecialchars($response->TurnoverCategory->Text)

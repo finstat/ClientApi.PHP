@@ -157,7 +157,7 @@ class FinstatApi extends BaseFinstatApi
         $response->UnReliability        = empty($detail->UnReliability) ? null : $this->parseBoolean($detail->UnReliability);
         $response->RegisterNumberText   = (string)$detail->RegisterNumberText;
         $response->TradeLicensingOffice = (string)$detail->TradeLicensingOffice;
-        $response->ActualYear           = (int)"{$detail->ActualYear}";
+        $response->ActualYear           = $this->parseNullableInt($detail->ActualYear);
         $response->SalesActual          = $this->parseNullableFloat($detail->SalesActual);
         $response->ProfitActual         = $this->parseNullableFloat($detail->ProfitActual);
         $response->Sales                = (string)$detail->Sales;
