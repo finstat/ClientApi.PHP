@@ -6,9 +6,13 @@ This repository contains a PHP client for interacting with the Finstat API servi
 
 - Retrieve detailed company information by ICO (Company ID)
 - Search companies using autocomplete functionality
-- Monitor changes in company data
-- Access daily data diffs
+- Monitor changes in company data, and the proceedings of monitored companies
+- Financial statements and their template legends
+- Access daily data diffs and pre-generated reports
+- Bankruptcy, restructuring and distraint (CRE) searches
 - Support for both Slovak and Czech business registries
+
+Every class is loaded by Composer's autoloader (`vendor/autoload.php`); the examples below assume it is included.
 
 ## Installation
 
@@ -37,16 +41,10 @@ $json = false;                             // Set to true if you want the API to
 
 ```php
 <?php
-require_once(__DIR__ . '/../FinStatApi/FinstatApi.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/AutoCompleteResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BaseResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/BasicResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/DetailResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/ExtendedResult.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Detail/UltimateResult.php');
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Initialize the API client
-$api = new FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+$api = new FinStat\Api\FinstatApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
 
 // Get basic company information
 $ico = '35757442'; // Example company ICO
@@ -111,47 +109,76 @@ $autocompleteResults = $api->RequestAutoComplete('volkswagen', $json);
 
 ```php
 <?php
-require_once(__DIR__ . '/../FinStatApi/FinstatMonitoringApi.php');
-require_once(__DIR__ . '/../FinStat.Client/ViewModel/Monitoring/MonitoringReportResult.php');
+require_once __DIR__ . '/vendor/autoload.php';
 
-// Initialize the monitoring API client
-$api = new FinstatMonitoringApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+// Initialize the monitoring API client (works with the Czech API URL too)
+$api = new FinStat\Api\FinstatMonitoringApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+
+// Every call takes an optional monitoring category before $json; null uses the default one
+$category = null;
 
 // Add a company to monitoring by ICO
 $ico = '35757442';
-$success = $api->AddToMonitoring($ico, $json);
+$success = $api->AddToMonitoring($ico, $category, $json);
 
 // Add a date to monitoring
 $date = "1.1.1991";
-$success = $api->AddDateToMonitoring($date, $json);
+$success = $api->AddDateToMonitoring($date, $category, $json);
 
 // Get list of monitored ICOs
-$monitoredList = $api->MonitoringList($json);
+$monitoredList = $api->MonitoringList($category, $json);
 
 // Get list of monitored dates
-$monitoredDateList = $api->MonitoringDateList($json);
+$monitoredDateList = $api->MonitoringDateList($category, $json);
 
 // Remove a company from monitoring
-$success = $api->RemoveFromMonitoring($ico, $json);
+$success = $api->RemoveFromMonitoring($ico, $category, $json);
 
 // Remove a date from monitoring
-$success = $api->RemoveDateFromMonitoring($date, $json);
+$success = $api->RemoveDateFromMonitoring($date, $category, $json);
 
 // Get monitoring reports
-$reports = $api->MonitoringReport($json);
-$dateReports = $api->MonitoringDateReport($json);
+$reports = $api->MonitoringReport($category, $json);
+$dateReports = $api->MonitoringDateReport($category, $json);
+
+// Bankruptcy and restructuring proceedings of the monitored companies and dates (Slovak API)
+$proceedings = $api->MonitoringProceedings($json);
+$dateProceedings = $api->MonitoringDateProceedings($json);
+
+// Monitoring categories of the account (Czech API, or a Premium license on the Slovak one)
+$categories = $api->MonitoringCategories($json);
 ```
 
- Daily Diff API
+### Statement API
 
 ```php
 <?php
-require_once(__DIR__ . '/../FinStatApi/FinstatDailyDiffApi.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Diff/DailyDiff.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Diff/DailyDiffList.php');
+require_once __DIR__ . '/vendor/autoload.php';
+
+$api = new FinStat\Api\FinstatStatementApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+
+// Statements of a company, each with the templates it can be shown in
+$statements = $api->RequestStatements($ico, $json);
+
+// One statement in one template: Template2011v2, Template2014, Template2014micro, TemplateFinancial,
+// TemplateROPO or TemplateNujPU (the last two are non-profit: Expenses and Revenue instead of IncomeStatement)
+$statement = $api->RequestStatementDetail($ico, 2025, 'Template2014', $json);
+
+// Row names of a template, in the given language (default 'sk')
+$legend = $api->RequestStatementLegend('Template2014', 'sk', $json);
+```
+
+In XML mode templates are names. JSON sends them as the server's numbers: 1 Template2011v2,
+2 Template2014, 3 Template2014micro, 4 TemplateFinancial, 8 TemplateROPO, 9 TemplateNujPU.
+
+### Daily Diff API
+
+```php
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Initialize the daily diff API client
-$api = new FinstatDailyDiffApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+$api = new FinStat\Api\FinstatDailyDiffApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
 
 // Get list of available daily diffs
 $list = $api->RequestListOfDailyDiffs($json);
@@ -159,20 +186,37 @@ $list = $api->RequestListOfDailyDiffs($json);
 // Download a specific daily diff file
 $file = "example_file.zip";
 $data = $api->DownloadDailyDiffFile($file, $file);
+
+// The same for statements, statements in the 2014 template and Ultimate data:
+// FinstatDailyStatementDiffApi, FinstatDailyStatement2014DiffApi (each with RequestStatementLegend)
+// and FinstatDailyUltimateDiffApi
+```
+
+### Reporting API
+
+```php
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
+
+$api = new FinStat\Api\FinstatReportingApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+
+// Report topics, the reports of one topic, and one report file
+$topics = $api->RequestTopics($json);
+$reports = $api->RequestList($topics[0]->ID, $json);
+$data = $api->DownloadReportFile($reports[0]->FileName, 'report.xlsx');
 ```
 
 ### Bankruptcy and Restructuring API
 
 ```php
-require_once(__DIR__ . '/../FinStatApi/FinstatBankruptcyRestructuringApi.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/Deadline.php');
-require_once(__DIR__ . '/../FinStat.ViewModel/BankuptcyRestructuing/BankruptcyRestructuring.php');
+<?php
+require_once __DIR__ . '/vendor/autoload.php';
 
-// Initialize the daily diff API client
-$api = new FinstatBankruptcyRestructuringApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
+// Initialize the bankruptcy and restructuring API client
+$api = new FinStat\Api\FinstatBankruptcyRestructuringApi($apiUrl, $apiKey, $privateKey, $stationId, $stationName, $timeout);
 
-// Get list of person bankruptcy proceedings
-$list = $api->RequestPersonBankruptcyProceedings($name, $surname, $dateOfBirth, $json);
+// Get list of person bankruptcy proceedings ($dateOfBirth is a DateTime)
+$list = $api->RequestPersonBankruptcyProceedings($name, $surname, new DateTime('1975-03-12'), $json);
 
 // Get list of company bankruptcy and restructuring proceedings by ico
 $list = $api->RequestCompanyBankruptcyRestructuring($ico, null, $json);
