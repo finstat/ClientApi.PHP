@@ -11,7 +11,7 @@ class FinstatReportingApi extends AbstractFinstatApi
     public function RequestTopics($json = false)
     {
         $detail = $this->DoRequest("GetReportingTopics", array(), "reporting-topics", $json);
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
                 return $this->parseObjectArray($detail, 'ReportingTopic', function($element) {
                     $o = new ReportingTopic();
@@ -34,7 +34,7 @@ class FinstatReportingApi extends AbstractFinstatApi
             'topic' => $topic,
         ), "reporting-list|" . $topic, $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
                 return $this->parseObjectArray($detail, 'ReportOutput', function($element) {
                     $o = new ReportOutput();

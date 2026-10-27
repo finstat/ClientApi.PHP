@@ -13,7 +13,7 @@ class AbstractFinstatDailyDiffApi extends AbstractFinstatApi
     {
         $detail = $this->DoRequest($requestUrl, array(), null, $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
                 $result = new DailyDiffList();
                 $result->Version = (string) $detail->Version;
@@ -35,7 +35,7 @@ class AbstractFinstatDailyDiffApi extends AbstractFinstatApi
 
     protected function ParseDailyDiff($detail)
     {
-        if($detail != false) {
+        if ($detail !== false) {
             $result = new DailyDiff();
             $result->FileName = (string) $detail->FileName;
             $result->FileSize = (int) $detail->FileSize;

@@ -30,6 +30,7 @@ class Address
     public $StreetNumber;
     public $ZipCode;
     public $City;
+    public $District;
     public $Country;
     public $Region;
 }

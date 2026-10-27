@@ -22,7 +22,7 @@ class FinstatDailyStatementDiffApi extends AbstractFinstatDailyDiffApi
             'lang' => $lang,
         ), $lang, $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
                 $result = array();
                 foreach ($detail->KeyValue as $element) {

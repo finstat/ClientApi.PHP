@@ -2,12 +2,17 @@
 
 namespace FinStat\Api;
 
+use DateTime;
 use FinStat\Client\AbstractFinstatApi;
 use FinStat\Client\ViewModel\Monitoring\MonitoringReportResult;
 use FinStat\Client\ViewModel\Monitoring\MonitoringDateReportResult;
 use FinStat\Client\ViewModel\Monitoring\MonitoringCategory;
 use FinStat\ViewModel\Deadline;
-use FinStat\ViewModel\Monitoring\ProceedingResult;
+use FinStat\ViewModel\Monitoring\Address;
+use FinStat\ViewModel\Monitoring\AdministratorAddress;
+use FinStat\ViewModel\Monitoring\IssuedPerson;
+use FinStat\ViewModel\Monitoring\MonitoringProceedingResult;
+use FinStat\ViewModel\Monitoring\PersonAddress;
 
 class FinstatMonitoringApi extends AbstractFinstatApi
 {
@@ -81,6 +86,26 @@ class FinstatMonitoringApi extends AbstractFinstatApi
         return ($json) ? $detail : $this->parseMonitoringProceedings($detail);
     }
 
+    //
+    // The monitoring categories of the account (finstat.cz, or a Premium license on finstat.sk)
+    //
+    // Returns: MonitoringCategory[]
+    public function MonitoringCategories($json = false)
+    {
+        $detail = $this->DoRequest("MonitoringCategories", array(), "monitoringcategories", $json);
+
+        if ($json || $detail === false) {
+            return $detail;
+        }
+
+        return $this->parseObjectArray($detail, 'MonitoringCategory', function($element) {
+            $o = new MonitoringCategory();
+            $o->Category = (string)$element->Category;
+            $o->Name     = (string)$element->Name;
+            return $o;
+        });
+    }
+
     private function parseMonitoringList($detail)
     {
         if  ($detail === false) {
@@ -144,16 +169,16 @@ class FinstatMonitoringApi extends AbstractFinstatApi
         return $this->parseObjectArray($detail, 'ProceedingResult', function($element) {
             $o = new MonitoringProceedingResult();
             $o->DebtorsAddress = $this->parseObjectArray($element->DebtorsAddress, 'PersonAddress', function($address) {
-                return $this->parsePersonAddress($address);
+                return $this->parsePersonAddress($address, new PersonAddress());
             });
             $o->ProposersAddress = $this->parseObjectArray($element->ProposersAddress, 'PersonAddress', function($address) {
-                return $this->parsePersonAddress($address);
+                return $this->parsePersonAddress($address, new PersonAddress());
             });
             $o->AdministratorsAddress = $this->parseObjectArray($element->AdministratorsAddress, 'AdministratorAddress', function($address) {
                 return $this->parseAdministratorAddress($address);
             });
             if(!empty($element->CourtsAddress)) {
-                $o->CourtsAddress  = $this->parseFullAddress($element->CourtsAddress);
+                $o->CourtsAddress  = $this->parseFullAddress($element->CourtsAddress, new Address());
             }
             $o->ReferenceFileNumber     = (string)$element->ReferenceFileNumber;
             $o->Status                  = (string)$element->Status;
@@ -170,8 +195,8 @@ class FinstatMonitoringApi extends AbstractFinstatApi
 
             if(!empty($element->IssuedBy)) {
                 $p = new IssuedPerson();
-                $p->Name        = (string)$element->Name;
-                $p->Function    = (string)$element->Function;
+                $p->Name        = (string)$element->IssuedBy->Name;
+                $p->Function    = (string)$element->IssuedBy->Function;
                 $o->IssuedBy  = $p;
             }
 

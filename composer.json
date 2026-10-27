@@ -20,7 +20,14 @@
             "FinStat\\Api\\": "FinStatApi/",
             "FinStatCZ\\": "FinStatApiCZ/",
             "FinStatCZ\\ViewModel\\": "FinStatCZ.ViewModel/"
-        }
+        },
+        "classmap": [
+            "FinStat.Client/",
+            "FinStat.ViewModel/",
+            "FinStatApi/",
+            "FinStatApiCZ/",
+            "FinStatCZ.ViewModel/"
+        ]
     },
     "require": {
         "php": "^7.1 || ^8.0",

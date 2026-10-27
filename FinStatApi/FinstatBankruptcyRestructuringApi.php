@@ -17,7 +17,7 @@ class FinstatBankruptcyRestructuringApi extends AbstractFinstatApi
             'dateOfBirth' => $dateOfBirth->format('Y-m-d')
         ), $name . "|" . $surname . "|" . $dateOfBirth->format('Y-m-d'), $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
                 $result = [];
                 return $this->parseBankruptcyRestructuringList($detail);
@@ -36,7 +36,7 @@ class FinstatBankruptcyRestructuringApi extends AbstractFinstatApi
             'name' => $name,
         ), $ico . $name, $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
                 return $this->parseBankruptcyRestructuringList($detail);
             } else {

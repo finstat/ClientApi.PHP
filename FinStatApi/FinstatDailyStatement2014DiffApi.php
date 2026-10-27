@@ -25,36 +25,13 @@ class FinstatDailyStatement2014DiffApi extends AbstractFinstatDailyDiffApi
             'lang' => $lang,
         ), $lang, $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
                 $result =  new StatementLegendResult();
 
-                $result->Assets = array();
-                foreach ($detail->Assets as $element) {
-                    $o = new StatementLegendValue();
-                    $o->ReportRow = (string)$element->Row;
-                    $o->ReportSection = (string)$element->Section;
-                    $o->Name = (string)$element->Name;
-                    $result->Assets[] = $o;
-                }
-
-                $result->LiabilitiesAndEquity = array();
-                foreach ($detail->LiabilitiesAndEquity as $element) {
-                    $o = new StatementLegendValue();
-                    $o->ReportRow = (string)$element->Row;
-                    $o->ReportSection = (string)$element->Section;
-                    $o->Name = (string)$element->Name;
-                    $result->LiabilitiesAndEquity[] = $o;
-                }
-
-                $result->IncomeStatement = array();
-                foreach ($detail->IncomeStatement as $element) {
-                    $o = new StatementLegendValue();
-                    $o->ReportRow = (string)$element->Row;
-                    $o->ReportSection = (string)$element->Section;
-                    $o->Name = (string)$element->Name;
-                    $result->IncomeStatement[] = $o;
-                }
+                $result->Assets = $this->parseStatementLegendValues($detail->Assets);
+                $result->LiabilitiesAndEquity = $this->parseStatementLegendValues($detail->LiabilitiesAndEquity);
+                $result->IncomeStatement = $this->parseStatementLegendValues($detail->IncomeStatement);
 
                 return $result;
             } else {

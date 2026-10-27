@@ -6,6 +6,13 @@ use FinStat\Client\AbstractFinstatApi;
 use FinStat\ViewModel\KeyValue;
 use FinStat\ViewModel\Statement\StatementResult;
 use FinStat\ViewModel\Statement\StatementItem;
+use FinStat\ViewModel\Statement\StatementValue;
+use FinStat\ViewModel\Statement\AssetStatementValue;
+use FinStat\ViewModel\Statement\FinancialStatementValue;
+use FinStat\ViewModel\Statement\NonProfitStatementResult;
+use FinStat\ViewModel\Statement\StatementLegendResult;
+use FinStat\ViewModel\Statement\NonProfitStatementLegendResult;
+use FinStat\ViewModel\Statement\StatementLegendValue;
 
 class FinstatStatementApi extends AbstractFinstatApi
 {
@@ -15,7 +22,7 @@ class FinstatStatementApi extends AbstractFinstatApi
             'ico' => $ico,
         ), $ico, $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
                 $result = array();
                 foreach ($detail->StatementItem as $element) {
@@ -25,8 +32,8 @@ class FinstatStatementApi extends AbstractFinstatApi
                     $o->DateTo = $this->parseDate($element->DateTo);
                     $o->DatePublished = $this->parseDate($element->DatePublished);
                     $o->Templates =  array();
-                    if (!empty($detail->Templates)) {
-                        foreach ($detail->Templates->TemplateTypeEnum as $s) {
+                    if (!empty($element->Templates)) {
+                        foreach ($element->Templates->TemplateTypeEnum as $s) {
                             $o->Templates[] = (string)$s;
                         }
                     }
@@ -49,9 +56,9 @@ class FinstatStatementApi extends AbstractFinstatApi
             'template' => $template,
         ), $ico . "|" . $year, $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
-                $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateNujPU");
+                $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateROPO");
                 $result = $isNonProfit ? new NonProfitStatementResult() : new StatementResult();
 
                 $result->ICO = (string)$detail->ICO;
@@ -64,61 +71,28 @@ class FinstatStatementApi extends AbstractFinstatApi
                 $result->OriginalFormat = (string)$detail->OriginalFormat;
                 $result->Source = (string)$detail->Source;
 
-                $result->Assets = array();
-                foreach ($detail->Assets as $element) {
-                    $o = new AssetStatementValue();
-                    $o->Row    =  (string)$element->Row;
-                    $o->Section    =  (string)$element->Section;
-                    $o->Actual =  (float)$element->Actual;
-                    $o->Previous    =  (float)$element->Previous;
-                    $o->ActualBrutto =  (float)$element->ActualBrutto;
-                    $o->ActualCorrection    =  (float)$element->ActualCorrection;
-                    $result->Assets[] = $o;
-                }
-
-                $result->LiabilitiesAndEquity = array();
-                foreach ($detail->LiabilitiesAndEquity as $element) {
-                    $o = new StatementValue();
-                    $o->Row    =  (string)$element->Row;
-                    $o->Section    =  (string)$element->Section;
-                    $o->Actual =  (float)$element->Actual;
-                    $o->Previous    =  (float)$element->Previous;
-                    $result->LiabilitiesAndEquity[] = $o;
-                }
+                $result->Assets = $this->parseObjectArray($detail->Assets, 'AssetStatementValue', function ($element) {
+                    $o = $this->parseStatementValue($element, new AssetStatementValue());
+                    $o->ActualBrutto = $this->parseNullableFloat($element->ActualBrutto);
+                    $o->ActualCorrection = $this->parseNullableFloat($element->ActualCorrection);
+                    return $o;
+                });
+                $result->LiabilitiesAndEquity = $this->parseObjectArray($detail->LiabilitiesAndEquity, 'StatementValue', function ($element) {
+                    return $this->parseStatementValue($element, new StatementValue());
+                });
                 if ($isNonProfit) {
-                    $result->Expenses = array();
-                    foreach ($detail->Expenses as $element) {
-                        $o = new FinancialStatementValue();
-                        $o->Row    =  (string)$element->Row;
-                        $o->Section    =  (string)$element->Section;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
-                        $o->ActualMain =  (float)$element->ActualMain;
-                        $o->ActualCommercial    =  (float)$element->ActualCommercial;
-                        $result->Expenses[] = $o;
-                    }
-
-                    $result->Revenue = array();
-                    foreach ($detail->Revenue as $element) {
-                        $o = new FinancialStatementValue();
-                        $o->Row    =  (string)$element->Row;
-                        $o->Section    =  (string)$element->Section;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
-                        $o->ActualMain =  (float)$element->ActualMain;
-                        $o->ActualCommercial    =  (float)$element->ActualCommercial;
-                        $result->Revenue[] = $o;
-                    }
+                    $financial = function ($element) {
+                        $o = $this->parseStatementValue($element, new FinancialStatementValue());
+                        $o->ActualMain = $this->parseNullableFloat($element->ActualMain);
+                        $o->ActualCommercial = $this->parseNullableFloat($element->ActualCommercial);
+                        return $o;
+                    };
+                    $result->Expenses = $this->parseObjectArray($detail->Expenses, 'FinancialStatementValue', $financial);
+                    $result->Revenue = $this->parseObjectArray($detail->Revenue, 'FinancialStatementValue', $financial);
                 } else {
-                    $result->IncomeStatement = array();
-                    foreach ($detail->IncomeStatement as $element) {
-                        $o = new StatementValue();
-                        $o->Row    =  (string)$element->Row;
-                        $o->Section    =  (string)$element->Section;
-                        $o->Actual =  (float)$element->Actual;
-                        $o->Previous    =  (float)$element->Previous;
-                        $result->IncomeStatement[] = $o;
-                    }
+                    $result->IncomeStatement = $this->parseObjectArray($detail->IncomeStatement, 'StatementValue', function ($element) {
+                        return $this->parseStatementValue($element, new StatementValue());
+                    });
                 }
 
                 $result->PreviousAccountingPeriodFrom = $this->parseDate($detail->PreviousAccountingPeriodFrom);
@@ -140,56 +114,18 @@ class FinstatStatementApi extends AbstractFinstatApi
             'template' => $template
         ), $lang, $json);
 
-        if($detail != false) {
+        if ($detail !== false) {
             if(!$json) {
-                $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateNujPU");
+                $isNonProfit = ($template == "TemplateNujPU" || $template == "TemplateROPO");
                 $result = $isNonProfit ? new NonProfitStatementLegendResult() : new StatementLegendResult();
 
-                $result->Assets = array();
-                foreach ($detail->Assets as $element) {
-                    $o = new StatementLegendValue();
-                    $o->ReportRow = (string)$element->Row;
-                    $o->ReportSection = (string)$element->Section;
-                    $o->Name = (string)$element->Name;
-                    $result->Assets[] = $o;
-                }
-
-                $result->LiabilitiesAndEquity = array();
-                foreach ($detail->LiabilitiesAndEquity as $element) {
-                    $o = new StatementLegendValue();
-                    $o->ReportRow = (string)$element->Row;
-                    $o->ReportSection = (string)$element->Section;
-                    $o->Name = (string)$element->Name;
-                    $result->LiabilitiesAndEquity[] = $o;
-                }
-
+                $result->Assets = $this->parseStatementLegendValues($detail->Assets);
+                $result->LiabilitiesAndEquity = $this->parseStatementLegendValues($detail->LiabilitiesAndEquity);
                 if ($isNonProfit) {
-                    $result->Expenses = array();
-                    foreach ($detail->Expenses as $element) {
-                        $o = new StatementLegendValue();
-                        $o->ReportRow = (string)$element->Row;
-                        $o->ReportSection = (string)$element->Section;
-                        $o->Name = (string)$element->Name;
-                        $result->Expenses[] = $o;
-                    }
-
-                    $result->Revenue = array();
-                    foreach ($detail->Revenue as $element) {
-                        $o = new StatementLegendValue();
-                        $o->ReportRow = (string)$element->Row;
-                        $o->ReportSection = (string)$element->Section;
-                        $o->Name = (string)$element->Name;
-                        $result->Revenue[] = $o;
-                    }
+                    $result->Expenses = $this->parseStatementLegendValues($detail->Expenses);
+                    $result->Revenue = $this->parseStatementLegendValues($detail->Revenue);
                 } else {
-                    $result->IncomeStatement = array();
-                    foreach ($detail->IncomeStatement as $element) {
-                        $o = new StatementLegendValue();
-                        $o->ReportRow = (string)$element->Row;
-                        $o->ReportSection = (string)$element->Section;
-                        $o->Name = (string)$element->Name;
-                        $result->IncomeStatement[] = $o;
-                    }
+                    $result->IncomeStatement = $this->parseStatementLegendValues($detail->IncomeStatement);
                 }
 
                 return $result;
@@ -199,5 +135,14 @@ class FinstatStatementApi extends AbstractFinstatApi
         }
 
         return null;
+    }
+
+    private function parseStatementValue($element, StatementValue $o): StatementValue
+    {
+        $o->ReportRow = (string)$element->ReportRow;
+        $o->ReportSection = (string)$element->ReportSection;
+        $o->Actual = $this->parseNullableFloat($element->Actual);
+        $o->Previous = $this->parseNullableFloat($element->Previous);
+        return $o;
     }
 }

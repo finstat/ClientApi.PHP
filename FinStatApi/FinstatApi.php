@@ -95,7 +95,7 @@ class FinstatApi extends BaseFinstatApi
         $response->PaymentOrderWarning      = $this->parseBoolean($detail->PaymentOrderWarning);
         $response->PaymentOrderUrl          = (string)$detail->PaymentOrderUrl;
         $response->OrChange                 = $this->parseBoolean($detail->OrChange);
-        $response->OrChangeUrl              = (string)$detail->OrChangeURL;
+        $response->OrChangeUrl              = (string)$detail->OrChangeUrl;
         $response->SkNaceCode               = (string)$detail->SkNaceCode;
         $response->SkNaceText               = (string)$detail->SkNaceText;
         $response->SkNaceDivision           = (string)$detail->SkNaceDivision;

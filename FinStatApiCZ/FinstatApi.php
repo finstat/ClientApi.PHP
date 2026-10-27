@@ -400,14 +400,4 @@ class FinstatApi extends BaseFinstatApi
         $o->BirthDate = $this->parseDate($element->BirthDate);
         return $o;
     }
-
-    private function parseNullableFloat($element)
-    {
-        return empty($element) ? null : (float)"{$element}";
-    }
-
-    private function parseNullableInt($element)
-    {
-        return empty($element) ? null : (int)"{$element}";
-    }
 }

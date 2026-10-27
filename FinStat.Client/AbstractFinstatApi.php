@@ -21,12 +21,15 @@ use FinStat\Client\Exceptions\ParseException;
 use FinStat\Client\Exceptions\RateLimitExceededException;
 use FinStat\Client\Exceptions\RegisterUnavailableException;
 use FinStat\Client\Exceptions\UnauthorizedException;
+use FinStat\Client\ViewModel\AddressResult;
 use FinStat\Client\ViewModel\Limit;
 use FinStat\Client\ViewModel\Limits;
+use FinStat\Client\ViewModel\PersonAddressResult;
 use FinStat\ViewModel\Detail\FunctionResult;
 use FinStat\ViewModel\Detail\IcDphAdditionalResult;
 use FinStat\ViewModel\Detail\NamePartsResult;
 use FinStat\ViewModel\Detail\PersonResult;
+use FinStat\ViewModel\Statement\StatementLegendValue;
 
 class AbstractFinstatApi
 {
@@ -354,7 +357,7 @@ class AbstractFinstatApi
 
     protected function parseFullAddress($element, $object = null)
     {
-        $o = ($object != null) ? $object : new Address();
+        $o = ($object != null) ? $object : new AddressResult();
         $o = $this->parseAddress($element, $o);
         $o->Name            = (string)$element->Name;
         return $o;
@@ -455,6 +458,113 @@ class AbstractFinstatApi
         $result->RemoveListDetectedDate = $this->parseDate($icDphAdditional->RemoveListDetectedDate);
 
         return $result;
+    }
+
+    /**
+     * Parse XML string array element into PHP array
+     * Handles SimpleXMLElement objects containing <string> child elements
+     * 
+     * @param SimpleXMLElement|null $element The XML element containing string children
+     * @return array Array of strings, or empty array if element is empty
+     */
+    protected function parseStringArray($element): array
+    {
+        if (empty($element) || empty($element->string)) {
+            return array();
+        }
+        
+        $result = array();
+        foreach ($element->string as $s) {
+            $result[] = (string)$s;
+        }
+        return $result;
+    }
+
+    /**
+     * Parse XML object array element into PHP array using a parser callback
+     * Generic method for parsing collections of complex objects
+     * 
+     * @param SimpleXMLElement|null $element The XML element containing object children
+     * @param string $itemElementName Name of the child element (e.g., 'Debt', 'Company')
+     * @param callable $parser Callback function to parse each item: function($item) { return $parsed; }
+     * @return array Array of parsed objects, or empty array if element is empty
+     */
+    protected function parseObjectArray($element, string $itemElementName, callable $parser): array
+    {
+        if (empty($element)) {
+            return array();
+        }
+        
+        $result = array();
+        foreach ($element->{$itemElementName} as $item) {
+            $result[] = $parser($item);
+        }
+        return $result;
+    }
+
+    /**
+     * Parse boolean value from XML element
+     * 
+     * @param SimpleXMLElement|null $element The XML element
+     * @return bool True if element equals 'true', false otherwise
+     */
+    protected function parseBoolean($element): bool
+    {
+        return !empty($element) && (string)$element === 'true';
+    }
+
+    /**
+     * Parse nullable string from XML element
+     * 
+     * @param SimpleXMLElement|null $element The XML element
+     * @return string|null String value or null if empty
+     */
+    protected function parseNullableString($element): ?string
+    {
+        return !empty($element) ? (string)$element : null;
+    }
+
+    /**
+     * Parse nullable number from XML element
+     *
+     * An element sent as xsi:nil="true" carries an attribute, so empty() does not see it as empty; the text decides.
+     *
+     * @param SimpleXMLElement|null $element The XML element
+     * @return float|null Number, or null if the element is missing, empty or nil
+     */
+    protected function parseNullableFloat($element): ?float
+    {
+        $text = $element === null ? '' : trim((string)$element);
+        return $text === '' ? null : (float)$text;
+    }
+
+    /**
+     * Parse nullable integer from XML element
+     *
+     * @param SimpleXMLElement|null $element The XML element
+     * @return int|null Integer, or null if the element is missing, empty or nil
+     */
+    protected function parseNullableInt($element): ?int
+    {
+        $text = $element === null ? '' : trim((string)$element);
+        return $text === '' ? null : (int)$text;
+    }
+
+    /**
+     * Parse the rows of a statement legend section (<Assets>, <IncomeStatement>, …)
+     *
+     * @param SimpleXMLElement|null $section The section element holding <StatementLegendValue> rows
+     * @return StatementLegendValue[]
+     */
+    protected function parseStatementLegendValues($section): array
+    {
+        return $this->parseObjectArray($section, 'StatementLegendValue', function ($element) {
+            $o = new StatementLegendValue();
+            $o->ReportRow = (string)$element->ReportRow;
+            $o->ReportSection = (string)$element->ReportSection;
+            $o->Name = (string)$element->Name;
+            return $o;
+        });
     }
 
     protected function DownloadFile($requestUrl, $fileName, $exportPath)
