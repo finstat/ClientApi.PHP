@@ -42,6 +42,9 @@ $useJson = false;
 $testIco = '35757442';
 $testDate = '1.1.1991';
 
+// Monitoring category (see Example 6 for the account's categories); null uses the default one
+$category = null;
+
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
@@ -450,7 +453,7 @@ echo "<h1>📌 Example 1: Add Company to Monitoring</h1>";
 echo "<p><b>Endpoint:</b> AddToMonitoring('$testIco')</p>";
 
 try {
-    $result = $api->AddToMonitoring($testIco, $useJson);
+    $result = $api->AddToMonitoring($testIco, $category, $useJson);
     echo "<div class='success'>✓ Company added to monitoring: ICO $testIco</div>";
     echoLimitsSafe($api);
 } catch (NotFoundException $e) {
@@ -479,7 +482,7 @@ echo "<h1>📅 Example 2: Add Date to Monitoring</h1>";
 echo "<p><b>Endpoint:</b> AddDateToMonitoring('$testDate')</p>";
 
 try {
-    $result = $api->AddDateToMonitoring($testDate, $useJson);
+    $result = $api->AddDateToMonitoring($testDate, $category, $useJson);
     echo "<div class='success'>✓ Date added to monitoring: $testDate</div>";
     echoLimitsSafe($api);
 } catch (BadRequestException $e) {
@@ -502,7 +505,7 @@ echo "<h1>📋 Example 3: Get Monitoring Lists</h1>";
 
 echo "<h2>Companies Being Monitored:</h2>";
 try {
-    $list = $api->MonitoringList($useJson);
+    $list = $api->MonitoringList($category, $useJson);
     echoMonitoringList($list);
     echoLimitsSafe($api);
 } catch (FinstatException $e) {
@@ -512,7 +515,7 @@ try {
 
 echo "<h2>Dates Being Monitored:</h2>";
 try {
-    $list = $api->MonitoringDateList($useJson);
+    $list = $api->MonitoringDateList($category, $useJson);
     echoMonitoringList($list);
     echoLimitsSafe($api);
 } catch (FinstatException $e) {
@@ -529,7 +532,7 @@ echo "<h1>📊 Example 4: Get Monitoring Reports (Detected Changes)</h1>";
 
 echo "<h2>Company Changes Report:</h2>";
 try {
-    $report = $api->MonitoringReport($useJson);
+    $report = $api->MonitoringReport($category, $useJson);
     echoMonitoringReport($report, $useJson);
     echoLimitsSafe($api);
 } catch (FinstatException $e) {
@@ -539,7 +542,7 @@ try {
 
 echo "<h2>Date Changes Report:</h2>";
 try {
-    $report = $api->MonitoringDateReport($useJson);
+    $report = $api->MonitoringDateReport($category, $useJson);
     echoMonitoringReport($report, $useJson);
     echoLimitsSafe($api);
 } catch (FinstatException $e) {
@@ -556,7 +559,7 @@ echo "<h1>🗑 Example 5: Remove from Monitoring</h1>";
 
 echo "<h2>Remove Company:</h2>";
 try {
-    $result = $api->RemoveFromMonitoring($testIco, $useJson);
+    $result = $api->RemoveFromMonitoring($testIco, $category, $useJson);
     echo "<div class='success'>✓ Company removed from monitoring: ICO $testIco</div>";
     echoLimitsSafe($api);
 } catch (NotFoundException $e) {
@@ -572,8 +575,52 @@ try {
 
 echo "<h2>Remove Date:</h2>";
 try {
-    $result = $api->RemoveDateFromMonitoring($testDate, $useJson);
+    $result = $api->RemoveDateFromMonitoring($testDate, $category, $useJson);
     echo "<div class='success'>✓ Date removed from monitoring: $testDate</div>";
+    echoLimitsSafe($api);
+} catch (FinstatException $e) {
+    echoException($e);
+    echoLimitsSafe($api);
+}
+
+echo '<hr />';
+
+// ============================================
+// EXAMPLE 6: Proceedings and Categories
+// ============================================
+echo "<h1>⚖ Example 6: Proceedings and Categories</h1>";
+
+// Bankruptcy and restructuring proceedings of the monitored companies and dates (finstat.sk only)
+foreach (array('MonitoringProceedings' => 'Companies', 'MonitoringDateProceedings' => 'Dates') as $method => $title) {
+    echo "<h2>Proceedings - $title:</h2>";
+    try {
+        $proceedings = $api->$method($useJson);
+        $count = is_array($proceedings) ? count($proceedings) : 0;
+        echo "<p><b>Proceedings:</b> $count</p>";
+        if ($count > 0) {
+            echo "<ul>";
+            foreach (array_slice($proceedings, 0, 5) as $p) {
+                echo "<li>" . htmlspecialchars("{$p->ReferenceFileNumber} ({$p->Type}) ") . echoDate($p->PublishDate, $useJson)
+                    . " - <a href='" . htmlspecialchars($p->Url) . "'>" . htmlspecialchars((string)$p->Character) . "</a></li>";
+            }
+            echo "</ul>";
+        }
+        echoLimitsSafe($api);
+    } catch (FinstatException $e) {
+        echoException($e);
+        echoLimitsSafe($api);
+    }
+}
+
+// Categories of the account: finstat.cz, or a Premium license on finstat.sk
+echo "<h2>Monitoring Categories:</h2>";
+try {
+    $categories = $api->MonitoringCategories($useJson);
+    echo "<ul>";
+    foreach ((array)$categories as $c) {
+        echo "<li><b>" . htmlspecialchars($c->Category) . "</b>: " . htmlspecialchars($c->Name) . "</li>";
+    }
+    echo "</ul>";
     echoLimitsSafe($api);
 } catch (FinstatException $e) {
     echoException($e);
